@@ -1,8 +1,11 @@
+'use client';
+
 import {promises as fs} from 'fs';
 import {join} from 'path';
 import {evaluate, EvaluateOptions} from "@mdx-js/mdx";
 import * as runtime from 'react/jsx-runtime'
 import {contentDir} from "@/app/lib/paths";
+import {MDXProvider} from "@mdx-js/react";
 
 export function Planet() {
     return <span style={{color: 'tomato'}}>Pluto</span>
@@ -26,3 +29,13 @@ export default async function ProjectCard({source}): Promise<React.JSX.Element> 
     )
 
 }
+
+
+// <MDXProvider components={{
+//     Planet() {
+//         return <span style={{color: 'tomato'}}>Pluto</span>
+//     }
+// }}>
+//     <MDXContent />
+// </MDXProvider>
+// )

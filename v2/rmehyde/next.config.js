@@ -8,11 +8,18 @@
 //     pageExtensions: ['js', 'jsx', 'mdx']
 // })
 
-// fix for fail to resolve 'fs' from https://stackoverflow.com/a/70995196
 
-module.exports = {
+
+withMDX = require('@next/mdx')();
+
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
 
     webpack(config) {
+
+        // fix for fail to resolve 'fs' from https://stackoverflow.com/a/70995196
         config.resolve.fallback = {
 
             // if you miss it, all the other options in fallback, specified
@@ -23,19 +30,22 @@ module.exports = {
         };
 
         // MDX loader
-        config.module.rules.push({
-            test: /\.mdx$/,
-            use: [
-                {
-                    loader: '@mdx-js/loader',
-                    options: {
-                        remarkPlugins: [],
-                        rehypePlugins: [],
-                    },
-                },
-            ],
-        });
+        // config.module.rules.push({
+        //     test: /\.mdx$/,
+        //     use: [
+        //         {
+        //             loader: '@mdx-js/loader',
+        //             options: {
+        //                 remarkPlugins: [],
+        //                 rehypePlugins: [],
+        //             },
+        //         },
+        //     ],
+        // });
 
         return config;
     },
-};
+}
+
+
+module.exports = withMDX(nextConfig);
