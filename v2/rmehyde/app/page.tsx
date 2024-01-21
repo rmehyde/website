@@ -3,7 +3,6 @@ import ProjectCard from "@/app/ui/cards/project-card";
 
 import {promises as fs} from 'fs';
 
-import Example from '../content/example.mdx'
 import {contentDir} from "@/app/lib/paths";
 
 export default async function Home() {
@@ -17,7 +16,6 @@ export default async function Home() {
                     <ProjectCard key={project} source={project}/>
                 ))}
             </div>
-            <Example/>
         </main>
     )
 }
