@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -28,7 +30,9 @@ const config: Config = {
     }
   },
   plugins: [
-    //   expose colors as variables available to CSS e.g. globals.css, from https://gist.github.com/Merott/d2a19b32db07565e94f10d13d11a8574
+    // expose colors as variables available to CSS e.g. globals.css
+    //   from https://gist.github.com/Merott/d2a19b32db07565e94f10d13d11a8574
+
     function({ addBase, theme }) {
       function extractColorVars(colorObj, colorGroup = '') {
         return Object.keys(colorObj).reduce((vars, colorKey) => {
