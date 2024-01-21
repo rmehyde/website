@@ -1,21 +1,16 @@
 import React from "react";
-import ProjectCard from "@/app/ui/cards/project-card";
 
 import {promises as fs} from 'fs';
 
-import {contentDir} from "@/app/lib/paths";
+import {contentDir} from "@/app/lib/mdx-content";
+import MDXCards from "@/app/ui/cards/mdxcards";
 
 export default async function Home() {
-    const projectNames: string[] = await fs.readdir(contentDir)
-    console.log("names: ", projectNames)
+
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <div>
-                {projectNames.map((project) => (
-                    <ProjectCard key={project} source={project}/>
-                ))}
-            </div>
+        <main className="min-h-screen p-14">
+            <MDXCards contentDir={contentDir}/>
         </main>
     )
 }
