@@ -1,7 +1,5 @@
 # Reese M.E. Hyde's Personal Site
 
-Reese Hyde's personal website.
-
 As a software engineer I obviously overengineered this baby, as is a rite of passage for  personal sites.
 The site used to exist with its current content and design as manually-written HTML+CSS. That was great, the code 
 was totally readable and the complexity of the implementation nicely matched the actual project.
