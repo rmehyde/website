@@ -10,7 +10,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en">
         <body className="">
-        <header className="h-20 w-full text-3xl font-sans underline box-border pt-10 pl-10 pb-0 pr-0">
+        <header className="w-full text-2xl sm:text-3xl font-sans underline box-border pt-10 pl-10 pb-0 pr-0">
             Reese Hyde: Selected Projects
         </header>
         {children}
