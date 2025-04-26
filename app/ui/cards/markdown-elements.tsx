@@ -12,5 +12,5 @@ export function H1({ children }: {children: ReactNode}): React.JSX.Element {
 }
 
 export function Link(content: {href: string, children: ReactNode}): React.JSX.Element {
-    return (<a href={content.href} className="underline text-royalblue-400 visited:text-cobalt-700">{content.children}</a>)
+    return (<a href={content.href} target="_blank" className="underline text-royalblue-400 visited:text-cobalt-700">{content.children}</a>)
 }
