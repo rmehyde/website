@@ -1,1 +1,1 @@
-export const contentDir = "content"
+export const contentDir = "public/content"
