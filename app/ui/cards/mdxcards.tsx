@@ -1,79 +1,94 @@
-import {promises as fs} from 'fs';
-import {join} from 'path';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 
-import {evaluate, EvaluateOptions} from "@mdx-js/mdx";
+import { evaluate, EvaluateOptions } from "@mdx-js/mdx";
 import * as runtime from 'react/jsx-runtime'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkFrontmatter from 'remark-frontmatter'
+import yaml from 'yaml';
 
 import React from "react";
-import {H1, Link} from "@/app/ui/cards/markdown-elements";
+import { H1, Link } from "@/app/ui/cards/markdown-elements";
+import { MDXModule } from 'mdx/types';
 
+const Suffixes = [".mdx", ".md", ".yaml", ".yml"];
 
-const Suffixes = [".mdx", ".md"]
+type ParsedContent = {
+    priority: number;
+    mdxModule: MDXModule;
+};
 
-
-export async function MDXCard(key: string, fileContent: string): Promise<{priority: number, component: React.JSX.Element}> {
-    // mdx compile options
-    // @ts-ignore
+async function parseContentFile(filePath: string, filename: string): Promise<ParsedContent> {
     const evaluateOptions: EvaluateOptions = {
         ...runtime,
-        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter]
+        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+    };
+
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+
+    // for YAML files
+    if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
+        const parsed = yaml.parse(fileContent);
+        if (!parsed?.content || typeof parsed.priority !== 'number') {
+            throw new Error(`YAML file ${filename} must have 'priority' (number) and 'content' (string)`);
+        }
+        const mdxContent = await evaluate(parsed.content, evaluateOptions);
+        return {
+            priority: parsed.priority ?? 1000,
+            mdxModule: mdxContent,
+        };
     }
 
-    const mdxContent = (await evaluate(fileContent, evaluateOptions))
-
+    // For MDX/MD files
+    const mdxContent = await evaluate(fileContent, evaluateOptions);
     return {
-        // @ts-ignore
-        priority: mdxContent.frontmatter.priority,
-            component: (
-        <div key={key} className="bg-gray-100 font-sans text-base block box-content p-5 m-4 shadow-bold">
-            <mdxContent.default components={
-                // @ts-ignore
-                {h1: H1, a: Link}
-            }/>
-        </div>
-    )}
+        priority: mdxContent.frontmatter?.priority ?? 1000,
+        mdxModule: mdxContent,
+    };
 }
 
-export default async function MDXCards({contentDir}: {contentDir: string}): Promise<React.JSX.Element> {
-    // get all filesnames in contentDir that end with a valid suffix
-    const contentFilenames: string[] = (await fs.readdir(contentDir))
-        .filter(fname => Suffixes.some(suffix => fname.endsWith(suffix)))
+async function renderMDXCard(
+    key: string,
+    parsed: ParsedContent
+): Promise<{ priority: number; component: React.JSX.Element }> {
+    const priority = parsed.priority;
+    const mdxContent = parsed.mdxModule
+    return {
+        priority,
+        component: (
+            <div key={key} className="bg-gray-100 font-sans text-base block box-content p-5 m-4 shadow-bold">
+                {/* @ts-ignore */}
+                <mdxContent.default components={{ h1: H1, a: Link }} />
+            </div>
+        ),
+    };
+}
 
-    // parse all files
-    const componentsWithPriority: {priority: number, component: React.JSX.Element}[] = [];
+export default async function MDXCards({ contentDir }: { contentDir: string }): Promise<React.JSX.Element> {
+    const contentFilenames = (await fs.readdir(contentDir))
+        .filter(fname => Suffixes.some(suffix => fname.endsWith(suffix)));
+
+    const componentsWithPriority: { priority: number; component: React.JSX.Element }[] = [];
+
     await Promise.all(
         contentFilenames.map(async (filename) => {
-            // read file
-            const key= filename.substring(0, filename.indexOf("."))
-            const fileContent = await fs.readFile(join(contentDir, `${filename}`), 'utf-8');
+            const key = filename.substring(0, filename.lastIndexOf('.'));
+            const filePath = join(contentDir, filename);
 
-            // add object with priority and the parsed card
-            componentsWithPriority.push(
-                await MDXCard(key, fileContent)
-            )
+            const parsed = await parseContentFile(filePath, filename);
+            const rendered = await renderMDXCard(key, parsed);
+
+            componentsWithPriority.push(rendered);
         })
     );
 
-    // build cards into final component according to priority
     const cards = componentsWithPriority
-        .toSorted((a, b) => {
-            if (a.priority === undefined) {
-                return 1
-            } else if (b.priority === undefined) {
-                return -1
-            } else {
-                return a.priority - b.priority
-            }
-        })
-        .map(card => card.component)
+        .toSorted((a, b) => a.priority - b.priority)
+        .map(card => card.component);
 
     return (
         <div>
             {cards}
         </div>
-    )
+    );
 }
-
-
