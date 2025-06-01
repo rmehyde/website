@@ -1,76 +1,102 @@
-// app/contact/page.tsx
 "use client";
 
-import {useState, useRef} from "react";
+import {useState, useRef, useContext, useEffect} from "react";
+import {ContactContext} from "@/app/contact/contactContext";
 import {decryptContactInfo} from "./decrypt";
+
+// shadcn/ui components:
+import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog";
+
+// Lucide icons:
+import {Lock, Unlock} from "lucide-react";
+import clsx from "clsx";
 
 
 export default function ContactPage() {
+    const {contact, setContact} = useContext(ContactContext);
     const [password, setPassword] = useState("");
-    const [info, setInfo] = useState<{ email: string; phone: string } | null>(null);
     const [error, setError] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const [isShaking, setIsShaking] = useState(false);
+
     const passwordRef = useRef<HTMLInputElement>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleDecrypt = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        setInfo(null);
 
-        const rawPassword = passwordRef.current?.value.trim() || "";
+        const rawPwd = passwordRef.current?.value.trim() || "";
         try {
-            const decrypted = await decryptContactInfo(rawPassword);
-            setInfo(decrypted);
+            const decrypted = await decryptContactInfo(rawPwd);
+            setContact(decrypted);
+            setIsOpen(false); // close modal on success
         } catch {
             setError("Incorrect password, please try again.");
+            // trigger shake:
+            setIsShaking(true);
+            setTimeout(() => setIsShaking(false), 500); // matches CSS animation duration
         }
-    };
+    }
 
     return (
-        <div style={{maxWidth: 400, margin: "2rem auto", fontFamily: "sans-serif"}}>
-            {info ? (
-                <div>
-                    <h2>Contact Information</h2>
-                    <p>
-                        <strong>Email:</strong> {info.email}
-                    </p>
-                    <p>
-                        <strong>Phone:</strong> {info.phone}
-                    </p>
-                </div>
-            ) : (
-                <form onSubmit={handleSubmit}>
-                    <h2>Enter Password to View Contact</h2>
-                    <div style={{margin: "1rem 0"}}>
-                        <label style={{display: "block", marginBottom: "0.5rem"}}>
-                            Password:
-                        </label>
-                        <input
-                            type="password"
-                            ref={passwordRef}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            style={{
-                                width: "100%",
-                                padding: "0.5rem",
-                                fontSize: "1rem",
-                                boxSizing: "border-box",
-                            }}
-                            autoComplete="current-password"
-                        />
+        <div className="flex justify-center p-8">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                        Contact Info
+                        {contact.email.includes("*") ? (
+                            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <Lock className="h-5 w-5"/>
+                                    </Button>
+                                </DialogTrigger>
+
+                                <DialogContent className={clsx("sm:max-w-[400px]")}>
+                                    <div className={isShaking ? "animate-shake" : ""}>
+                                        <DialogHeader>
+                                            <DialogTitle>Unlock Contact Info</DialogTitle>
+                                        </DialogHeader>
+                                        <br/>
+                                        <form onSubmit={handleDecrypt} className="space-y-4">
+                                            <Input
+                                                type="password"
+                                                placeholder="Enter password"
+                                                ref={passwordRef}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                autoComplete="current-password"
+                                            />
+                                            {error && <p className="text-sm text-red-600">{error}</p>}
+
+                                            <DialogFooter>
+                                                <Button type="submit">Decrypt</Button>
+                                            </DialogFooter>
+                                        </form>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        ) : (
+                            <Button variant="ghost" size="icon" disabled>
+                                <Unlock className="h-5 w-5"/>
+                            </Button>
+                        )}
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-2">
+                    <div>
+                        <span className="font-medium">Email:</span> {contact.email}
                     </div>
-                    <button
-                        type="submit"
-                        style={{
-                            padding: "0.5rem 1rem",
-                            fontSize: "1rem",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Decrypt
-                    </button>
-                    {error && <p style={{color: "red", marginTop: "0.75rem"}}>{error}</p>}
-                </form>
-            )}
+                    <div>
+                        <span className="font-medium">Phone:</span> {contact.phone}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
+

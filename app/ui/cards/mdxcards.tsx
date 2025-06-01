@@ -23,10 +23,12 @@ type ParsedContent = {
 async function parseContentFile(filePath: string, filename: string): Promise<ParsedContent> {
     const evaluateOptions: EvaluateOptions = {
         ...runtime,
+        Fragment: React.Fragment,
         remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
     };
 
     const fileContent = await fs.readFile(filePath, 'utf-8');
+    // TODO: rip out all the now-irrelevant MDX stuff and build components directly from ContentSchema
 
     // for YAML files
     if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
@@ -43,6 +45,7 @@ async function parseContentFile(filePath: string, filename: string): Promise<Par
     // For MDX/MD files
     const mdxContent = await evaluate(fileContent, evaluateOptions);
     return {
+        // @ts-ignore
         priority: mdxContent.frontmatter?.priority ?? 1000,
         mdxModule: mdxContent,
     };

@@ -1,5 +1,6 @@
 import type {Metadata} from 'next'
 import './globals.css'
+import {ContactProvider} from "@/app/contact/contactContext";
 
 export const metadata: Metadata = {
     title: 'Reese M.E. Hyde',
@@ -13,7 +14,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <header className="w-full text-2xl sm:text-3xl font-sans underline box-border text-center sm:text-left sm:pl-10 pt-10 pb-0 pr-0">
             Reese Hyde: Selected Projects
         </header>
-        {children}
+        <ContactProvider>{children}</ContactProvider>
         </body>
         </html>
     )
