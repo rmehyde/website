@@ -5,6 +5,8 @@ import {contentToLatex, loadContent} from "@/app/lib/contentschema";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
+// TODO: bundle the files properly
+
 export default function GeneratePDFButton() {
     const [ready, setReady] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -67,11 +69,22 @@ export default function GeneratePDFButton() {
             // \setmainfont{Georgia}
 
             const latex = String.raw`
+\RequirePackage{latexrelease}[2020-02-02]
 \documentclass{article}
-\usepackage{hyperref}
-\usepackage{fontspec}
-\setmainfont{TeX Gyre Bonum}
-
+\usepackage[dvipsnames]{xcolor}
+\definecolor{Cobalt}{HTML}{0047AB}
+\usepackage{hyperref, fontspec, CharisSIL}
+\hypersetup{
+    colorlinks=true,
+    pdfhighlight=/N,
+    linkcolor=Cobalt,
+    urlcolor=Cobalt,
+    citecolor=Cobalt,
+}
+\usepackage{soul}
+\setul{0.3ex}{0.15ex}
+\setulcolor{Cobalt} 
+\newcommand*\uhref[2]{\href{#1}{\ul{#2}}}
 \begin{document}
 ${projectContent}
 \end{document}`;
@@ -86,6 +99,7 @@ ${projectContent}
 
             // Compile to .xdv
             const result = await engine.compileLaTeX();
+            console.log(result.log)
 
             // Access the DvipdfmxEngine from the global window object
 
@@ -106,6 +120,7 @@ ${projectContent}
 
             // Compile the .xdv file to generate the PDF
             const pdfResult = await converter.compilePDF();
+            console.log(pdfResult.log)
 
             // Create a Blob from the PDF result
             const pdfBlob = new Blob([pdfResult.pdf], {type: "application/pdf"});

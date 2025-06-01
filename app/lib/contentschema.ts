@@ -5,12 +5,12 @@ import { z } from "zod";
 const ContentType = z.enum(["project"]);
 
 const LinkSchema = z.object({
-        text: z.string(),
+        tag: z.string(),
         detail: z.string(),
         target: z.string(),
 })
 
-const ContentSchema = z.object(
+export const ContentSchema = z.object(
     {
         contentType: ContentType,
         title: z.string(),
@@ -21,11 +21,11 @@ const ContentSchema = z.object(
     }
 )
 
-// const ProjectSchema = ContentSchema.extend({
-//     contentType: z.literal(ContentType.enum.project),
-// })
+const ProjectSchema = ContentSchema.extend({
+    contentType: z.literal(ContentType.enum.project),
+})
 
-type Content = z.infer<typeof ContentSchema>;
+export type Content = z.infer<typeof ContentSchema>;
 
 // TODO: rather than fetching, bundle the YAML to prevent loads
 export async function loadContent(filePath: string): Promise<Content> {
@@ -56,13 +56,13 @@ export function escapeLatex(str: string): string {
 
 export function contentToLatex(content: Content): string {
         const linksLatex = content.links?.map(link => {
-                return `\\href{${link.target}}{${escapeLatex(link.detail)}}`;
+                return `\\uhref{${link.target}}{${escapeLatex(link.detail)}}`;
         }).join("\n") ?? "";
 
         return `
 \\section*{${content.title}}
-${escapeLatex(content.detail)}
-
+${escapeLatex(content.detail)}\n
+\\noindent
 ${linksLatex}
     `.trim();
 }

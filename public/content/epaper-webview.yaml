@@ -1,0 +1,12 @@
+contentType: project
+title: E-Paper Web Viewer
+priority: 20
+summary: E-Paper screen library with Python wrappers and webpage viewer
+detail:
+  A refactoring of the Waveshare IT8951 code to a simple C library for displaying images on Waveshare e-paper screens, 
+  wrapped in a Python interface. A web viewer is implemented using selenium to render dynamic webpages (e.g. Sunrise) 
+  on Waveshare e-paper screens.
+links:
+  - tag: repo
+    detail: Source on GitHub
+    target: https://github.com/rmehyde/IT8951

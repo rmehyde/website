@@ -1,0 +1,9 @@
+contentType: project
+title: NFL Game Log Scraper
+priority: 85
+summary: Web scraper for NFL game logs
+detail: A web scraper written in Python to extract NFL game log data from NFL.com.
+links:
+  - tag: repo
+    detail: Source on GitHub
+    target: https://github.com/rmehyde/nfl-scraper

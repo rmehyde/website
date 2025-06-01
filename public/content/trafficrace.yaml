@@ -1,0 +1,14 @@
+contentType: project
+title: Traffic Race VR
+priority: 55
+summary: Multiplayer Frogger-like VR game
+detail: A Google Cardboard mobile VR game in which players on a local network race each other across a highway.
+links:
+  - tag: apk
+    detail: Download the Android APK
+    # TODO: make secure once working
+    target: http://rmehyde.com/assets/trafficrace.apk
+  - tag: screenshots
+    detail: Check out some screenshots
+    # TODO: make secure once working
+    target: http://rmehyde.com/trafficracescreens.html

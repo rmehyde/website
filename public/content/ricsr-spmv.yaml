@@ -1,0 +1,12 @@
+contentType: project
+title: RiCSR SpMV
+priority: 30
+summary: Multi-GPU sparse matrix-vector multiplication CUDA implementation
+detail:
+  A research project exploring sparse matrix-vector multiplication using the novel Ribboned Compressed Sparse Row 
+  (RiCSR) data structure and accompanying CUDA computation implementation to exploit NVIDIA GPU architecture and scale 
+  across multiple devices.
+links:
+  - tag: repo
+    detail: Source on GitHub
+    target: https://github.com/rmehyde/ricsr-spmv

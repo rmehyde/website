@@ -1,16 +1,9 @@
 contentType: project
 title: Calendupe
-type: project
 priority: 5
 summary: Google Calendar event duplicator
 detail: A cloud program to automatically copy obfuscated events from one Google Calendar to another.
 links:
-  - text: repo
+  - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/calendupe
-# TODO: deprecate content
-content: |
-  # Calendupe
-  A cloud program to automatically copy obfuscated events from one Google Calendar to another.
-  
-  [Source on GitHub](https://github.com/rmehyde/calendupe)
