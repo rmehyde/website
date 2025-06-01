@@ -1,0 +1,15 @@
+contentType: project
+title: NYC Subway Map
+priority: 8
+summary: Google Calendar event duplicator
+detail:
+  An Android app containing a high-quality, no-frills offline map of the New York City subway system. No ads for a 
+  clean interface and vector graphics for that crispy zoom.
+links:
+  - tag: app
+    detail: App on the Google Play Store
+    target: https://play.google.com/store/apps/details?id=com.rmehyde.subwaymap
+  - tag: webpage
+    detail: View the map as a webpage
+    # TODO: make secure link once working
+    target: http://rmehyde.com/subwaymap.html

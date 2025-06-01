@@ -10,6 +10,8 @@ import yaml from 'yaml';
 import React from "react";
 import { H1, Link } from "@/app/ui/cards/markdown-elements";
 import { MDXModule } from 'mdx/types';
+import {ContentSchema} from "@/app/lib/contentschema";
+import {generateMarkdownFromContent} from "@/app/lib/yamltomdx";
 
 const Suffixes = [".mdx", ".md", ".yaml", ".yml"];
 
@@ -28,11 +30,10 @@ async function parseContentFile(filePath: string, filename: string): Promise<Par
 
     // for YAML files
     if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
-        const parsed = yaml.parse(fileContent);
-        if (!parsed?.content || typeof parsed.priority !== 'number') {
-            throw new Error(`YAML file ${filename} must have 'priority' (number) and 'content' (string)`);
-        }
-        const mdxContent = await evaluate(parsed.content, evaluateOptions);
+        const raw = yaml.parse(fileContent);
+        const parsed = ContentSchema.parse(raw); // validate with zod
+        const mdxString = generateMarkdownFromContent(parsed);
+        const mdxContent = await evaluate(mdxString, evaluateOptions);
         return {
             priority: parsed.priority ?? 1000,
             mdxModule: mdxContent,

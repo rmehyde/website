@@ -1,0 +1,11 @@
+contentType: project
+title: Parallel Merge Sort
+priority: 60
+summary: Parallelized merge sort implementation
+detail:
+  A parallelized implementation of the merge sort algorithm for sorting arrays in Java. This is an alternative to Java 
+  8's Arrays.parallelSort() function and provides a 40-100% speedup.
+links:
+  - tag: repo
+    detail: Source on GitHub
+    target: https://github.com/rmehyde/parallelmergesort
