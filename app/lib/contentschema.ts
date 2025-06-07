@@ -1,6 +1,5 @@
-import fs from "fs";
-import { parse as parseYaml } from "yaml";
-import { z } from "zod";
+import {parse as parseYaml} from "yaml";
+import {z} from "zod";
 
 const ContentType = z.enum(["project"]);
 
@@ -37,6 +36,15 @@ export async function loadContent(filePath: string): Promise<Content> {
 
         const parsed = parseYaml(rawYaml);
         return ContentSchema.parse(parsed);
+}
+
+// TODO: rather than fetching, bundle the templates to prevent loads
+export async function loadTemplate(filePath: string): Promise<string> {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+                throw new Error(`Failed to fetch template: ${response.status} ${response.statusText}`);
+        }
+        return await response.text()
 }
 
 export function escapeLatex(str: string): string {

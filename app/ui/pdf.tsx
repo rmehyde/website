@@ -1,7 +1,8 @@
 'use client';
 
 import {useState} from 'react';
-import {contentToLatex, loadContent} from "@/app/lib/contentschema";
+import mustache from 'mustache';
+import {contentToLatex, loadContent, loadTemplate} from "@/app/lib/contentschema";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
@@ -65,29 +66,8 @@ export default function GeneratePDFButton() {
             const parsedContent = await loadContent('/content/calendupe.yaml');
             const projectContent = contentToLatex(parsedContent);
 
-            // \usepackage{fontspec}
-            // \setmainfont{Georgia}
-
-            const latex = String.raw`
-\RequirePackage{latexrelease}[2020-02-02]
-\documentclass{article}
-\usepackage[dvipsnames]{xcolor}
-\definecolor{Cobalt}{HTML}{0047AB}
-\usepackage{hyperref, fontspec, CharisSIL}
-\hypersetup{
-    colorlinks=true,
-    pdfhighlight=/N,
-    linkcolor=Cobalt,
-    urlcolor=Cobalt,
-    citecolor=Cobalt,
-}
-\usepackage{soul}
-\setul{0.3ex}{0.15ex}
-\setulcolor{Cobalt} 
-\newcommand*\uhref[2]{\href{#1}{\ul{#2}}}
-\begin{document}
-${projectContent}
-\end{document}`;
+            const template = await loadTemplate("/templates/resume.tex.mustache")
+            const latex = mustache.render(template, { projectContent })
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
             // const url = URL.createObjectURL(pdfBlob);
