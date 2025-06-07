@@ -1,0 +1,20 @@
+\RequirePackage{latexrelease}[2020-02-02]
+\documentclass{article}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{Cobalt}{HTML}{0047AB}
+\usepackage{hyperref, fontspec, CharisSIL}
+\hypersetup{
+colorlinks=true,
+pdfhighlight=/N,
+linkcolor=Cobalt,
+urlcolor=Cobalt,
+citecolor=Cobalt,
+}
+\usepackage{soul}
+\setul{0.3ex}{0.15ex}
+\setulcolor{Cobalt}
+\newcommand*\uhref[2]{\href{#1}{\ul{#2}}}
+
+\begin{document}
+{{{projectContent}}}
+\end{document}
