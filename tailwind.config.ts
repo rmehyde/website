@@ -73,7 +73,7 @@ const config: Config = {
   	},
   	fontFamily: {
   		sans: [
-  			'Helvetica',
+			'var(--font-sans)',
   			'sans-serif'
   		]
   	}
