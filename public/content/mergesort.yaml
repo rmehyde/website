@@ -9,3 +9,5 @@ links:
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/parallelmergesort
+scores:
+  backend: 5

@@ -13,3 +13,5 @@ links:
     detail: Visit the site
     # TODO: make secure once working
     target: http://rmehyde.com/
+scores:
+  frontend: 5

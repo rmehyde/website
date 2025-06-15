@@ -10,3 +10,7 @@ links:
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/ricsr-spmv
+scores:
+  ml-eng: 5
+  backend: 3
+  data-eng: 1

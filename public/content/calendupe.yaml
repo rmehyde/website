@@ -7,3 +7,7 @@ links:
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/calendupe
+scores:
+  backend: 5
+  data-eng: 3
+  devops-infra: 3

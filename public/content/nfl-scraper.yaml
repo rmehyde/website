@@ -7,3 +7,5 @@ links:
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/nfl-scraper
+scores:
+  backend: 4

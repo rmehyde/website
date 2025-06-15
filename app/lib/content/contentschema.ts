@@ -1,5 +1,6 @@
 import {parse as parseYaml} from "yaml";
 import {z} from "zod";
+import {dimensionScoresSchema} from "@/app/lib/content/scoring";
 
 const ContentType = z.enum(["project"]);
 
@@ -18,6 +19,7 @@ export const ContentSchema = z.object(
         summary: z.string(),
         detail: z.string(),
         links: z.array(LinkSchema).optional(),
+        scores: dimensionScoresSchema,
     }
 )
 

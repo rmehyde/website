@@ -1,7 +1,7 @@
-import { promises as fs } from 'fs';
-import { join } from 'path';
+import {promises as fs} from 'fs';
+import {join} from 'path';
 
-import { evaluate, EvaluateOptions } from "@mdx-js/mdx";
+import {evaluate, EvaluateOptions} from "@mdx-js/mdx";
 import * as runtime from 'react/jsx-runtime'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import remarkFrontmatter from 'remark-frontmatter'
@@ -10,7 +10,7 @@ import yaml from 'yaml';
 import React from "react";
 import { H1, Link } from "@/app/ui/cards/markdown-elements";
 import { MDXModule } from 'mdx/types';
-import {ContentSchema} from "@/app/lib/contentschema";
+import {ContentSchema} from "@/app/lib/content/contentschema";
 import {generateMarkdownFromContent} from "@/app/lib/yamltomdx";
 
 const Suffixes = [".mdx", ".md", ".yaml", ".yml"];
@@ -62,13 +62,13 @@ async function renderMDXCard(
         component: (
             <div key={key} className="bg-gray-100 font-sans text-base block box-content p-5 m-4 shadow-bold">
                 {/* @ts-ignore */}
-                <mdxContent.default components={{ h1: H1, a: Link }} />
+                <mdxContent.default components={{h1: H1, a: Link}}/>
             </div>
         ),
     };
 }
 
-export default async function MDXCards({ contentDir }: { contentDir: string }): Promise<React.JSX.Element> {
+export default async function Mdxcards({ contentDir }: { contentDir: string }): Promise<React.JSX.Element> {
     const contentFilenames = (await fs.readdir(contentDir))
         .filter(fname => Suffixes.some(suffix => fname.endsWith(suffix)));
 

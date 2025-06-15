@@ -18,6 +18,12 @@ const nextConfig = {
             fs: false, // the solution
         };
 
+        // bundle yaml files
+        config.module.rules.push({
+            test: /\.ya?ml$/,
+            use: 'js-yaml-loader',
+        });
+
         return config;
     },
 }

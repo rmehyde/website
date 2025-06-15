@@ -1,5 +1,6 @@
 import {z} from "zod";
 
+export const maxScore = 5
 
 export const Dimension = z.enum(
     [
@@ -9,7 +10,7 @@ export const Dimension = z.enum(
         "leadership",
         "sales-eng",
         "frontend",
-        "devops",
+        "devops-infra",
         "backend",
         "data-eng",
     ]
@@ -23,16 +24,24 @@ export const dimensionLabels: Readonly<Record<Dimension, string>> = {
     "leadership": "Leadership",
     "sales-eng": "Sales Engineering",
     "frontend": "Frontend Engineering",
-    "devops": "DevOps",
+    "devops-infra": "DevOps & Infra Engineering",
     "backend": "Backend Engineering",
     "data-eng": "Data Engineering",
 };
 
 export const dimensionScoresSchema = z.object(
     Dimension.options.reduce((result, dim) => {
-        result[dim] = z.number().int().min(0).max(5).default(0)
+        result[dim] = z.number().int().min(0).max(maxScore).default(0)
         return result
     }, {} as Record<Dimension, z.ZodNumber>)
 )
-export type DimensionsScores = z.infer<typeof dimensionScoresSchema>;
+export type DimensionScores = z.infer<typeof dimensionScoresSchema>;
 
+// combine dimension preference scores with a content score
+export function scoreContent(weights: DimensionScores, contentScores: DimensionScores) {
+    return Object.fromEntries(
+        Object.entries(weights).map(
+            ([dim, dimScore]) => [ dim, dimScore - (maxScore - contentScores[dim]) ]
+        )
+    );
+}

@@ -7,3 +7,7 @@ links:
   - tag: repo
     detail: Source & Screenshot on GitHub
     target: https://github.com/rmehyde/sunrise
+scores:
+  frontend: 5
+  backend: 4
+  data-eng: 2

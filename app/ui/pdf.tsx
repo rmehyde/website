@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import mustache from 'mustache';
-import {contentToLatex, loadContent, loadTemplate} from "@/app/lib/contentschema";
+import {contentToLatex, loadContent, loadTemplate} from "@/app/lib/content/contentschema";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
