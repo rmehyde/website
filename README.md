@@ -8,7 +8,7 @@ It's now constructed in the following way:
 - Statically built NextJS site
 - Single page with a list of my projects
 - Each Project is defined as a file in `<project>.mdx`
-- These MDX files get built into [MDXCard components](./app/ui/cards/mdxcards.tsx) and rendered on the page
+- These MDX files get built into [MDXCard components](app/ui/cards/contentCards.tsx) and rendered on the page
 
 Updating content is now _slightly_ easier because I can just plop it in a new Markdown file without touching code. But 
 I did this mostly to learn about Next, TypeScript, React, and modern frontend development in general. I do have some 

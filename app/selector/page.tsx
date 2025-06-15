@@ -2,12 +2,12 @@
 
 import { RadialSelector } from '@/components/ui/radial';
 import { useState } from 'react';
-import {Dimension, dimensionLabels, dimensionScoresSchema} from "@/app/lib/content/scoring";
+import {Dimension, dimensionLabels, maxScore} from "@/app/lib/content/scoring";
 
 export default function RadialSelectorDemoPage() {
     // initialize each value to 0
     const [values, setValues] = useState<Record<string, number>>(
-        Dimension.options.reduce((acc, dim) => ({ ...acc, [dim]: 0 }), {})
+        Dimension.options.reduce((acc, dim) => ({ ...acc, [dim]: maxScore }), {})
     );
 
     // update state and log whenever a handle moves
