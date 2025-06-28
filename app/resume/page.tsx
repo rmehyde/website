@@ -1,10 +1,11 @@
 'use client'
 
-import {Dimension, dimensionLabels, maxScore} from '@/app/lib/content/scoring';
+import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
 import GeneratePDFButton from "@/app/ui/pdf";
 import {Card} from "@/components/ui/card";
+import ContentCards from "@/app/ui/cards/contentCards";
 
 export default function DynamicProjects() {
     // initialize weights to maxScore for each dimension
@@ -33,7 +34,7 @@ export default function DynamicProjects() {
                     className="relative"
                     style={{width: "fit-content", 'marginLeft': 'auto', 'marginRight': 'auto'}}
                 >
-                    <GeneratePDFButton/>
+                    <GeneratePDFButton weights={dimensionScoresSchema.parse(values)} />
                 </div>
             </Card>
         </main>

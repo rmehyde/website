@@ -10,7 +10,7 @@ import yaml from 'yaml';
 import React from "react";
 import { H1, Link } from "@/app/ui/cards/markdown-elements";
 import { MDXModule } from 'mdx/types';
-import {Schema} from "@/app/lib/content/schema";
+import {ContentSchema} from "@/app/lib/content/schema";
 import {generateMarkdownFromContent} from "@/app/lib/yamltomdx";
 
 const Suffixes = [".mdx", ".md", ".yaml", ".yml"];
@@ -33,7 +33,7 @@ async function parseContentFile(filePath: string, filename: string): Promise<Par
     // for YAML files
     if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
         const raw = yaml.parse(fileContent);
-        const parsed = Schema.parse(raw); // validate with zod
+        const parsed = ContentSchema.parse(raw); // validate with zod
         const mdxString = generateMarkdownFromContent(parsed);
         const mdxContent = await evaluate(mdxString, evaluateOptions);
         return {

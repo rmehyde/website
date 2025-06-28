@@ -5,11 +5,12 @@ import {dimensionScoresSchema} from "@/app/lib/content/scoring";
 
 const ContentType = z.enum(["project"]);
 
-const LinkSchema = z.object({
+export const LinkSchema = z.object({
     tag: z.string(),
     detail: z.string(),
     target: z.string(),
 })
+export type Link = z.infer<typeof LinkSchema>;
 
 const BaseContentSchema = z.object(
     {
@@ -26,12 +27,12 @@ const BaseContentSchema = z.object(
 export const ProjectSchema = BaseContentSchema.extend({
     contentType: z.literal(ContentType.enum.project),
 })
+export type Project = z.infer<typeof ProjectSchema>;
 
-export const Schema = z.discriminatedUnion(
+export const ContentSchema = z.discriminatedUnion(
     "contentType", [ProjectSchema]
 )
-
-export type Content = z.infer<typeof Schema>;
+export type Content = z.infer<typeof ContentSchema>;
 
 // TODO: rather than fetching, bundle the YAML to prevent loads
 export async function loadContent(filePath: string): Promise<Content> {
@@ -42,7 +43,7 @@ export async function loadContent(filePath: string): Promise<Content> {
     const rawYaml = await response.text();
 
     const parsed = parseYaml(rawYaml);
-    return Schema.parse(parsed);
+    return ContentSchema.parse(parsed);
 }
 
 

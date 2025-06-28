@@ -2,15 +2,16 @@
 
 import {useState} from 'react';
 import mustache from 'mustache';
-import {loadContent} from "@/app/lib/content/schema";
 import {Button} from "@/components/ui/button";
 import {contentToLatex, loadTemplate} from "@/app/lib/content/latex";
+import {DimensionScores} from "@/app/lib/content/scoring";
+import {filterAndSortContent} from "@/app/lib/content/load";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
 // TODO: bundle the files properly
 
-export default function GeneratePDFButton() {
+export default function GeneratePDFButton({ weights }: { weights: DimensionScores }) {
     const [ready, setReady] = useState(false);
     const [busy, setBusy] = useState(false);
 
@@ -65,11 +66,11 @@ export default function GeneratePDFButton() {
             const engine = new XeTeXEngine();
             await engine.loadEngine();  // Must load the wasm engine
 
-            const parsedContent = await loadContent('/content/calendupe.yaml');
-            const projectContent = contentToLatex(parsedContent);
-
+            const content = filterAndSortContent(weights)
+            const projectContent = content.map(c => contentToLatex(c)).join('\n');
             const template = await loadTemplate("/templates/resume.tex.mustache")
-            const latex = mustache.render(template, {projectContent})
+            const latex = mustache.render(template, {projectContent, email: "foo@bar.baz", phone: "512 555 1234"})
+            console.log(latex);
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
             // const url = URL.createObjectURL(pdfBlob);
