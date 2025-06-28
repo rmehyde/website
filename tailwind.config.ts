@@ -66,6 +66,7 @@ const config: Config = {
   			bold: '4px 4px 8px #919191'
   		},
   		borderRadius: {
+		    xl: 'calc(min(var(--radius) + .25rem, var(--radius) * 2))',
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'

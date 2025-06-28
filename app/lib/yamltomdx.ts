@@ -1,4 +1,4 @@
-import {Content} from "@/app/lib/content/contentschema";
+import {Content} from "@/app/lib/content/schema";
 
 
 export function generateMarkdownFromContent(data: Omit<Content, 'content'>): string {

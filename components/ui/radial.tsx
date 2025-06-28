@@ -28,7 +28,7 @@ function splitLines(text: string, maxLen: number): string[] {
     for (let i = 0; i < raw.length; i++) {
         if (/^[^A-Za-z0-9]+$/.test(raw[i]) && i + 1 < raw.length) {
             // symbol-only token → merge with next
-            words.push(raw[i] + " " + raw[i+1]);
+            words.push(raw[i] + " " + raw[i + 1]);
             i++;
         } else {
             words.push(raw[i]);
@@ -68,9 +68,9 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const svgRef = useRef<SVGSVGElement>(null);
 
     const dimensions = Object.keys(dimensionLabels);
-    const dimensionLabelLines: Record<string,string[]> = Object.fromEntries(
+    const dimensionLabelLines: Record<string, string[]> = Object.fromEntries(
         Object.entries(dimensionLabels).map(
-            ([key, label]) => [ key, splitLines(label, 17) ]
+            ([key, label]) => [key, splitLines(label, 17)]
         )
     );
     // total svg size includes extra space for labels
@@ -134,121 +134,119 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     };
 
     return (
-        <Card className="p-4 bg-card text-card-foreground">
-            <div
-                className="relative"
-                style={{width: total, height: total}}
+        <div
+            className="relative"
+            style={{width: total, height: total, 'marginLeft': 'auto', 'marginRight': 'auto'}}
+        >
+            <svg
+                ref={svgRef}
+                width={total}
+                height={total}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerLeave={onPointerUp}
             >
-                <svg
-                    ref={svgRef}
-                    width={total}
-                    height={total}
-                    onPointerMove={onPointerMove}
-                    onPointerUp={onPointerUp}
-                    onPointerLeave={onPointerUp}
-                >
-                    {/* axes */}
-                    {dimensions.map((dim, i) => {
-                        const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                        const x2 = cx + Math.cos(angle) * plotRadius;
-                        const y2 = cy + Math.sin(angle) * plotRadius;
-                        return (
-                            <line
-                                key={dim}
-                                x1={cx}
-                                y1={cy}
-                                x2={x2}
-                                y2={y2}
-                                stroke="hsl(var(--muted-foreground))"
-                                strokeWidth={1}
-                            />
-                        );
-                    })}
-
-                    {/* concentric integer-level circles */}
-                    {[...Array(max + 1).keys()].slice(0).map((lvl) => {
-                        const t = lvl / max;
-                        return (
-                            <circle
-                                key={lvl}
-                                cx={cx}
-                                cy={cy}
-                                r={innerR + (plotRadius - innerR) * t}
-                                fill="none"
-                                stroke="hsl(var(--muted-foreground))"
-                                strokeWidth={0.5}
-                            />
-                        );
-                    })}
-
-                    {/* connecting shape */}
-                    <g transform={`translate(${cx}, ${cy})`}>
-                        <path
-                            d={radialLineGen(dataPoints)!}
-                            fill="hsl(var(--primary) / 0.2)"
-                            stroke="hsl(var(--primary))"
-                            strokeWidth={2}
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                        />
-                    </g>
-
-                    {/* draggable handles */}
-                    {dimensions.map((dim, i) => {
-                        const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                        const v = Math.max(0, Math.min(values[dim] ?? 0, max));
-                        const r = innerR + (plotRadius - innerR) * (v / max);
-                        const ux = Math.cos(angle);
-                        const uy = Math.sin(angle);
-                        const hx = cx + ux * r;
-                        const hy = cy + uy * r;
-                        return (
-                            <circle
-                                key={dim}
-                                cx={hx}
-                                cy={hy}
-                                r={handleR}
-                                fill="hsl(var(--primary))"
-                                stroke="hsl(var(--primary-foreground))"
-                                strokeWidth={2}
-                                onPointerDown={onHandleDown(dim)}
-                                style={{cursor: "pointer"}}
-                            />
-                        );
-                    })}
-                </svg>
-                {/* plot labels */}
+                {/* axes */}
                 {dimensions.map((dim, i) => {
-                    // compute the same label anchor point you used before
-                    const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI/2;
-                    const lx = cx + Math.cos(angle) * (plotRadius + labelMargin * 0.8);
-                    const ly = cy + Math.sin(angle) * (plotRadius + labelMargin * 0.8);
-                    const tx = -50 + 50 * Math.cos(angle);
-                    const ty = -50 + 50 * Math.sin(angle);
-
+                    const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
+                    const x2 = cx + Math.cos(angle) * plotRadius;
+                    const y2 = cy + Math.sin(angle) * plotRadius;
                     return (
-                        <Label
+                        <line
                             key={dim}
-                            style={{
-                                position:  "absolute",
-                                left:      `${lx}px`,
-                                top:       `${ly}px`,
-                                transform: `translate(${tx}%, ${ty}%)`,
-                                textAlign: "center",
-                                whiteSpace: "nowrap",  // let <br/> drive line breaks
-                            }}
-                            className="text-xs font-medium"
-                        >
-                            {dimensionLabelLines[dim].map((line, idx) => (
-                                <React.Fragment key={idx}>
-                                    {line}
-                                    {idx < dimensionLabelLines[dim].length - 1 && <br />}
-                                </React.Fragment>
-                            ))}
-                        </Label>
+                            x1={cx}
+                            y1={cy}
+                            x2={x2}
+                            y2={y2}
+                            stroke="hsl(var(--muted-foreground))"
+                            strokeWidth={1}
+                        />
                     );
                 })}
-            </div>
-        </Card>
+
+                {/* concentric integer-level circles */}
+                {[...Array(max + 1).keys()].slice(0).map((lvl) => {
+                    const t = lvl / max;
+                    return (
+                        <circle
+                            key={lvl}
+                            cx={cx}
+                            cy={cy}
+                            r={innerR + (plotRadius - innerR) * t}
+                            fill="none"
+                            stroke="hsl(var(--muted-foreground))"
+                            strokeWidth={0.5}
+                        />
+                    );
+                })}
+
+                {/* connecting shape */}
+                <g transform={`translate(${cx}, ${cy})`}>
+                    <path
+                        d={radialLineGen(dataPoints)!}
+                        fill="hsl(var(--primary) / 0.2)"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                    />
+                </g>
+
+                {/* draggable handles */}
+                {dimensions.map((dim, i) => {
+                    const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
+                    const v = Math.max(0, Math.min(values[dim] ?? 0, max));
+                    const r = innerR + (plotRadius - innerR) * (v / max);
+                    const ux = Math.cos(angle);
+                    const uy = Math.sin(angle);
+                    const hx = cx + ux * r;
+                    const hy = cy + uy * r;
+                    return (
+                        <circle
+                            key={dim}
+                            cx={hx}
+                            cy={hy}
+                            r={handleR}
+                            fill="hsl(var(--primary))"
+                            stroke="hsl(var(--primary-foreground))"
+                            strokeWidth={2}
+                            onPointerDown={onHandleDown(dim)}
+                            style={{cursor: "pointer"}}
+                        />
+                    );
+                })}
+            </svg>
+            {/* plot labels */}
+            {dimensions.map((dim, i) => {
+                // compute the same label anchor point you used before
+                const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
+                const lx = cx + Math.cos(angle) * (plotRadius + labelMargin * 0.8);
+                const ly = cy + Math.sin(angle) * (plotRadius + labelMargin * 0.8);
+                const tx = -50 + 50 * Math.cos(angle);
+                const ty = -50 + 50 * Math.sin(angle);
+
+                return (
+                    <Label
+                        key={dim}
+                        style={{
+                            position: "absolute",
+                            left: `${lx}px`,
+                            top: `${ly}px`,
+                            transform: `translate(${tx}%, ${ty}%)`,
+                            textAlign: "center",
+                            whiteSpace: "nowrap",  // let <br/> drive line breaks
+                        }}
+                        className="text-xs font-medium"
+                    >
+                        {dimensionLabelLines[dim].map((line, idx) => (
+                            <React.Fragment key={idx}>
+                                {line}
+                                {idx < dimensionLabelLines[dim].length - 1 && <br/>}
+                            </React.Fragment>
+                        ))}
+                    </Label>
+                );
+            })}
+        </div>
     );
 };

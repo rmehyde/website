@@ -2,7 +2,9 @@
 
 import {useState} from 'react';
 import mustache from 'mustache';
-import {contentToLatex, loadContent, loadTemplate} from "@/app/lib/content/contentschema";
+import {loadContent} from "@/app/lib/content/schema";
+import {Button} from "@/components/ui/button";
+import {contentToLatex, loadTemplate} from "@/app/lib/content/latex";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
@@ -67,7 +69,7 @@ export default function GeneratePDFButton() {
             const projectContent = contentToLatex(parsedContent);
 
             const template = await loadTemplate("/templates/resume.tex.mustache")
-            const latex = mustache.render(template, { projectContent })
+            const latex = mustache.render(template, {projectContent})
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
             // const url = URL.createObjectURL(pdfBlob);
@@ -125,14 +127,11 @@ export default function GeneratePDFButton() {
     }
 
     return (
-        <button
+        <Button
             onClick={handleClick}
             disabled={busy}
-            className="rounded bg-blue-600 px-4 py-2 text-white disabled:bg-gray-400"
         >
-            {busy ? 'Compiling…'
-                : ready ? 'Generate PDF again'
-                    : 'Generate PDF'}
-        </button>
+            {busy ? 'Compiling…' : 'Generate PDF'}
+        </Button>
     );
 }
