@@ -1,10 +1,6 @@
 import React from "react";
 import {ReactNode} from "react";
 
-interface Props {
-    children: ReactNode
-}
-
 export function H1({ children }: {children: ReactNode}): React.JSX.Element {
     return (
         <h1 className={'text-xl pb-2'}>{children}</h1>

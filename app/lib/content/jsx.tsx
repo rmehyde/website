@@ -1,5 +1,5 @@
 import React from 'react'
-import {Content} from './contentschema'
+import {Content} from './schema'
 import {H1, Link} from "@/app/ui/cards/markdown-elements"; // wherever your Content type lives
 
 export function generateContentElements(
