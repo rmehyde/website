@@ -1,4 +1,11 @@
-import {Content} from "@/app/lib/content/schema";
+import {Content, Link} from "@/app/lib/content/schema";
+import {z} from "zod";
+
+enum Verbosity {
+    Concise = "Concise",
+    Standard = "Standard",
+    Verbose = "Verbose",
+}
 
 export function escapeLatex(str: string): string {
     return str
@@ -14,11 +21,33 @@ export function escapeLatex(str: string): string {
         .replace(/~/g, '\\~{}');
 }
 
-export function contentToLatex(content: Content): string {
-    const linksLatex = content.links?.map(link => {
-        return `\\uhref{${link.target}}{${escapeLatex(link.detail)}}`;
-    }).join("\n") ?? "";
+function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): string {
+    if (links === undefined || links.length === 0) {
+        console.log("no links", links)
+        return ""
+    }
+    switch (verbosity) {
+        case Verbosity.Concise:
+            const hyperlinks = links.map(link =>
+                `\\uhref{${link.target}}{(${escapeLatex(link.tag)})}`
+            ).join(', ')
+            return `\\textsuperscript{${hyperlinks}}`
+        case Verbosity.Standard:
+        case Verbosity.Verbose:
+            return links.map((link, i) => {
+                const label =
+                    i === 0
+                        ? link.detail
+                        : link.detail.charAt(0).toLowerCase() + link.detail.slice(1)
+                return `\\uhref{${link.target}}{${escapeLatex(label)}}`
+            }
+            ).join(" or ")
+    }
+}
 
+export function contentToLatex(content: Content): string {
+    const linksLatex = linksToLatex(content.links, Verbosity.Concise)
+    console.log(linksLatex)
     return `
 \\section*{${content.title}}
 ${escapeLatex(content.detail)}\n

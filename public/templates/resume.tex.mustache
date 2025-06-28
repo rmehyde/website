@@ -1,20 +1,85 @@
-\RequirePackage{latexrelease}[2020-02-02]
-\documentclass{article}
+{{! Set mustache delimiters }}
+{{=<% %>=}}
+
+% setup document class and margins
+\documentclass[11pt]{article}
+\usepackage[margin=0.75in]{geometry}
+
+% CharisSIL font
+\usepackage{CharisSIL}
+
+% tables for header
+\usepackage{tabularx, array, makecell, enumitem}
+
+% section heading style
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5ex}{0.5ex}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+
+% lists
+\setlist[itemize,2]{leftmargin=2.5em}
+% make bullets bigger?
+\pagestyle{empty}
+\setlist[itemize]{noitemsep, topsep=0pt, leftmargin=*,
+% label={\LARGE\textbullet}
+label={\tb}
+}
+
+% links
 \usepackage[dvipsnames]{xcolor}
 \definecolor{Cobalt}{HTML}{0047AB}
-\usepackage{hyperref, fontspec, CharisSIL}
+\usepackage[hidelinks]{hyperref}
 \hypersetup{
-colorlinks=true,
-pdfhighlight=/N,
-linkcolor=Cobalt,
-urlcolor=Cobalt,
-citecolor=Cobalt,
+    colorlinks=true,
+    pdfhighlight=/N,
+    linkcolor=Cobalt,
+    urlcolor=Cobalt,
+    citecolor=Cobalt,
 }
+% soul for underlining
 \usepackage{soul}
 \setul{0.3ex}{0.15ex}
 \setulcolor{Cobalt}
+% uhref is an underlined link
 \newcommand*\uhref[2]{\href{#1}{\ul{#2}}}
+% blkuhref is a black underlined link
+\newcommand{\blkuhref}[2]{%
+\begingroup
+\hypersetup{allcolors=black}% temporarily override every link color
+\href{#1}{#2}%
+\endgroup
+}
+
+% TODO: find a better arrow font
+% arrows since I don't like the ones in the default font
+\newcommand{\rightarr}{\mbox{\fontfamily{cmr}\selectfont{→}}}
+\newcommand{\tb}{\mbox{\fontfamily{cmr}\selectfont\textbullet}}
+\newcommand{\bulletspace}{\enspace \tb \enspace}
+
 
 \begin{document}
-{{{projectContent}}}
+
+% header: name and contact info
+% no indentation on this line; create a full-width box
+% in the body, right after \begin{document}:
+\noindent
+\begin{tabularx}{\textwidth}{
+>{\centering\arraybackslash}X   % left column, centered
+>{\centering\arraybackslash}X   % middle column, centered
+>{\centering\arraybackslash}X   % right column, centered
+}
+% left cell: wrap both lines in \makecell{…}
+\makecell{\small{Brooklyn, NY} \\
+\href{http://rmehyde.com}{\small{rmehyde.com}}}
+&
+% middle cell: just your name
+{\huge\textbf{Reese Hyde}}
+&
+% right cell: wrap email+phone in \makecell{…}
+\makecell{\href{mailto:resume@rmehyde.com}{\small{resume@rmehyde.com}} \\
+\small{(512) ***-****}}
+\end{tabularx}
+\vspace{1em}
+
+<%{projectContent}%>
 \end{document}

@@ -1,5 +1,5 @@
 import {DimensionScores, scoreContent} from "@/app/lib/content/scoring";
-import {Schema, Content} from "@/app/lib/content/schema";
+import {ContentSchema, Content} from "@/app/lib/content/schema";
 
 // load all .yaml/.yml content files as objects at build time
 const contentModules = (require as any).context(
@@ -21,7 +21,7 @@ export function filterAndSortContent(
         .map((key: string): ScoredContent => {
             const raw: string = contentModules(key) as string
             console.log(raw)
-            const parsed: Content = Schema.parse(raw)
+            const parsed: Content = ContentSchema.parse(raw)
             const contentScores: Record<string, number> = scoreContent(
                 weights,
                 parsed.scores
