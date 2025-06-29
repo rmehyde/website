@@ -31,6 +31,8 @@ export const dimensionLabels: Readonly<Record<Dimension, string>> = {
 
 export const dimensionScoresSchema = z.object(
     Dimension.options.reduce((result, dim) => {
+        // TODO: investigate
+        // @ts-ignore
         result[dim] = z.number().int().min(0).max(maxScore).default(0)
         return result
     }, {} as Record<Dimension, z.ZodNumber>)
@@ -41,7 +43,7 @@ export type DimensionScores = z.infer<typeof dimensionScoresSchema>;
 export function scoreContent(weights: DimensionScores, contentScores: DimensionScores) {
     return Object.fromEntries(
         Object.entries(weights).map(
-            ([dim, dimScore]) => [ dim, dimScore - (maxScore - contentScores[dim]) ]
+            ([dim, dimScore]) => [ dim, dimScore - (maxScore - contentScores[Dimension.parse(dim)]) ]
         )
     );
 }
