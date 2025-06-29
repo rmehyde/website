@@ -1,0 +1,13 @@
+contentType: oss
+title: CPython
+priority: 15
+summary: Standard Python implementation
+detail: Added support for source-specific multicast IGMPv3 socket options to the standard Python language implementation
+links:
+  - tag: pull reqs
+    detail: Pull Requests on GitHub
+    target: https://github.com/search?q=repo%3Apython%2Fcpython+is%3Apr+author%3Armehyde+author%3Areesehyde+&type=pullrequests
+scores:
+  backend: 5
+  devops-infra: 2
+  ml-eng: 1

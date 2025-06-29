@@ -3,7 +3,7 @@
 import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
-import GeneratePDFButton from "@/app/ui/pdf";
+import PDFComponent from "@/app/ui/pdf";
 import {Card} from "@/components/ui/card";
 import ContentCards from "@/app/ui/cards/contentCards";
 
@@ -30,11 +30,8 @@ export default function DynamicProjects() {
                     plotRadius={100}  // TODO: should be 75 on mobile
                 />
 
-                <div
-                    className="relative"
-                    style={{width: "fit-content", 'marginLeft': 'auto', 'marginRight': 'auto'}}
-                >
-                    <GeneratePDFButton weights={dimensionScoresSchema.parse(values)} />
+                <div className="relative" style={{'marginLeft': 'auto', 'marginRight': 'auto'}}>
+                    <PDFComponent weights={dimensionScoresSchema.parse(values)} />
                 </div>
             </Card>
         </main>

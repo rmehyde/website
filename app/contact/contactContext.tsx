@@ -12,6 +12,7 @@ const defaultMasked: ContactInfo = {
     phone: "(***) ***-****",
 };
 
+// TODO: we probably want something more persistent, this doesn't even survive page refreshes
 export const ContactContext = createContext<{
     contact: ContactInfo;
     setContact: (c: ContactInfo) => void;

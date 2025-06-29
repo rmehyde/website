@@ -3,7 +3,9 @@
 
 % setup document class and margins
 \documentclass[11pt]{article}
+% TODO: wtf my right margin is tiny tho??
 \usepackage[margin=0.75in]{geometry}
+%\usepackage{parskip}
 
 % CharisSIL font
 \usepackage{CharisSIL}
@@ -36,24 +38,33 @@ label={\tb}
     urlcolor=Cobalt,
     citecolor=Cobalt,
 }
+
+
 % soul for underlining
-\usepackage{soul}
-\setul{0.3ex}{0.15ex}
-\setulcolor{Cobalt}
+% \usepackage{soul}
+% \setul{0.3ex}{0.15ex}
+% \setulcolor{Cobalt}
+
+% ulem for underlining
+\usepackage[normalem]{ulem}
+\renewcommand\ULthickness{0.15ex}
+\renewcommand\ULdepth{.3ex}
+
+
 % uhref is an underlined link
-\newcommand*\uhref[2]{\href{#1}{\ul{#2}}}
+\newcommand*\uhref[2]{\href{#1}{\uline{#2}}}
 % blkuhref is a black underlined link
 \newcommand{\blkuhref}[2]{%
-\begingroup
-\hypersetup{allcolors=black}% temporarily override every link color
-\href{#1}{#2}%
-\endgroup
+    \begingroup
+    \hypersetup{allcolors=black}% temporarily override every link color
+    \uhref{#1}{#2}%
+    \endgroup
 }
 
 % TODO: find a better arrow font
 % arrows since I don't like the ones in the default font
 \newcommand{\rightarr}{\mbox{\fontfamily{cmr}\selectfont{→}}}
-\newcommand{\tb}{\mbox{\fontfamily{cmr}\selectfont\textbullet}}
+\newcommand{\tb}{\mbox{\fontfamily{cmr}\selectfont\LARGE{\textbullet}}}
 \newcommand{\bulletspace}{\enspace \tb \enspace}
 
 
@@ -70,16 +81,19 @@ label={\tb}
 }
 % left cell: wrap both lines in \makecell{…}
 \makecell{\small{Brooklyn, NY} \\
-\href{http://rmehyde.com}{\small{rmehyde.com}}}
+\blkuhref{http://rmehyde.com}{\small{rmehyde.com}}}
 &
 % middle cell: just your name
 {\huge\textbf{Reese Hyde}}
 &
 % right cell: wrap email+phone in \makecell{…}
-\makecell{\href{mailto:resume@rmehyde.com}{\small{resume@rmehyde.com}} \\
-\small{(512) ***-****}}
+\makecell{\blkuhref{mailto:<%email%>}{\small{<%email%>}} \\
+\small{<%phone%>}}
 \end{tabularx}
 \vspace{1em}
 
-<%{projectContent}%>
+<%#projectsOssContent%>
+\section*{\textsc{Projects \& Open-Source Contributions}}
+<%{projectsOssContent}%>
+<%/projectsOssContent%>
 \end{document}

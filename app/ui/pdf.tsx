@@ -1,19 +1,29 @@
 'use client';
 
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import mustache from 'mustache';
 import {Button} from "@/components/ui/button";
-import {contentToLatex, loadTemplate} from "@/app/lib/content/latex";
+import {
+    projectsToLatex,
+    loadTemplate,
+    baseContentToLatex,
+    projectsOssContent,
+    projectsOssToLatex
+} from "@/app/lib/content/latex";
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {filterAndSortContent} from "@/app/lib/content/load";
+import {filterAndSortContent, groupContentByType} from "@/app/lib/content/load";
+import {ContactContext} from "@/app/contact/contactContext";
+import {ContentTypeEnum} from "@/app/lib/content/schema";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
 // TODO: bundle the files properly
 
-export default function GeneratePDFButton({ weights }: { weights: DimensionScores }) {
+export default function PDFComponent({weights}: { weights: DimensionScores }) {
+    const {contact} = useContext(ContactContext);
     const [ready, setReady] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState("");
 
     function loadXeTeX(): Promise<void> {
         return new Promise((res, rej) => {
@@ -66,10 +76,11 @@ export default function GeneratePDFButton({ weights }: { weights: DimensionScore
             const engine = new XeTeXEngine();
             await engine.loadEngine();  // Must load the wasm engine
 
-            const content = filterAndSortContent(weights)
-            const projectContent = content.map(c => contentToLatex(c)).join('\n');
+            const allContent = filterAndSortContent(weights)
+            const contentByType = groupContentByType(allContent)
+            const projectsOssContent = projectsOssToLatex(contentByType);
             const template = await loadTemplate("/templates/resume.tex.mustache")
-            const latex = mustache.render(template, {projectContent, email: "foo@bar.baz", phone: "512 555 1234"})
+            const latex = mustache.render(template, {projectsOssContent, email: contact.email, phone: contact.phone})
             console.log(latex);
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
@@ -108,15 +119,22 @@ export default function GeneratePDFButton({ weights }: { weights: DimensionScore
             // Create a Blob from the PDF result
             const pdfBlob = new Blob([pdfResult.pdf], {type: "application/pdf"});
             const url = URL.createObjectURL(pdfBlob);
+            setPdfUrl(url)
 
-            // Trigger the download of the PDF
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'output.pdf';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // open PDF in a new tab
+            // const win = window.open(url, '_blank');
+            // if (win !== null) {
+            //     win.focus();
+            // }
+
+            // OR: trigger the download of the PDF
+            // const a = document.createElement('a');
+            // a.href = url;
+            // a.download = 'output.pdf';
+            // document.body.appendChild(a);
+            // a.click();
+            // document.body.removeChild(a);
+            // URL.revokeObjectURL(url);
 
             setReady(true);
         } catch (e) {
@@ -128,11 +146,20 @@ export default function GeneratePDFButton({ weights }: { weights: DimensionScore
     }
 
     return (
-        <Button
-            onClick={handleClick}
-            disabled={busy}
-        >
-            {busy ? 'Compiling…' : 'Generate PDF'}
-        </Button>
+        <div>
+            <div className="relative" style={{width: "fit-content", 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+                <Button
+                    onClick={handleClick}
+                    disabled={busy}
+                >
+                    {busy ? 'Compiling…' : 'Generate PDF'}
+                </Button>
+            </div>
+            <div className={"h-8 w-full"}/>
+            <object data={pdfUrl}
+                    type='application/pdf'
+                    width='100%' height='1000px'>
+            </object>
+        </div>
     );
 }
