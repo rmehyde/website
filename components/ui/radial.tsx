@@ -165,7 +165,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 })}
 
                 {/* concentric integer-level circles */}
-                {[...Array(max + 1).keys()].slice(0).map((lvl) => {
+                {Array.from({ length: max + 1 }, (_, lvl) => {
                     const t = lvl / max;
                     return (
                         <circle

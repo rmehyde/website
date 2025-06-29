@@ -3,17 +3,10 @@
 import {useContext, useState} from 'react';
 import mustache from 'mustache';
 import {Button} from "@/components/ui/button";
-import {
-    projectsToLatex,
-    loadTemplate,
-    baseContentToLatex,
-    projectsOssContent,
-    projectsOssToLatex
-} from "@/app/lib/content/latex";
+import {loadTemplate, projectsOssToLatex} from "@/app/lib/content/latex";
 import {DimensionScores} from "@/app/lib/content/scoring";
 import {filterAndSortContent, groupContentByType} from "@/app/lib/content/load";
 import {ContactContext} from "@/app/contact/contactContext";
-import {ContentTypeEnum} from "@/app/lib/content/schema";
 
 // TODO: switch to importing rather than script tag nonsense which works with these
 
