@@ -3,7 +3,8 @@ import {z} from "zod";
 import {dimensionScoresSchema} from "@/app/lib/content/scoring";
 
 
-const ContentType = z.enum(["project"]);
+export const ContentTypeEnum = z.enum(["project", "oss"]);
+export type ContentType = z.infer<typeof ContentTypeEnum>;
 
 export const LinkSchema = z.object({
     tag: z.string(),
@@ -12,9 +13,9 @@ export const LinkSchema = z.object({
 })
 export type Link = z.infer<typeof LinkSchema>;
 
-const BaseContentSchema = z.object(
+export const BaseContentSchema = z.object(
     {
-        contentType: ContentType,
+        contentType: ContentTypeEnum,
         title: z.string(),
         summary: z.string(),
         detail: z.string(),
@@ -23,27 +24,23 @@ const BaseContentSchema = z.object(
         scores: dimensionScoresSchema,
     }
 )
+export type BaseContent = z.infer<typeof BaseContentSchema>;
 
 export const ProjectSchema = BaseContentSchema.extend({
-    contentType: z.literal(ContentType.enum.project),
+    contentType: z.literal(ContentTypeEnum.enum.project),
 })
 export type Project = z.infer<typeof ProjectSchema>;
 
+export const OpenSourceSchema = BaseContentSchema.extend({
+    contentType: z.literal(ContentTypeEnum.enum.oss),
+})
+export type OpenSource = z.infer<typeof ProjectSchema>;
+
 export const ContentSchema = z.discriminatedUnion(
-    "contentType", [ProjectSchema]
+    "contentType", [ProjectSchema, OpenSourceSchema]
 )
 export type Content = z.infer<typeof ContentSchema>;
 
-// TODO: rather than fetching, bundle the YAML to prevent loads
-export async function loadContent(filePath: string): Promise<Content> {
-    const response = await fetch(filePath);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch YAML: ${response.status} ${response.statusText}`);
-    }
-    const rawYaml = await response.text();
-
-    const parsed = parseYaml(rawYaml);
-    return ContentSchema.parse(parsed);
-}
-
-
+export type ContentByType = {
+    [T in ContentType]: Extract<Content, { contentType: T }>[]
+};

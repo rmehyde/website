@@ -1,0 +1,14 @@
+contentType: oss
+title: SHAP
+priority: 35
+summary: Leading explainable AI library
+detail: Removed unnecessary dependency cap in leading explainable AI library to unblock modern dependencies
+links:
+  - tag: pull reqs
+    detail: Pull Requests on GitHub
+    target: https://github.com/search?q=repo%3Ashap%2Fshap+is%3Apr+author%3Armehyde+author%3Areesehyde+&type=pullrequests
+scores:
+  ml-eng: 5
+  ml-science: 3
+  devops-infra: 2
+  backend: 1

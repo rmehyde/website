@@ -1,5 +1,5 @@
 import {DimensionScores, scoreContent} from "@/app/lib/content/scoring";
-import {ContentSchema, Content} from "@/app/lib/content/schema";
+import {ContentSchema, Content, ContentByType, ContentTypeEnum} from "@/app/lib/content/schema";
 
 // load all .yaml/.yml content files as objects at build time
 const contentModules = (require as any).context(
@@ -37,4 +37,22 @@ export function filterAndSortContent(
         .filter((item: ScoredContent) => item.score > 0)
         .sort((a: ScoredContent, b: ScoredContent) => b.score - a.score)
         .map((item: ScoredContent) => item.content)
+}
+
+export function groupContentByType(content: Content[]): ContentByType {
+    // initiate empty array with each type
+    const result = Object.values(ContentTypeEnum.enum).reduce(
+        (acc, type) => {
+            acc[type] = [];
+            return acc;
+        },
+        {} as ContentByType
+    );
+
+    // fill in content for the correct type
+    for (const item of content) {
+        (result[item.contentType] as Array<typeof item>).push(item);
+    }
+
+    return result;
 }
