@@ -1,8 +1,7 @@
-import {BaseContent, Content, ContentByType, ContentTypeEnum, Link, Project} from "@/app/lib/content/schema";
-import {z} from "zod";
+import {BaseContent, Job, Link, Project} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
-enum Verbosity {
+export enum Verbosity {
     Concise = "Concise",
     Verbose = "Verbose",
 }
@@ -21,7 +20,7 @@ export function escapeLatex(str: string): string {
         .replace(/~/g, '\\~{}');
 }
 
-function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): string {
+export function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): string {
     if (links === undefined || links.length === 0) {
         console.log("no links", links)
         return ""
@@ -44,7 +43,7 @@ function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): string {
     }
 }
 
-function baseContentToLatex(
+export function baseContentToLatex(
     projects: BaseContent[],
     verbosity: Verbosity,
     includeLinks: boolean = true,
@@ -70,48 +69,41 @@ function baseContentToLatex(
     }
 }
 
-function projectsToLatex(
+export function projectsToLatex(
     projects: Project[],
     verbosity: Verbosity,
     maxProjects: number | null = null,
     includeLinks: boolean = true,
 ): string {
-    let suffix = ""
+    let suffix = "";
     if (maxProjects !== null && projects.length > maxProjects) {
         projects = projects.slice(0, maxProjects);
         // TODO: in the future it would be kinda cool if this took you to a projects page with the scores as
         //  the ones used to generate this resume
-        suffix = `\\bulletspace\n(\\& more at \\blkuhref{https://rmehyde.com/projects}{rmehyde.com})\n`
+        suffix = `\\bulletspace\n(\\& more at \\blkuhref{https://rmehyde.com/projects}{rmehyde.com})\n`;
     }
-    return baseContentToLatex(projects, verbosity, includeLinks) + suffix
+    return baseContentToLatex(projects, verbosity, includeLinks) + suffix;
 }
 
 
-// TODO: move to another module
-export function projectsOssToLatex(content: ContentByType) {
-    const projectsContent = projectsToLatex(
-        content[ContentTypeEnum.enum.project],
-        Verbosity.Concise,
-        3,
-        false,
-    );
-    const ossContent = baseContentToLatex(
-        content[ContentTypeEnum.enum.oss],
-        Verbosity.Concise,
-        true
-    );
-    const maybeSeparator = (projectsContent.length > 0 && ossContent.length > 0)
-        // TODO: the second vspace isn't doing anything?
-        ? dedent(String.raw`
-            \vspace{-.5em}
-            \par\noindent
-            \makebox[\linewidth][c]{\rule{0.25\linewidth}{0.75pt}}
-            \vspace{-1.25em}
-            \par\noindent
-            `)
-        : ""
-    console.log(projectsContent, ossContent)
-    return projectsContent + maybeSeparator + ossContent;
+function isoDateToString(isoDate: string): string {
+    const [year, month] = isoDate.split("-").map(Number);
+    const monthName = new Date(0, month - 1).toLocaleString("en", { month: "short" });
+    return `${monthName}. ${year}`;
+}
+
+
+export function jobToLatex(job: Job): string {
+    const rolesString = job.roles.join(" \\rightarr ");
+    const titleString = rolesString + ", " + job.company;
+    const startString = isoDateToString(job.start);
+    const endString = job.end ? isoDateToString(job.end) : "Present";
+    // TODO: space before em dash is larger than after
+    const locTimeString = `${job.location} \\textemdash~ {${startString}}\\textendash{${endString}}`;
+    // TODO: larger font, spacing
+    const header = `\\textbf{${titleString} \\hfill ${locTimeString}}`
+    const items = job.duties.map(duty => `  \\item ${escapeLatex(duty.summary)}`).join('\n');
+    return header + "\n\\begin{itemize}\n" + items + "\n\\end{itemize}";
 }
 
 

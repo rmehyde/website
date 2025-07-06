@@ -1,0 +1,45 @@
+contentType: job
+title: MLE @ Cash App
+summary: Machine Learning Engineer on Cash App's Identity ML team
+detail:
+  Work as Machine Learning Engineer on Cash App's Identity ML team at Block. Our mandate is to detect users who are 
+  misrepresenting their identity on Cash App, for example by using a stolen identity.
+company: Cash App (Block)
+roles:
+  - Machine Learning Engineer
+location: New York, NY
+start: "2023-10-01"
+priority: 5
+scores:
+  ml-eng: 5
+  ml-science: 2
+  data-analytics: 2
+  leadership: 3
+  devops-infra: 2
+  backend: 3
+  data-eng: 3
+duties:
+  # TODO: consider how much to add sub-duties
+  - title: Limits Model
+    contentType: duty
+    summary: Productionized send/receive/transfer limit model netting $2.1M additional annual profit
+    detail:
+      Collaborated with Machine Learning Modeler to bring experimental model to determine customer send/receive/transfer
+      limits into production, netting $2.1M additional annual profit
+    priority: 35
+    scores:
+      ml-eng: 5
+      ml-science: 1
+      data-analytics: 4
+      leadership: 2
+  - title: Suspension Migration
+    contentType: duty
+    summary: Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices
+    detail:
+      Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices, unblocking
+      expiration of costly data center contract
+    priority: 55
+    scores:
+      ml-eng: 5
+      backend: 5
+      data-eng: 4

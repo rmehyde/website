@@ -1,16 +1,44 @@
 'use client';
 
 import {useContext, useState} from 'react';
-import mustache from 'mustache';
 import {Button} from "@/components/ui/button";
-import {loadTemplate, projectsOssToLatex} from "@/app/lib/content/latex";
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {filterAndSortContent, groupContentByType} from "@/app/lib/content/load";
 import {ContactContext} from "@/app/contact/contactContext";
+import {generateResumeLatex} from "@/app/lib/content/resume";
 
-// TODO: switch to importing rather than script tag nonsense which works with these
+// TODO: switch to importing rather than script tag nonsense which works with these per here
+//  https://github.com/adamkaplan0/latextableviewer/blob/398a648679cad833ab56ed8a7d1fa2de60d4d0fc/src/features/latexCompilation/latexCompilation.js
 
-// TODO: bundle the files properly
+// TODO (not now): move these files to a proper lib location and ensure they're bundled correctly
+
+function loadXeTeX(): Promise<void> {
+    return new Promise((res, rej) => {
+        if ((window as any).XeTeXEngine) return res();  // already loaded?
+
+        const tag = document.createElement('script');
+        tag.src = '/lib/swiftlatex/XeTeXEngine.js';   // 👈 your public path
+        tag.async = true;
+        tag.onload = () => res();
+        tag.onerror = () => rej(new Error('failed to load XeTeXEngine.js'));
+        document.body.appendChild(tag);
+    });
+}
+
+function loadDvipdfm(): Promise<void> {
+    return new Promise((res, rej) => {
+        if ((window as any).DvipdfmxEngine) {
+            res();
+            return;
+        }
+
+        const tag = document.createElement('script');
+        tag.src = '/lib/swiftlatex/DvipdfmxEngine.js';   // 👈 your public path
+        tag.async = true;
+        tag.onload = () => res();
+        tag.onerror = () => rej(new Error('failed to load DvipdfmxEngine.js'));
+        document.body.appendChild(tag);
+    });
+}
 
 export default function PDFComponent({weights}: { weights: DimensionScores }) {
     const {contact} = useContext(ContactContext);
@@ -18,39 +46,14 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
     const [busy, setBusy] = useState(false);
     const [pdfUrl, setPdfUrl] = useState("");
 
-    function loadXeTeX(): Promise<void> {
-        return new Promise((res, rej) => {
-            if ((window as any).XeTeXEngine) return res();  // already loaded?
-
-            const tag = document.createElement('script');
-            tag.src = '/lib/swiftlatex/XeTeXEngine.js';   // 👈 your public path
-            tag.async = true;
-            tag.onload = () => res();
-            tag.onerror = () => rej(new Error('failed to load XeTeXEngine.js'));
-            document.body.appendChild(tag);
-        });
-    }
-
-    function loadDvipdfm(): Promise<void> {
-        return new Promise((res, rej) => {
-            if ((window as any).DvipdfmxEngine) {
-                res();
-                return;
-            }
-
-            const tag = document.createElement('script');
-            tag.src = '/lib/swiftlatex/DvipdfmxEngine.js';   // 👈 your public path
-            tag.async = true;
-            tag.onload = () => res();
-            tag.onerror = () => rej(new Error('failed to load DvipdfmxEngine.js'));
-            document.body.appendChild(tag);
-        });
-    }
-
-
     async function handleClick() {
+        // TODO: await ready
+
+        // TODO: cancel any previous
+
         setBusy(true);
         try {
+            // TODO: move all loading to global upfront state which sets 'ready' when done
             await loadXeTeX().then(() => {
                 console.log("loaded XeTeXEngine.js")
             });
@@ -69,12 +72,7 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
             const engine = new XeTeXEngine();
             await engine.loadEngine();  // Must load the wasm engine
 
-            const allContent = filterAndSortContent(weights)
-            const contentByType = groupContentByType(allContent)
-            const projectsOssContent = projectsOssToLatex(contentByType);
-            const template = await loadTemplate("/templates/resume.tex.mustache")
-            const latex = mustache.render(template, {projectsOssContent, email: contact.email, phone: contact.phone})
-            console.log(latex);
+            const latex = await generateResumeLatex(weights, contact);
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
             // const url = URL.createObjectURL(pdfBlob);
@@ -89,7 +87,6 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
             console.log(result.log)
 
             // Access the DvipdfmxEngine from the global window object
-
             const DvipdfmxEngine = (window as any).DvipdfmxEngine;
             const converter = new DvipdfmxEngine();
 
@@ -113,21 +110,6 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
             const pdfBlob = new Blob([pdfResult.pdf], {type: "application/pdf"});
             const url = URL.createObjectURL(pdfBlob);
             setPdfUrl(url)
-
-            // open PDF in a new tab
-            // const win = window.open(url, '_blank');
-            // if (win !== null) {
-            //     win.focus();
-            // }
-
-            // OR: trigger the download of the PDF
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.download = 'output.pdf';
-            // document.body.appendChild(a);
-            // a.click();
-            // document.body.removeChild(a);
-            // URL.revokeObjectURL(url);
 
             setReady(true);
         } catch (e) {
