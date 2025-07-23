@@ -5,9 +5,8 @@ import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
 import PDFComponent from "@/app/ui/pdf";
 import {Card} from "@/components/ui/card";
-import ContentCards from "@/app/ui/cards/contentCards";
 
-export default function DynamicProjects() {
+export default function DynamicResume() {
     // initialize weights to maxScore for each dimension
     const [values, setValues] = useState<Record<string, number>>(
         Dimension.options.reduce(
@@ -19,7 +18,7 @@ export default function DynamicProjects() {
     return (
         <main className="min-h-screen p-4 md:p-14">
             <Card className="p-4 bg-card text-card-foreground">
-                {/* TODO: fix scroll issue on mobile */}
+                {/* TODO: fix scroll issue on mobile (hooks into scrollbar after dragging one) */}
                 {/* radial selector drives the weights */}
                 <RadialSelector
                     dimensionLabels={dimensionLabels}
