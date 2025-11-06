@@ -94,7 +94,7 @@ function isoDateToString(isoDate: string): string {
 
 
 export function jobToLatex(job: Job): string {
-    const rolesString = job.roles.join(" \\rightarr ");
+    const rolesString = job.roles.join(" \\rightarr\\ ");
     const titleString = rolesString + ", " + job.company;
     const startString = isoDateToString(job.start);
     const endString = job.end ? isoDateToString(job.end) : "Present";
