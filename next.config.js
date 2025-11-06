@@ -24,30 +24,9 @@ const nextConfig = {
             use: 'js-yaml-loader',
         });
 
-        // wasem
-        config.experiments = {
-            asyncWebAssembly: true,
-            layers: true,
-        };
-
-        // 1. Tell Webpack to treat .wasm files as async WebAssembly modules
-        config.module.rules.push({
-            test: /\.wasm$/,
-            type: 'webassembly/async',
-        });
-
-        // 2. Force these wrapper & worker scripts to be parsed as JS,
-        //    not as static assets exporting only URLs
-        config.module.rules.push({
-            test: /(?:XeTeXEngine|DvipdfmxEngine|swiftlatexxetex|dvipdfmx)\.js$/,
-            type: 'javascript/auto',
-        });
-
-        // 3. Let you import .wasm without specifying the extension
-        config.resolve.extensions.push('.wasm');
-
         return config;
     },
 }
+
 
 module.exports = withMDX(nextConfig);
