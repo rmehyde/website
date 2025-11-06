@@ -2,6 +2,9 @@
 
 import {useContext, useState} from 'react';
 import {Button} from "@/components/ui/button";
+import {
+    loadTemplate, projectsOssToLatex,
+} from "@/app/lib/content/latex";
 import {DimensionScores} from "@/app/lib/content/scoring";
 import {ContactContext} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
