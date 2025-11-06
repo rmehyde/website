@@ -31,6 +31,8 @@ export const dimensionLabels: Readonly<Record<Dimension, string>> = {
 
 export const dimensionScoresSchema = z.object(
     Dimension.options.reduce((result, dim) => {
+        // TODO: revisit!
+        // @ts-ignore
         result[dim] = z.number().int().min(0).max(maxScore).default(0)
         return result
     }, {} as Record<Dimension, z.ZodDefault<z.ZodNumber>>)

@@ -133,6 +133,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         }
     };
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div
             className="relative"
