@@ -63,12 +63,16 @@ label={\tb}
 
 % TODO: find a better arrow font
 % arrows since I don't like the ones in the default font
-\newcommand{\rightarr}{\mbox{\fontfamily{cmr}\selectfont{→}}}
-\newcommand{\tb}{\mbox{\fontfamily{cmr}\selectfont\LARGE{\textbullet}}}
-\newcommand{\bulletspace}{\enspace \tb \enspace}
+%\newcommand{\rightarr}{{{\fontfamily{cmr}\selectfont →}}}
+\newcommand{\rightarr}{→}
+\newcommand{\tb}{{{\fontfamily{cmr}\selectfont\LARGE\textbullet}}}
+\newcommand{\bulletspace}{\space\tb\allowbreak\space}
 
 
 \begin{document}
+% sloppy can be used to fix spacing quite nicely
+%%  however one way it achieves this is through ruthless hyp-henation, in the middle of words
+% \sloppy
 
 % header: name and contact info
 % no indentation on this line; create a full-width box
