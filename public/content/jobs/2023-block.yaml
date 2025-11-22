@@ -1,12 +1,12 @@
 contentType: job
-title: MLE @ Cash App
+title: MLE @ Block
 summary: Machine Learning Engineer on Cash App's Identity ML team
 detail:
   Work as Machine Learning Engineer on Cash App's Identity ML team at Block. Our mandate is to detect users who are 
   misrepresenting their identity on Cash App, for example by using a stolen identity.
-company: Cash App (Block)
+company: Block
 roles:
-  - Applied MLE
+  - Applied MLE (Cash App)
   - ML Platform Engineer
 location: New York, NY
 start: "2023-10-01"
