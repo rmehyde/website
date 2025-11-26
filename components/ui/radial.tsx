@@ -16,6 +16,7 @@ type RadialSelectorProps = {
     max: number;
     levels: number; // number of concentric integer steps
     onChange: (newValues: Record<string, number>) => void;
+    onComplete?: (finalValues: Record<string, number>) => void;
     plotRadius?: number;
     minRadiusRatio?: number;
     labelMargin?: number;
@@ -60,6 +61,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   values,
                                                                   max,
                                                                   onChange,
+                                                                  onComplete,
                                                                   plotRadius = 150,
                                                                   minRadiusRatio = 0.1,
                                                                   labelMargin = 20,
@@ -130,6 +132,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         if (activeDim) {
             e.currentTarget.releasePointerCapture(e.pointerId);
             setActiveDim(null);
+            // Call onComplete with final values when user releases
+            onComplete?.(values);
         }
     };
 

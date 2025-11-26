@@ -1,4 +1,4 @@
-import {BaseContent, Job, Link, Project} from "@/app/lib/content/schema";
+import {BaseContent, Duty, Job, Link, Project} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
 export enum Verbosity {
@@ -93,6 +93,16 @@ function isoDateToString(isoDate: string): string {
 }
 
 
+function jobDutyToLatex(duty: Duty): string {
+    const lines = [`  \\item ${escapeLatex(duty.summary)} ` + linksToLatex(duty.links, Verbosity.Concise)]
+    if (duty.subduties.length > 0) {
+        lines.push("\\begin{itemize}")
+        lines.push(...duty.subduties.map(jobDutyToLatex));
+        lines.push("\\end{itemize}")
+    }
+    return lines.join('\n');
+}
+
 export function jobToLatex(job: Job): string {
     const rolesString = job.roles.join(" \\rightarr\\ ");
     const titleString = rolesString + ", " + job.company;
@@ -102,7 +112,7 @@ export function jobToLatex(job: Job): string {
     const locTimeString = `${job.location} \\textemdash~ {${startString}}\\textendash{${endString}}`;
     // TODO: larger font, spacing
     const header = `\\textbf{${titleString} \\hfill ${locTimeString}}`
-    const items = job.duties.map(duty => `  \\item ${escapeLatex(duty.summary)}`).join('\n');
+    const items = job.duties.map(jobDutyToLatex).join('\n');
     return header + "\n\\begin{itemize}\n" + items + "\n\\end{itemize}";
 }
 

@@ -1,0 +1,58 @@
+contentType: job
+title: MLE @ Dstillery
+summary: Machine Learning Engineer at Dstillery
+detail:
+  TODO
+company: Dstillery
+roles:
+  - Software Engineer
+  - ML Engineer
+location: New York, NY
+start: "2018-10-01"
+end: "2020-10-01"
+priority: 45
+scores:
+  ml-eng: 5
+  ml-science: 3
+  data-analytics: 1
+  backend: 5
+  data-eng: 4
+  frontend: 1
+duties:
+  - title: Productionized ML Models
+    contentType: duty
+    summary: Worked with Data Scientists to productionize ML models and novel algorithms
+    detail:
+      TODO
+    priority: 15
+    scores:
+      ml-eng: 5
+      ml-science: 3
+  - title: Built Spark ETLs
+    contentType: duty
+    summary: Created and optimized Spark jobs to run analysis and ETL operations against peta-scale data
+    detail:
+      TODO
+    priority: 20
+    scores:
+      data-analytics: 4
+      data-eng: 5
+  - title: Built Firehose Event Ingestion
+    contentType: duty
+    summary: Designed and implemented data ingestion pipeline that processes 100 billion daily events
+    detail:
+      TODO
+    priority: 25
+    scores:
+      data-analytics: 5
+      data-eng: 5
+  - title: Java Profiler Visualization
+    contentType: duty
+    summary: Created interactive profiler data visualizer to analyze and optimize Java program performance
+    detail:
+      TODO
+    priority: 20
+    scores:
+      data-analytics: 5
+      frontend: 4
+      backend: 4

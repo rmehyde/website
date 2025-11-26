@@ -30,7 +30,7 @@ duties:
     priority: 7
     scores:
       ml-eng: 5
-      ml-science: 3
+      ml-science: 2
       leadership: 5
   - title: Mentored Junior Engineers
     contentType: duty
@@ -39,9 +39,9 @@ duties:
       Mentored ML engineers, ML researchers, software engineers, and sales engineers across the company.
     priority: 68
     scores:
-      ml-eng: 3
-      backend: 3
-      ml-science: 2
+      ml-eng: 2
+      backend: 2
+      ml-science: 1
       leadership: 4
   - title: Built Internal ML Platform
     contentType: duty
