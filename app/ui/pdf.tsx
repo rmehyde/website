@@ -1,16 +1,11 @@
 'use client';
 
-import {useContext, useState} from 'react';
-import {Button} from "@/components/ui/button";
-import {
-    loadTemplate, projectsOssToLatex,
-} from "@/app/lib/content/latex";
+import React, {useContext, useState, useRef, useCallback, useEffect} from 'react';
 import {DimensionScores} from "@/app/lib/content/scoring";
 import {ContactContext} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
 
-// TODO: switch to importing rather than script tag nonsense which works with these per here
-//  https://github.com/adamkaplan0/latextableviewer/blob/398a648679cad833ab56ed8a7d1fa2de60d4d0fc/src/features/latexCompilation/latexCompilation.js
+// TODO: needs error handling! should show error to user if failed
 
 // TODO (not now): move these files to a proper lib location and ensure they're bundled correctly
 
@@ -43,18 +38,21 @@ function loadDvipdfm(): Promise<void> {
     });
 }
 
-export default function PDFComponent({weights}: { weights: DimensionScores }) {
+type RenderState = 'idle' | 'rendering' | 'pending';
+
+export default function PDFComponent({onWeightsComplete}: {
+    onWeightsComplete?: (callback: (weights: DimensionScores) => void) => void;
+}) {
     const {contact} = useContext(ContactContext);
-    const [ready, setReady] = useState(false);
-    const [busy, setBusy] = useState(false);
+    const [renderState, setRenderState] = useState<RenderState>('idle');
     const [pdfUrl, setPdfUrl] = useState("");
+    const pendingWeightsRef = useRef<DimensionScores | null>(null);
 
-    async function handleClick() {
-        // TODO: await ready
-
-        // TODO: cancel any previous
-
-        setBusy(true);
+    const renderPDF = useCallback(async (weightsToRender: DimensionScores) => {
+        setRenderState('rendering');
+        
+        // Clear any pending render since we're starting fresh
+        pendingWeightsRef.current = null;
         try {
             // TODO: move all loading to global upfront state which sets 'ready' when done
             await loadXeTeX().then(() => {
@@ -75,7 +73,7 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
             const engine = new XeTeXEngine();
             await engine.loadEngine();  // Must load the wasm engine
 
-            const latex = await generateResumeLatex(weights, contact);
+            const latex = await generateResumeLatex(weightsToRender, contact);
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
             // const url = URL.createObjectURL(pdfBlob);
@@ -114,30 +112,65 @@ export default function PDFComponent({weights}: { weights: DimensionScores }) {
             const url = URL.createObjectURL(pdfBlob);
             setPdfUrl(url)
 
-            setReady(true);
         } catch (e) {
             console.error('LaTeX compile failed:', e);
             alert('Failed – see console.');
         } finally {
-            setBusy(false);
+            // Check if there's a pending render to start
+            const pendingWeights = pendingWeightsRef.current;
+            if (pendingWeights) {
+                // Clear the pending weights and start new render
+                pendingWeightsRef.current = null;
+                setRenderState('pending');
+                // Use setTimeout to avoid immediate recursion
+                setTimeout(() => renderPDF(pendingWeights), 0);
+            } else {
+                setRenderState('idle');
+            }
         }
-    }
+    }, [contact]);
+
+    // Function to trigger render (from button or weight changes)
+    const triggerRender = useCallback((weightsToRender: DimensionScores) => {
+        if (renderState === 'idle') {
+            renderPDF(weightsToRender);
+        } else {
+            // Queue these weights for after current render
+            pendingWeightsRef.current = weightsToRender;
+            if (renderState === 'rendering') {
+                setRenderState('pending');
+            }
+        }
+    }, [renderState, renderPDF]);
+    
+    // Register triggerRender with parent on mount (only once)
+    const hasRegisteredRef = useRef(false);
+    useEffect(() => {
+        if (!hasRegisteredRef.current && onWeightsComplete) {
+            onWeightsComplete(triggerRender);
+            hasRegisteredRef.current = true;
+        }
+    }, [onWeightsComplete]); // Remove triggerRender from deps to prevent re-registration
+
 
     return (
         <div>
-            <div className="relative" style={{width: "fit-content", 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                <Button
-                    onClick={handleClick}
-                    disabled={busy}
-                >
-                    {busy ? 'Compiling…' : 'Generate PDF'}
-                </Button>
+            <div className="relative">
+                <object data={pdfUrl}
+                        type='application/pdf'
+                        width='100%' height='1000px'>
+                </object>
+                {renderState !== 'idle' && (
+                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
+                        <div className="bg-card p-4 rounded-lg shadow-lg border flex items-center space-x-3">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                            <span className="text-sm font-medium">
+                                {'Generating PDF...'}
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
-            <div className={"h-8 w-full"}/>
-            <object data={pdfUrl}
-                    type='application/pdf'
-                    width='100%' height='1000px'>
-            </object>
         </div>
     );
 }

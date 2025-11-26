@@ -46,11 +46,12 @@ export type OpenSource = z.infer<typeof ProjectSchema>;
 export const DutySchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.duty),
     // TODO: add a projects matcher/exclusion
+    //   I think this means excluding things from being listed in both Projects and Duties? wrote it awhile ago
     get subduties(): ZodArray<ZodTypeAny>{
         return z.array(DutySchema).default([])
     }
 });
-type Duty = z.infer<typeof DutySchema>;
+export type Duty = z.infer<typeof DutySchema>;
 
 export const JobSchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.job),
