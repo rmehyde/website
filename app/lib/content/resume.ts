@@ -30,7 +30,7 @@ export function projectsAndOssToLatex(content: ContentByType) {
             `)
         : ""
     console.log(projectsContent, ossContent)
-    return projectsContent + maybeSeparator + ossContent;
+    return ossContent + maybeSeparator + projectsContent;
 }
 
 export async function generateResumeLatex(weights: DimensionScores, contact: ContactInfo) {
