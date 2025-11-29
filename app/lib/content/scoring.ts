@@ -40,10 +40,47 @@ export const dimensionScoresSchema = z.object(
 export type DimensionScores = z.infer<typeof dimensionScoresSchema>;
 
 // combine dimension preference scores with a content score
-export function scoreContent(weights: DimensionScores, contentScores: DimensionScores) {
+//   this returns dimensioned scores each in the range [-maxScore, maxScore]
+//   it just adds the weight and content score together and subtracts maxScore
+//   so 2 and 3 with max of 5 gives 0, 5 and 5 gives 5, 0 and 1 gives -4, etc.
+//   helpful for filtering: is this content _relevant in some way_?
+export function scoreContentAbsolute(weights: DimensionScores, contentScores: DimensionScores): DimensionScores {
     return Object.fromEntries(
-        Object.entries(weights).map(
-            ([dim, dimScore]) => [ dim, dimScore - (maxScore - contentScores[Dimension.parse(dim)]) ]
-        )
-    );
+        (Object.keys(weights) as Dimension[]).map(dim => {
+            const dimScore = weights[dim];
+            const contentScore = contentScores[dim];
+            return [dim, dimScore + contentScore - maxScore];
+        })
+    ) as DimensionScores;
+}
+
+// compute cosine similarity between content
+//   this considers the similarity of the _direction_
+//   helpful for ranking: _how relevant_ is this content?
+export function scoreContentCosine(
+    weights: DimensionScores,
+    contentScores: DimensionScores
+): number {
+    const dims = Object.keys(weights) as (keyof DimensionScores)[];
+
+    let dot = 0;
+    let normW = 0;
+    let normC = 0;
+
+    for (const dim of dims) {
+        const w = weights[dim] ?? 0;
+        const c = contentScores[dim] ?? 0;
+
+        dot += w * c;
+        normW += w * w;
+        normC += c * c;
+    }
+
+    const denom = Math.sqrt(normW) * Math.sqrt(normC);
+    if (denom === 0) {
+        // define similarity as 0 when one vector is all zeros
+        return 0;
+    }
+
+    return dot / denom;
 }
