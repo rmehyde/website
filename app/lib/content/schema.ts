@@ -65,7 +65,7 @@ export const JobSchema = BaseContentSchema.extend({
 export type Job = z.infer<typeof JobSchema>;
 
 export const ContentSchema = z.discriminatedUnion(
-    "contentType", [ProjectSchema, OpenSourceSchema, JobSchema]
+    "contentType", [ProjectSchema, OpenSourceSchema, JobSchema, DutySchema]
 );
 export type Content = z.infer<typeof ContentSchema>;
 
