@@ -1,5 +1,5 @@
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {filterAndSortContent, groupContentByType} from "@/app/lib/content/load";
+import {getFilteredAndSortedContent, groupContentByType} from "@/app/lib/content/load";
 import {baseContentToLatex, jobToLatex, loadTemplate, projectsToLatex, Verbosity} from "@/app/lib/content/latex";
 import mustache from "mustache";
 import {ContactInfo} from "@/app/contact/contactContext";
@@ -34,7 +34,7 @@ export function projectsAndOssToLatex(content: ContentByType) {
 }
 
 export async function generateResumeLatex(weights: DimensionScores, contact: ContactInfo) {
-    const allContent = filterAndSortContent(weights)
+    const allContent = getFilteredAndSortedContent(weights)
     const contentByType = groupContentByType(allContent)
     const projectsOssContent = projectsAndOssToLatex(contentByType);
     // TODO: need to score duties within jobs, filter, sort, etc. also ensure jobs are sorted by date :)
