@@ -108,3 +108,9 @@ export function groupContentByType(content: Content[]): ContentByType {
 
     return result;
 }
+
+export function sortJobsByDate(jobs: Job[]) {
+    return jobs.toSorted(
+        (a, b) =>
+            new Date(b.start).getTime() - new Date(a.start).getTime())
+}
