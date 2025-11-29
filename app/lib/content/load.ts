@@ -8,54 +8,6 @@ const contentModules = (require as any).context(
     /\.(?:ya?ml)$/
 )
 
-function filterAndSortJobDuties(job: Job, weights: DimensionScores): Job {
-    type ScoredDuty = {
-        duty: Duty
-        score: number
-    }
-
-    const scoreDuty = (duty: Duty): number => {
-        const dutyScores: Record<string, number> = scoreContentAbsolute(
-            weights,
-            duty.scores
-        )
-        return Object.values(dutyScores)
-            .filter((v: number) => v > 0)
-            .reduce((sum: number, v: number) => sum + v, 0)
-    }
-
-    const processDuty = (duty: Duty): ScoredDuty => {
-        const subduties: Duty[] = ((duty as any).subduties ?? []) as Duty[]
-
-        const processedSubduties: ScoredDuty[] = subduties
-            .map(processDuty)
-            .filter((d: ScoredDuty) => d.score > 0)
-            .sort((a: ScoredDuty, b: ScoredDuty) => b.score - a.score)
-
-        const newDuty: Duty = {
-            ...duty,
-            ...(processedSubduties.length > 0
-                ? { subduties: processedSubduties.map((d: ScoredDuty) => d.duty) }
-                : {}),
-        } as Duty
-
-        const ownScore: number = scoreDuty(duty)
-
-        return { duty: newDuty, score: ownScore }
-    }
-
-    const scoredDuties: ScoredDuty[] = job.duties
-        .map(processDuty)
-        .filter((d: ScoredDuty) => d.score > 0)
-        .sort((a: ScoredDuty, b: ScoredDuty) => b.score - a.score)
-
-    return {
-        ...job,
-        duties: scoredDuties.map((d: ScoredDuty) => d.duty),
-    }
-}
-
-
 function filterAndSortedContent(
     content: Content[],
     weights: DimensionScores,
@@ -67,33 +19,65 @@ function filterAndSortedContent(
     }
 
     const scoredArray: ScoredContent[] = content.map(
-        (content: Content): ScoredContent => {
+        (item: Content): ScoredContent => {
+            let updatedContent: Content = item
+
+            // if it's a Job, recurse into duties
+            if (item.contentType === ContentTypeEnum.enum.job) {
+                console.log(`filtering and sorting duties in ${item.title}`)
+                const job = item as Job
+                const sortedDuties = filterAndSortedContent(
+                    job.duties as Content[],
+                    weights,
+                ) as Duty[]
+                updatedContent = { ...job, duties: sortedDuties }
+            }
+            // if it's a Duty, recurse into subduties
+            else if (item.contentType === ContentTypeEnum.enum.duty) {
+                console.log(`filtering and sorting subduties in ${item.title}`)
+                const duty = item as Duty
+                const sortedSubduties = filterAndSortedContent(
+                    (duty.subduties ?? []) as unknown as Content[],
+                    weights,
+                ) as Duty[]
+                updatedContent = {
+                    ...duty,
+                    ...(sortedSubduties.length > 0
+                        ? { subduties: sortedSubduties }
+                        : { subduties: [] }),
+                }
+            }
+
             const contentScores = scoreContentAbsolute(
                 weights,
-                content.scores
-            );
-            const cosineScore = scoreContentCosine(weights, content.scores);
+                updatedContent.scores,
+            )
+            const cosineScore = scoreContentCosine(
+                weights,
+                updatedContent.scores,
+            )
 
-            // if it's a Job, give the same treatment to inner duties
-            if (content.contentType === ContentTypeEnum.enum.job) {
-                console.log(`filtering and sorting duties in ${content.title}`)
-                content = filterAndSortJobDuties(content as Job, weights);
+            return {
+                content: updatedContent,
+                absoluteScores: contentScores,
+                directionScore: cosineScore,
             }
-            return { content: content, absoluteScores: contentScores, directionScore: cosineScore }
         })
 
     return scoredArray
         // filter to "has any dimension greater than zero"
-        .filter((item: ScoredContent) => Object.values(item.absoluteScores).some(v => v > 0))
+        .filter((item: ScoredContent) =>
+            Object.values(item.absoluteScores).some(v => v > 0),
+        )
         // sort by direction similarity (inverting since it sorts ascending)
-        .toSorted((a: ScoredContent, b: ScoredContent) => b.directionScore - a.directionScore)
+        .toSorted(
+            (a: ScoredContent, b: ScoredContent) =>
+                b.directionScore - a.directionScore,
+        )
         // drop scores and return just content
         .map((item: ScoredContent) => item.content)
 }
 
-// TODO: maybe we should be averaging by number of dimensions specified in content to determine relevancy?
-//  e.g. TreeTime is always first under Dstillery cause it has 3 dimensions, but how well do those actually line up
-//  with user input dims?
 export function getFilteredAndSortedContent(
     weights: DimensionScores
 ): Content[] {
