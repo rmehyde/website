@@ -69,7 +69,7 @@ function askPassword(promptText) {
         // prompt for info and password
         const email = await ask("Enter email: ");
         const phone = await ask("Enter phone: ");
-        const password = await askPassword("Enter password: ");
+        const password = await askPassword("Enter passphrase: ");
         rl.close();
 
         // derive a 32-byte key from password using PBKDF2

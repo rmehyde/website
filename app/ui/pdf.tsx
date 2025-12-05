@@ -1,9 +1,13 @@
 'use client';
 
-import React, {useContext, useState, useRef, useCallback, useEffect} from 'react';
-import {DimensionScores} from "@/app/lib/content/scoring";
-import {ContactContext} from "@/app/contact/contactContext";
+import React, {useState, useRef, useCallback, useEffect} from 'react';
+import {DimensionScores, dimensionScoresString} from "@/app/lib/content/scoring";
+import {useContactStore} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
+import {Button} from "@/components/ui/button";
+import {Download, Loader2} from "lucide-react";
+
+const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&sidebar=0&view=fitH"
 
 // TODO: needs error handling! should show error to user if failed
 
@@ -43,9 +47,10 @@ type RenderState = 'idle' | 'rendering' | 'pending';
 export default function PDFComponent({onWeightsComplete}: {
     onWeightsComplete?: (callback: (weights: DimensionScores) => void) => void;
 }) {
-    const {contact} = useContext(ContactContext);
+    const contact = useContactStore((state) => state.contact);
     const [renderState, setRenderState] = useState<RenderState>('idle');
     const [pdfUrl, setPdfUrl] = useState("");
+    // const [currentWeights, setCurrentWeights] = useState<DimensionScores | null>(null);
     const pendingWeightsRef = useRef<DimensionScores | null>(null);
 
     const renderPDF = useCallback(async (weightsToRender: DimensionScores) => {
@@ -110,7 +115,8 @@ export default function PDFComponent({onWeightsComplete}: {
             // Create a Blob from the PDF result
             const pdfBlob = new Blob([pdfResult.pdf], {type: "application/pdf"});
             const url = URL.createObjectURL(pdfBlob);
-            setPdfUrl(url)
+            setPdfUrl(url);
+            // setCurrentWeights(weightsToRender);
 
         } catch (e) {
             console.error('LaTeX compile failed:', e);
@@ -152,11 +158,29 @@ export default function PDFComponent({onWeightsComplete}: {
         }
     }, [onWeightsComplete]); // Remove triggerRender from deps to prevent re-registration
 
-
+    // TODO: dial pdf viewer options
+    //   hide panel: #navpanes=0 on chrome, #pagemode=none on firefox
+    //   chromium params: https://pdfobject.com/examples/pdf-open-params.html#
     return (
         <div>
+            <div className="flex justify-center mb-6">
+                {(renderState !== 'idle') ? (
+                    <Button disabled>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating PDF...
+                    </Button>
+                ) : (
+                    <Button asChild>
+                        {/* TODO: this shouldn't be available when generation failed! see note on failures above */}
+                        <a href={pdfUrl} download={`reesehyde-resume.pdf`}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download Resume
+                        </a>
+                    </Button>
+                )}
+            </div>
             <div className="relative">
-                <object data={pdfUrl}
+                <object data={pdfUrl + PDF_FRAGMENTS}
                         type='application/pdf'
                         width='100%' height='1000px'>
                 </object>
