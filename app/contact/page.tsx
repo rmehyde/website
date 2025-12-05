@@ -1,7 +1,7 @@
 "use client";
 
-import {useState, useRef, useContext, useEffect} from "react";
-import {ContactContext} from "@/app/contact/contactContext";
+import {useState, useRef} from "react";
+import {useContactStore} from "@/app/contact/contactContext";
 import {decryptContactInfo} from "./decrypt";
 
 // shadcn/ui components:
@@ -16,7 +16,8 @@ import clsx from "clsx";
 
 
 export default function ContactPage() {
-    const {contact, setContact} = useContext(ContactContext);
+    const contact = useContactStore((state) => state.contact);
+    const setContact = useContactStore((state) => state.setContact);
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
@@ -28,13 +29,13 @@ export default function ContactPage() {
         e.preventDefault();
         setError("");
 
-        const rawPwd = passwordRef.current?.value.trim() || "";
+        const rawPwd = passwordRef.current?.value.toLowerCase().replace(/\W/g, '') || "";
         try {
             const decrypted = await decryptContactInfo(rawPwd);
             setContact(decrypted);
             setIsOpen(false); // close modal on success
         } catch {
-            setError("Incorrect password, please try again.");
+            setError("Incorrect passphrase, please try again.");
             // trigger shake:
             setIsShaking(true);
             setTimeout(() => setIsShaking(false), 500); // matches CSS animation duration
@@ -63,8 +64,8 @@ export default function ContactPage() {
                                         <br/>
                                         <form onSubmit={handleDecrypt} className="space-y-4">
                                             <Input
-                                                type="password"
-                                                placeholder="Enter password"
+                                                type="text"
+                                                placeholder="Enter passphrase"
                                                 ref={passwordRef}
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}

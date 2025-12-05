@@ -21,7 +21,7 @@
 % lists
 \setlist[itemize,2]{leftmargin=2.5em}
 % make bullets bigger?
-\pagestyle{empty}
+% \pagestyle{empty}
 \setlist[itemize]{noitemsep, topsep=0pt, leftmargin=*,
 % label={\LARGE\textbullet}
 label={\tb}
@@ -68,6 +68,12 @@ label={\tb}
 \newcommand{\tb}{{{\fontfamily{cmr}\selectfont\LARGE\textbullet}}}
 \newcommand{\bulletspace}{\space\tb\allowbreak\space}
 
+
+% headers and footers
+\usepackage{fancyhdr}
+\fancyhf{}
+\cfoot{\scriptsize{This résumé was dynamically generated from one of over ten million parameter configurations. Tune it yourself at \blkuhref{http://rmehyde.com/resume}{rmehyde.com/resume}.}}
+\pagestyle{fancy}
 
 \begin{document}
 % sloppy can be used to fix spacing quite nicely

@@ -1,33 +1,40 @@
 "use client";
 
-import { createContext, ReactNode, useState } from "react";
+import { create } from 'zustand';
 
 export interface ContactInfo {
     email: string;
     phone: string;
 }
 
+// TODO: add versioning so I can update it
+
 const defaultMasked: ContactInfo = {
     email: "********@******.com",
     phone: "(***) ***-****",
 };
 
-// TODO: we probably want something more persistent, this doesn't even survive page refreshes
-export const ContactContext = createContext<{
+const getStoredContact = (): ContactInfo => {
+    if (typeof window === 'undefined') return defaultMasked;
+    try {
+        const stored = localStorage.getItem('contact-info');
+        return stored ? JSON.parse(stored) : defaultMasked;
+    } catch {
+        return defaultMasked;
+    }
+};
+
+interface ContactStore {
     contact: ContactInfo;
-    setContact: (c: ContactInfo) => void;
-}>({
-    contact: defaultMasked,
-    setContact: () => {},
-});
-
-export function ContactProvider({ children }: { children: ReactNode }) {
-    // start with masked defaults
-    const [contact, setContact] = useState<ContactInfo>(defaultMasked);
-
-    return (
-        <ContactContext.Provider value={{ contact, setContact }}>
-            {children}
-        </ContactContext.Provider>
-    );
+    setContact: (contact: ContactInfo) => void;
 }
+
+export const useContactStore = create<ContactStore>()((set) => ({
+    contact: getStoredContact(),
+    setContact: (contact) => {
+        set({ contact });
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('contact-info', JSON.stringify(contact));
+        }
+    },
+}));

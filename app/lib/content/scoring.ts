@@ -39,6 +39,13 @@ export const dimensionScoresSchema = z.object(
 )
 export type DimensionScores = z.infer<typeof dimensionScoresSchema>;
 
+export function dimensionScoresString(scores: DimensionScores): string {
+    return Object.entries(scores).map(([dim, score]) => {
+        const tag = (dimensionLabels[dim as Dimension].match(/[A-Z]/g) || []).join("").toLowerCase();
+        return `${tag}${score}`;
+    }).join("")
+}
+
 // combine dimension preference scores with a content score
 //   this returns dimensioned scores each in the range [-maxScore, maxScore]
 //   it just adds the weight and content score together and subtracts maxScore

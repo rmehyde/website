@@ -4,7 +4,7 @@ const WORKROOT = "/work";
 var Module = {};
 self.memlog = "";
 self.mainfile = "main.tex";
-self.texlive_endpoint = "http://127.0.0.1:5000/";
+self.texlive_endpoint = "http://192.168.1.100:5000/";
 Module["print"] = function (a) {
     self.memlog += a + "\n";
     console.log(a);
