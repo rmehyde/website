@@ -43,7 +43,7 @@ export default function DynamicProjects() {
     };
 
     return (
-        <main className="min-h-screen p-4 md:p-14">
+        <div>
             {/* TODO: fix scroll issue on mobile */}
             {/* radial selector drives the weights */}
             <RadialSelector
@@ -56,11 +56,12 @@ export default function DynamicProjects() {
                 plotRadius={100}  // TODO: should be 75 on mobile
             />
 
-            <div className="relative" style={{'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            {/* TODO: probably this padding should be global as well */}
+            <div className="pb-8">
                 <PDFComponent
                     onWeightsComplete={handlePDFReady}
                 />
             </div>
-        </main>
+        </div>
     )
 }

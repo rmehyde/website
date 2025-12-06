@@ -5,6 +5,7 @@ import { DimensionScores, } from '@/app/lib/content/scoring'
 import {generateContentElements} from "@/app/lib/content/jsx";
 import {getFilteredAndSortedContent, groupContentByType} from "@/app/lib/content/load";
 import {ContentTypeEnum} from "@/app/lib/content/schema";
+import {Card} from "@/components/ui/card";
 
 export default function ContentCards({ weights }: { weights: DimensionScores }) {
     const [cards, setCards] = useState<React.JSX.Element[] | null>(null)
@@ -16,9 +17,9 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
             const allContent = getFilteredAndSortedContent(weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
-                <div key={c.title} className="bg-gray-100 font-sans text-base block box-content p-5 m-4 shadow-bold">
+                <Card key={c.title} className="block box-content p-5 m-4">
                     {generateContentElements(c)}
-                </div>
+                </Card>
             ))
             console.log(items)
             if (!cancelled) setCards(items)
