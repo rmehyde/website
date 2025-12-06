@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
-body {
-  background-color: var(--color-skygray-300)
+a {
+  @apply hover:underline;
 }
 
 @layer base {
