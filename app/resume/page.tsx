@@ -1,11 +1,9 @@
 'use client'
 
-import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
+import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef} from "react";
 import PDFComponent from "@/app/ui/pdf";
-import {Card} from "@/components/ui/card";
-import ContentCards from "@/app/ui/cards/contentCards";
 
 export default function DynamicProjects() {
     // initialize weights to maxScore for each dimension
@@ -46,25 +44,23 @@ export default function DynamicProjects() {
 
     return (
         <main className="min-h-screen p-4 md:p-14">
-            <Card className="p-4 bg-card text-card-foreground">
-                {/* TODO: fix scroll issue on mobile */}
-                {/* radial selector drives the weights */}
-                <RadialSelector
-                    dimensionLabels={dimensionLabels}
-                    values={values}
-                    levels={maxScore}
-                    max={maxScore}
-                    onChange={setValues}
-                    onComplete={handleWeightsComplete}
-                    plotRadius={100}  // TODO: should be 75 on mobile
-                />
+            {/* TODO: fix scroll issue on mobile */}
+            {/* radial selector drives the weights */}
+            <RadialSelector
+                dimensionLabels={dimensionLabels}
+                values={values}
+                levels={maxScore}
+                max={maxScore}
+                onChange={setValues}
+                onComplete={handleWeightsComplete}
+                plotRadius={100}  // TODO: should be 75 on mobile
+            />
 
-                <div className="relative" style={{'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                    <PDFComponent 
-                        onWeightsComplete={handlePDFReady}
-                    />
-                </div>
-            </Card>
+            <div className="relative" style={{'marginLeft': 'auto', 'marginRight': 'auto'}}>
+                <PDFComponent
+                    onWeightsComplete={handlePDFReady}
+                />
+            </div>
         </main>
     )
 }

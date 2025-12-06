@@ -5,7 +5,8 @@ import {DimensionScores, dimensionScoresString} from "@/app/lib/content/scoring"
 import {useContactStore} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
 import {Button} from "@/components/ui/button";
-import {Download, Loader2} from "lucide-react";
+import {Spinner} from "@/components/ui/spinner";
+import {Download} from "lucide-react";
 
 const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&sidebar=0&view=fitH"
 
@@ -166,7 +167,7 @@ export default function PDFComponent({onWeightsComplete}: {
             <div className="flex justify-center mb-6">
                 {(renderState !== 'idle') ? (
                     <Button disabled>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Spinner/>
                         Generating PDF...
                     </Button>
                 ) : (
@@ -187,7 +188,7 @@ export default function PDFComponent({onWeightsComplete}: {
                 {renderState !== 'idle' && (
                     <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
                         <div className="bg-card p-4 rounded-lg shadow-lg border flex items-center space-x-3">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                            <Spinner/>
                             <span className="text-sm font-medium">
                                 {'Generating PDF...'}
                             </span>
