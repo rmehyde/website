@@ -181,10 +181,14 @@ export default function PDFComponent({onWeightsComplete}: {
                 )}
             </div>
             <div className="relative">
-                <object data={pdfUrl + PDF_FRAGMENTS}
-                        type='application/pdf'
-                        width='100%' height='1000px'>
-                </object>
+                {pdfUrl ? (
+                    <object data={pdfUrl + PDF_FRAGMENTS}
+                            type='application/pdf'
+                            width='100%' height='1000px'>
+                    </object>
+                ) : (
+                    <div className="w-full h-[1000px] bg-gray-300"></div>
+                )}
                 {renderState !== 'idle' && (
                     <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
                         <div className="bg-card p-4 rounded-lg shadow-lg border flex items-center space-x-3">
