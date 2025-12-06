@@ -1,7 +1,7 @@
 import type {Metadata} from 'next'
 import {Roboto} from 'next/font/google';
 import './globals.css'
-import {ConditionalHeader} from "@/app/ui/header";
+import {NavigationHeader} from "@/app/ui/header";
 
 export const metadata: Metadata = {
     title: 'Reese M.E. Hyde',
@@ -17,12 +17,14 @@ const roboto = Roboto({
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
-        <body className="">
-        <header>
-            <ConditionalHeader/>
-        </header>
-        {children}
-        </body>
+            <body className="min-h-screen max-w-7xl mx-auto px-4 md:px-14">
+                <header>
+                    <NavigationHeader/>
+                </header>
+                <main className="">
+                    {children}
+                </main>
+            </body>
         </html>
     )
 }

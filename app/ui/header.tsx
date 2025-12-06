@@ -3,13 +3,13 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {pages} from "@/app/lib/nav";
 
-export function ConditionalHeader() {
+export function NavigationHeader() {
     const pathname = usePathname()
 
     if (pathname === '/') return null
 
     return (
-        <header className="flex justify-between items-center p-4">
+        <header className="flex justify-between items-center p-4 md:py-6">
             <Link href="/" className="text-xl">Reese Hyde</Link>
             <nav className="flex gap-4">
                 {pages.map(page => {

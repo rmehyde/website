@@ -16,7 +16,7 @@ import {pages} from "@/app/lib/nav";
 
 export default async function Home() {
     return (
-        <main className="min-h-screen p-4 md:p-14">
+        <div className="min-h-screen flex flex-col justify-center md:pl-12">
             <div className="max-w-xl">
                 <div className="text-8xl">
                     Hi, I'm Reese.
@@ -26,7 +26,7 @@ export default async function Home() {
                     I enjoy building things. This website talks a bit about some software that I’ve built, and other things that I’ve done working for software companies.
                 </div>
             </div>
-            <div className="m-10"/>
+            <div className="m-6"/>
             <div className="text-3xl underline">
                 {pages.map((label) => (
                     <div key={label}>
@@ -34,6 +34,6 @@ export default async function Home() {
                     </div>
                 ))}
             </div>
-        </main>
+        </div>
     );
 }
