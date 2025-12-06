@@ -15,6 +15,7 @@ def generate_logo_svg(
     roundedness: float | Roundedness = 20.0,   # radius of the curved right angles
     base_color: str = "#000000",
     cap_color: str = "#000000",
+    allow_invalid: bool = False,
 ) -> str:
     """
     Generate an SVG for an H-like logo where:
@@ -39,9 +40,13 @@ def generate_logo_svg(
         )
     # TODO: use per-corner values instead of fixed float below!
 
-    # basic sanity
-    w = max(10.0, float(width))
+    # basic sanity and aliases
+    if width < 10 or height < 10:
+        raise ValueError(f"width ({width}) and height ({height}) must be at least 10")
+    w = width
     h = max(10.0, float(height))
+    if line_thickness < 1:
+        raise ValueError(f"line thickness ({line_thickness}) must be at least 1")
     t = max(1.0, float(line_thickness))
 
     # centerlines: keep strokes inside the SVG by half a thickness
@@ -60,15 +65,27 @@ def generate_logo_svg(
     # - can't exceed a fraction of the horizontal span
     max_r_vert_top = max(1.0, (y_mid - y_top) / 2.0)
     max_r_vert_bottom = max(1.0, (y_bottom - y_mid) / 2.0)
-    max_r_horiz = max(1.0, (x_right - x_left) / 4.0)
+    max_r_horiz = max(1.0, (x_right - x_left) / 2.0)
 
-    def _clamp_corner(val: float, max_vert: float, max_horiz: float) -> float:
-        return max(1.0, min(float(val), max_vert, max_horiz))
+    def _validate_corner(val: float, max_vert: float, max_horiz: float, name: str | None = None, allow_zero: bool = False) -> float:
+        if allow_invalid:
+            return val
 
-    r_tl = _clamp_corner(roundedness.top_left,     max_r_vert_top,    max_r_horiz)
-    r_tr = _clamp_corner(roundedness.top_right,    max_r_vert_top,    max_r_horiz)
-    r_mru = _clamp_corner(roundedness.mid_right_up,   max_r_vert_top,    max_r_horiz)
-    r_mrd = _clamp_corner(roundedness.mid_right_down, max_r_vert_bottom, max_r_horiz)
+        name = "corner" if name is None else f"{name} corner"
+        if val < 1.0 and not allow_zero:
+            raise ValueError(f"Roundedness for {name} must be at least 1, got {val}")
+        elif val > max_vert or val > max_horiz:
+            raise ValueError(
+                f"Roundedness for {name} must be at most {min(max_vert, max_horiz)} based on provided height/width,"
+                f" got {val}"
+            )
+
+        return val
+
+    r_tl = _validate_corner(roundedness.top_left, max_r_vert_top, max_r_horiz, name="top left", allow_zero=True)
+    r_tr = _validate_corner(roundedness.top_right,    max_r_vert_top,    max_r_horiz, name="top right")
+    r_mru = _validate_corner(roundedness.mid_right_up,   max_r_vert_top,    max_r_horiz, name="mid-right up")
+    r_mrd = _validate_corner(roundedness.mid_right_down, max_r_vert_bottom, max_r_horiz, name="mid-right down")
 
     # === key points (centerline coordinates) ===
 
@@ -96,13 +113,15 @@ def generate_logo_svg(
     lines = []
 
     # left vertical: bottom → just below top-left arc
+    lvl_y2 = TL_arc_start[1] if r_tl > 0 else TL_arc_start[1]+t/2
     lines.append(
-        f'<line x1="{BL[0]}" y1="{BL[1]}" x2="{TL_arc_start[0]}" y2="{TL_arc_start[1]}" />'
+        f'<line x1="{BL[0]}" y1="{BL[1]}" x2="{TL_arc_start[0]}" y2="{lvl_y2}" />'
     )
 
     # top bar: between top-left arc end and top-right arc start
+    tbl_x1 = TL_arc_end[0] if r_tl > 0 else TL_arc_end[0]-t/2
     lines.append(
-        f'<line x1="{TL_arc_end[0]}" y1="{TL_arc_end[1]}" '
+        f'<line x1="{tbl_x1}" y1="{TL_arc_end[1]}" '
         f'x2="{TR_arc_start[0]}" y2="{TR_arc_start[1]}" '
         f'stroke="{cap_color}" />'
     )
@@ -132,11 +151,12 @@ def generate_logo_svg(
     arcs = []
 
     # top-left: from vertical up to horizontal right
-    arcs.append(
-        f'<path d="M {TL_arc_start[0]} {TL_arc_start[1]} '
-        f'A {r_tl} {r_tl} 0 0 1 {TL_arc_end[0]} {TL_arc_end[1]}" '
-        f'stroke="{cap_color}" />'
-    )
+    if r_tl > 0:
+        arcs.append(
+            f'<path d="M {TL_arc_start[0]} {TL_arc_start[1]} '
+            f'A {r_tl} {r_tl} 0 0 1 {TL_arc_end[0]} {TL_arc_end[1]}" '
+            f'stroke="{cap_color}" />'
+        )
 
     # top-right: from horizontal right to vertical down
     arcs.append(
