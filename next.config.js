@@ -4,7 +4,8 @@ withMDX = require('@next/mdx')();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-    output: 'export',
+    // flag for static vs server
+    // output: 'export',
 
     webpack(config) {
 
