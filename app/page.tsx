@@ -19,7 +19,7 @@ export default async function Home() {
         <div className="min-h-screen flex flex-col justify-center md:pl-12">
             <div className="max-w-xl">
                 <div className="text-8xl">
-                    Hi, I'm Reese.
+                    {"Hi, I'm Reese."}
                 </div>
                 <br/>
                 <div className="text-2xl text-justify">

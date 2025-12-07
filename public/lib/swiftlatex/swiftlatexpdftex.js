@@ -5,7 +5,8 @@ var Module = {};
 self.memlog = "";
 self.initmem = undefined;
 self.mainfile = "main.tex";
-self.texlive_endpoint = "http://192.168.1.100:5000/";
+importScripts("config.js");
+self.texlive_endpoint = self.SWIFTLATEX_CONFIG.texlive_endpoint;
 Module["print"] = function (a) {
     self.memlog += a + "\n"
 };
@@ -234,12 +235,12 @@ function kpse_find_file_impl(nameptr, format, _mustexist) {
     }
     if (xhr.status === 200) {
         let arraybuffer = xhr.response;
-        const fileid = xhr.getResponseHeader("fileid");
+        const fileid = new URL(xhr.responseURL).pathname.split("/").pop();
         const savepath = TEXCACHEROOT + "/" + fileid;
         FS.writeFile(savepath, new Uint8Array(arraybuffer));
         texlive200_cache[cacheKey] = savepath;
         return allocate(intArrayFromString(savepath), "i8", ALLOC_NORMAL)
-    } else if (xhr.status === 301) {
+    }  else if (xhr.status === 301 || xhr.status === 404) {
         console.log("TexLive File not exists " + remote_url);
         texlive404_cache[cacheKey] = 1;
         return 0
@@ -282,7 +283,7 @@ function kpse_find_pk_impl(nameptr, dpi) {
         FS.writeFile(savepath, new Uint8Array(arraybuffer));
         pk200_cache[cacheKey] = savepath;
         return allocate(intArrayFromString(savepath), "i8", ALLOC_NORMAL)
-    } else if (xhr.status === 301) {
+    }  else if (xhr.status === 301 || xhr.status === 404) {
         console.log("TexLive File not exists " + remote_url);
         pk404_cache[cacheKey] = 1;
         return 0

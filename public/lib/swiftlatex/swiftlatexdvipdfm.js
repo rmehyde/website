@@ -4,7 +4,8 @@ const WORKROOT = "/work";
 var Module = {};
 self.memlog = "";
 self.mainfile = "main.tex";
-self.texlive_endpoint = "http://192.168.1.100:5000/";
+importScripts("config.js");
+self.texlive_endpoint = self.SWIFTLATEX_CONFIG.texlive_endpoint;
 Module["print"] = function (a) {
     self.memlog += a + "\n";
     console.log(a);
