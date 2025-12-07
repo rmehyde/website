@@ -4,3 +4,5 @@
 - consider local caching
     - can we cache files in IndexedDB, rather than fetching for every re-render? looks like fetching is most of the time, could be huge savings
     - https://stackoverflow.com/questions/31803363/indexeddb-store-file-as-file-or-blob-or-arraybuffer-what-is-the-best-option
+
+- also what's up with all the missing files? like some of the files exist but they have the wrong prefix? what's going on?
