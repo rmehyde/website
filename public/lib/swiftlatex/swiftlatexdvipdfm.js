@@ -4,7 +4,7 @@ const WORKROOT = "/work";
 var Module = {};
 self.memlog = "";
 self.mainfile = "main.tex";
-importScripts("config.js");
+importScripts("swiftlatex-shared.js");
 self.texlive_endpoint = self.SWIFTLATEX_CONFIG.texlive_endpoint;
 Module["print"] = function (a) {
     self.memlog += a + "\n";
@@ -133,51 +133,8 @@ self["onmessage"] = function (ev) {
         console.error("Unknown command " + cmd);
     }
 };
-let texlive404_cache = {};
-let texlive200_cache = {};
-function kpse_find_file_impl(nameptr, format, _mustexist) {
-    let reqname = UTF8ToString(nameptr);
-    if (reqname.startsWith("/tex/")) {
-        reqname = reqname.substr(5);
-    }
-    if (reqname.includes("/")) {
-        return 0;
-    }
-    const cacheKey = format + "/" + reqname;
-    if (cacheKey in texlive404_cache) {
-        return 0;
-    }
-    if (cacheKey in texlive200_cache) {
-        const savepath = texlive200_cache[cacheKey];
-        return allocate(intArrayFromString(savepath), "i8", ALLOC_NORMAL);
-    }
-    const remote_url = self.texlive_endpoint + "xetex/" + cacheKey;
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", remote_url, false);
-    xhr.timeout = 15e4;
-    xhr.responseType = "arraybuffer";
-    console.log("Start downloading texlive file " + remote_url);
-    try {
-        xhr.send();
-    } catch (err) {
-        console.log("TexLive Download Failed " + remote_url);
-        return 0;
-    }
-    if (xhr.status === 200) {
-        let arraybuffer = xhr.response;
-        // (1) derive a file name from the request instead of using fileid header
-        const fileid = cacheKey.replace(/\//g, "_");
-        const savepath = TEXCACHEROOT + "/" + fileid;
-        FS.writeFile(savepath, new Uint8Array(arraybuffer));
-        texlive200_cache[cacheKey] = savepath;
-        return allocate(intArrayFromString(savepath), "i8", ALLOC_NORMAL);
-    } else if (xhr.status === 301 || xhr.status === 404) {
-        // (2) treat 404 the same as 301
-        console.log("TexLive File not exists " + remote_url);
-        texlive404_cache[cacheKey] = 1;
-        return 0;
-    }
-    return 0;
+function kpse_find_file_impl_wrapper(nameptr, format, _mustexist) {
+    return kpse_find_file_impl(nameptr, format, _mustexist, "xetex");
 }
 var moduleOverrides = Object.assign({}, Module);
 var arguments_ = [];
@@ -3264,7 +3221,7 @@ function _getTempRet0() {
     return getTempRet0();
 }
 function _kpse_find_file_js(nameptr, format) {
-    return kpse_find_file_impl(nameptr, format);
+    return kpse_find_file_impl_wrapper(nameptr, format);
 }
 function _setTempRet0(val) {
     setTempRet0(val);
