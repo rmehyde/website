@@ -74,6 +74,8 @@ var XeTeXEngine = /** @class */ (function () {
     function XeTeXEngine() {
         this.latexWorker = undefined;
         this.latexWorkerStatus = EngineStatus.Init;
+        this.sharedBuffer = null;
+        this.mainThreadCacheHandler = null;
     }
     XeTeXEngine.prototype.loadEngine = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -85,6 +87,13 @@ var XeTeXEngine = /** @class */ (function () {
                             throw new Error('Other instance is running, abort()');
                         }
                         this.latexWorkerStatus = EngineStatus.Init;
+                        
+                        // Initialize SharedArrayBuffer cache system
+                        console.log('[XeTeX] Initializing SharedArrayBuffer cache system');
+                        return [4 /*yield*/, _this.initializeCacheSystem()];
+                    case 1:
+                        _a.sent();
+                        
                         return [4 /*yield*/, new Promise(function (resolve, reject) {
                                 _this.latexWorker = new Worker(ENGINE_PATH);
                                 _this.latexWorker.onmessage = function (ev) {
@@ -92,6 +101,14 @@ var XeTeXEngine = /** @class */ (function () {
                                     var cmd = data['result'];
                                     if (cmd === 'ok') {
                                         _this.latexWorkerStatus = EngineStatus.Ready;
+                                        
+                                        // Send SharedArrayBuffer to worker
+                                        console.log('[XeTeX] Sending SharedArrayBuffer to worker');
+                                        _this.latexWorker.postMessage({
+                                            cmd: 'init_sba_cache',
+                                            sharedBuffer: _this.sharedBuffer
+                                        });
+                                        
                                         resolve();
                                     }
                                     else {
@@ -100,7 +117,7 @@ var XeTeXEngine = /** @class */ (function () {
                                     }
                                 };
                             })];
-                    case 1:
+                    case 2:
                         _a.sent();
                         this.latexWorker.onmessage = function (_) {
                         };
@@ -237,11 +254,84 @@ var XeTeXEngine = /** @class */ (function () {
             this.latexWorker = undefined;
         }
     };
+    XeTeXEngine.prototype.initializeCacheSystem = function () {
+        var _this = this;
+        return new Promise(function(resolve, reject) {
+            try {
+                // Check if already loaded
+                if (window.SBACache) {
+                    _this.sharedBuffer = window.SBACache.initializeSBA();
+                    console.log('[XeTeX] SharedArrayBuffer initialized (cached):', _this.sharedBuffer.byteLength, 'bytes');
+                    
+                    if (window.MainThreadCache) {
+                        _this.mainThreadCacheHandler = window.MainThreadCache;
+                        _this.mainThreadCacheHandler.startCacheHandler(_this.sharedBuffer).then(resolve).catch(reject);
+                    } else {
+                        resolve(); // Continue without main thread handler
+                    }
+                    return;
+                }
+                
+                // Load cache utilities
+                var script = document.createElement('script');
+                script.src = '/lib/swiftlatex/sba-cache.js';
+                document.head.appendChild(script);
+                
+                script.onload = function() {
+                    // Initialize SharedArrayBuffer
+                    _this.sharedBuffer = (self.SBACache || window.SBACache).initializeSBA();
+                    console.log('[XeTeX] SharedArrayBuffer initialized:', _this.sharedBuffer.byteLength, 'bytes');
+                    
+                    // Load and start main thread cache handler
+                    var cacheScript = document.createElement('script');
+                    cacheScript.src = '/lib/swiftlatex/main-thread-cache.js';
+                    document.head.appendChild(cacheScript);
+                    
+                    cacheScript.onload = function() {
+                        console.log('[XeTeX] Starting main thread cache handler');
+                        _this.mainThreadCacheHandler = self.MainThreadCache || window.MainThreadCache;
+                        if (_this.mainThreadCacheHandler) {
+                            _this.mainThreadCacheHandler.startCacheHandler(_this.sharedBuffer).then(function() {
+                                resolve();
+                            }).catch(reject);
+                        } else {
+                            console.error('[XeTeX] MainThreadCache not available');
+                            resolve(); // Continue without caching
+                        }
+                    };
+                    
+                    cacheScript.onerror = function() {
+                        console.error('[XeTeX] Failed to load main-thread-cache.js');
+                        resolve(); // Continue without caching
+                    };
+                };
+                
+                script.onerror = function() {
+                    console.error('[XeTeX] Failed to load sba-cache.js');
+                    resolve(); // Continue without caching
+                };
+                
+            } catch (error) {
+                console.error('[XeTeX] Failed to initialize cache system:', error);
+                resolve(); // Continue without caching
+            }
+        });
+    };
+    
     XeTeXEngine.prototype.closeWorker = function () {
         if (this.latexWorker !== undefined) {
             this.latexWorker.postMessage({ 'cmd': 'grace' });
             this.latexWorker = undefined;
         }
+        
+        // Clean up cache system
+        if (this.mainThreadCacheHandler) {
+            console.log('[XeTeX] Stopping main thread cache handler');
+            this.mainThreadCacheHandler.stopCacheHandler();
+            this.mainThreadCacheHandler = null;
+        }
+        
+        this.sharedBuffer = null;
     };
     return XeTeXEngine;
 }());

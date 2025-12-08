@@ -1,120 +1,118 @@
-# SwiftLaTeX Persistent Cache Investigation
+# SwiftLaTeX SharedArrayBuffer + IndexedDB Cache Implementation
+
+## Current Status: 🚧 **WORK IN PROGRESS** 🚧
 
 ## Objective
+Implement persistent caching for SwiftLaTeX TeXLive file downloads using SharedArrayBuffer + IndexedDB to:
+- Eliminate repeated network requests across browser sessions
+- Make async IndexedDB operations appear synchronous to WASM code
+- Avoid the race conditions that plagued previous postMessage-based approaches
 
-Implement persistent caching for SwiftLaTeX TeXLive file downloads using IndexedDB to eliminate repeated network requests across browser sessions. The challenge was making async IndexedDB operations appear synchronous to WASM code that expects blocking file system calls.
+## Architecture Overview
 
-## The Challenge
+### The Solution: Single-Channel Synchronization
+Unlike previous attempts that failed due to race conditions between SharedArrayBuffer signaling and postMessage data transfer, this implementation uses **SharedArrayBuffer for both coordination AND data transfer**.
 
-SwiftLaTeX runs in web workers and uses synchronous `kpse_find_file_impl()` functions called directly from WASM. These functions expect to:
-1. Look up a file (e.g., "article.cls")
-2. Return a memory pointer immediately 
-3. Cannot be made async without rebuilding WASM with Asyncify
-
-The problem: IndexedDB is inherently asynchronous, but WASM expects synchronous responses.
-
-## What We Tried
-
-### Attempt 1: Synchronous IndexedDB API
-**Goal**: Use the W3C spec's synchronous IndexedDB API in web workers.
-**Result**: ❌ **Failed** - No browser has implemented the synchronous API and it's considered "at risk" for removal.
-
-### Attempt 2: SharedArrayBuffer + Atomics Synchronization
-**Goal**: Use SharedArrayBuffer and `Atomics.wait()` to block the worker until async IndexedDB operations complete.
-
-**Architecture**: 
 ```
-Worker Thread              Main Thread
-─────────────              ───────────
-kpse_find_file_impl()  
+Worker Thread                    Main Thread
+─────────────                    ───────────
+kpse_find_file_impl()
 ├─ Check in-memory cache
-├─ Check IndexedDB (sync wrapper)
-│  ├─ postMessage(request) ───→ handleRequest()
-│  ├─ Atomics.wait()       ←── async IndexedDB ops
-│  └─ return result        ←── postMessage(result)
-└─ Network request (fallback)
+├─ requestFileSBA() 
+│  ├─ Write request to SBA  
+│  ├─ Set state=REQUESTED
+│  └─ Atomics.wait()     ────────→ Monitor SBA for requests
+└─ Wake up, read result         ├─ IndexedDB lookup
+   from same SBA location       ├─ Network download if needed
+                                ├─ Write data to SBA
+                                ├─ Set state=DONE  
+                                └─ Atomics.notify()
 ```
 
-**What Worked**:
-- ✅ SharedArrayBuffer + Atomics available in cross-origin isolated context
-- ✅ Basic blocking pattern functional
-- ✅ IndexedDB operations successful in main thread
-- ✅ File storage and retrieval with TTL and versioning
-- ✅ Cache invalidation on version bumps
+## Implementation Components
 
-**What Failed**:
-- ❌ **Race conditions** between SharedArrayBuffer signaling and postMessage delivery
-- ❌ Complex state management trying to synchronize two async channels
-- ❌ Unreliable message ordering across worker boundaries
+### Core Files
+- **`sba-cache.js`**: 50MB SharedArrayBuffer utilities and structure definitions
+- **`main-thread-cache.js`**: IndexedDB handler that monitors SBA and fulfills requests  
+- **`swiftlatex-shared.js`**: Updated worker-side cache logic with SBA integration
+- **`XeTeXEngine.js`/`DvipdfmxEngine.js`**: Engine initialization with cache system setup
+- **Worker scripts**: Updated to handle SBA initialization messages
 
-### Specific Race Condition Issues
-
-The fundamental problem was coordinating two asynchronous communication channels:
-
-1. **SharedArrayBuffer**: Used for `Atomics.wait()` blocking and `Atomics.notify()` wakeup
-2. **postMessage**: Used for actual data transfer
-
-**The Race**:
+### SharedArrayBuffer Structure (50MB)
 ```
-Main Thread                 Worker Thread
-───────────                 ─────────────
-processRequest()            
-├─ IndexedDB operation      
-├─ Atomics.store(1) ────────→ Atomics.wait() returns ✓
-├─ Atomics.notify() ────────→ (worker wakes up)
-└─ postMessage(result) ─────→ (message not processed yet ❌)
-                             worker tries to read result → NULL
+[0-63]:      Control block (operation IDs, active request count)
+[64-1087]:   Request slots (64 bytes × 16 slots)
+[1088-end]:  File data area (~49MB for actual file content)
 ```
 
-**Timeline Example**:
+**Request Slot Layout (64 bytes):**
+- `[0-3]`: operationId 
+- `[4-7]`: state (FREE/REQUESTED/PROCESSING/DONE/ERROR)
+- `[8-11]`: resultOffset (in file data area)
+- `[12-15]`: resultSize  
+- `[16-47]`: filename (32 chars max)
+- `[48-51]`: format (subfolder number)
+- `[52-55]`: mustexist flag
+- `[56-59]`: engineId (1=xetex, 2=dvipdfm, 3=pdftex)
+
+## What Works ✅
+
+1. **SharedArrayBuffer initialization**: 50MB buffer creates successfully
+2. **IndexedDB setup**: Database and object stores create properly with versioning
+3. **Worker communication**: SBA gets passed to workers and views are set up
+4. **Basic request flow**: Workers can write requests, main thread can read them
+5. **Engine path handling**: Different engines can specify their TeXLive directory
+6. **Clean logging**: Debug output shows request flow clearly
+7. **File system safety**: Local filenames properly escape slashes and special characters
+
+## What Doesn't Work ❌
+
+### 1. **Path Corruption Issues** 🐛
+Still seeing mangled paths like:
+- `36/36_CharisSIL-Regular.ttf/rsrc` 
+- `32/36_CharisSIL-Regular.ttf`
+
+**Root Cause**: Unclear - the `36_` prefix suggests filename corruption is happening before our cache system even receives the request.
+
+### 2. **Inconsistent Path Construction** 🐛
+The relationship between:
+- **WASM request**: What the C code is asking for
+- **Format number**: Subfolder in TeXLive (e.g., `11`, `32`, `36`) 
+- **Filename**: Actual file name
+- **Full path**: How to construct the final URL
+
+Is still not correctly understood or implemented.
+
+### 3. **Directory Structure Mismatch** 🐛
+- Files exist in `/lib/xetex/11/ckx.map`, `/lib/xetex/36/CharisSIL-Regular.ttf`
+- System requests `/lib/xetex/ckx.map` (missing subfolder) or constructs wrong paths
+
+## Technical Challenges Solved ✅
+
+1. **Variable Redeclarations**: Fixed conflicting global variables between cache files
+2. **Script Loading Race Conditions**: Made cache initialization properly async with Promise handling
+3. **Export Format Issues**: Fixed module exports to work in browser environment  
+4. **Engine Path Separation**: Both XeTeX and DviPDFm now correctly use shared `/lib/xetex/` directory
+
+## Current Debugging Strategy
+
+The `[FIND-FILE]` logs show what WASM is actually requesting:
 ```
-14:15:55.899 🏁 [SYNC] Operation completed with status: 1
-14:15:55.899 ⚠️ [SYNC] No result found for operation ID: 1  ← Worker checks too early
-14:15:55.899 📥 [SYNC] Received result from main thread: 1 SUCCESS ← Arrives 1ms later
+[FIND-FILE] Original: "pdftex.map" → Processed: "pdftex.map" | Format: 11 | Engine: xetex
 ```
 
-### Failed Solutions Attempted
+This helps trace how:
+1. **Original**: Raw WASM request
+2. **Processed**: After `/tex/` prefix removal  
+3. **Format**: Subfolder number
+4. **Engine**: Which TeXLive directory to use
 
-1. **setTimeout delays** - Adding artificial waits (terrible practice)
-2. **Busy waiting loops** - Blocking worker thread inefficiently  
-3. **Complex state machines** - Over-engineering with multiple states
-4. **Result data in SharedArrayBuffer** - Trying to store complex objects in shared memory
-5. **Multiple synchronization points** - Waiting for both ready signal AND message processing
+## Known Issues to Investigate
 
-## Architecture That Partially Worked
-
-### File Structure
-```
-swiftlatex-shared.js           # Worker-side cache logic
-main-thread-indexeddb.js       # Main thread IndexedDB handler  
-swiftlatexxetex.js            # XeTeX engine (updated)
-swiftlatexdvipdfm.js          # DviPDFm engine (updated)  
-swiftlatexpdftex.js           # PDFTeX engine (updated)
-```
-
-### Cache Flow (When Working)
-```
-1. In-memory cache (fastest) - Per-invocation maps
-   ├─ texlive404_cache: Known missing files
-   └─ texlive200_cache: Local file paths
-
-2. IndexedDB persistent cache (medium) - Cross-session storage  
-   ├─ TTL expiration (30 days)
-   ├─ Version-based invalidation
-   └─ Blob storage for file contents
-
-3. Network requests (slowest) - TeXLive endpoint downloads
-   └─ Results stored in both cache layers
-```
-
-### Configuration
-```javascript
-self.SWIFTLATEX_CONFIG = {
-    texlive_endpoint: "/lib/",
-    cache_version: 1,              // Increment to purge cache
-    cache_ttl_ms: 30 * 24 * 60 * 60 * 1000  // 30 days
-};
-```
+1. **Where does `36_` prefix come from?** The filename corruption happens before our cache system
+2. **What creates `/rsrc` suffix?** Some requests have mysterious `/rsrc` appended
+3. **Format vs. path relationship**: When should format be used vs. ignored for URL construction?
+4. **Multiple request patterns**: Different file types may need different path handling logic
 
 ## Browser Requirements
 
@@ -125,75 +123,24 @@ self.SWIFTLATEX_CONFIG = {
   ```
 - **IndexedDB**: Universally supported
 - **Web Workers**: Required for SwiftLaTeX
+- **Atomics**: Required for synchronization
 
-## Lessons Learned
+## Next Steps
 
-### Technical Insights
-1. **Atomics.wait() blocks the entire worker thread** - No setTimeout/Promise callbacks can run
-2. **postMessage delivery is not synchronous** - Messages are queued and processed asynchronously
-3. **SharedArrayBuffer transfers are problematic** - Don't pass SABs through postMessage, share them at initialization
-4. **Race conditions are fundamental** - Two async channels cannot be reliably synchronized without proper ordering guarantees
+1. **Deep path debugging**: Add more granular logging to understand where path corruption originates
+2. **WASM analysis**: May need to examine the C/C++ side to understand request patterns
+3. **File type categorization**: Different file types (fonts, maps, styles) may need different handling
+4. **Fallback strategies**: Implement multiple URL patterns to try when files aren't found
+5. **Isolation & locking**: Our active request count logging confirms that only one request is happening at a time. But this needs to be enforced via a locking mechanism.
+6. **Error handling**: Graceful degredation is needed around the IndexedDB caching system. It's a nice-to-have optimization which should fail gracefully.
 
-### Design Patterns
-- ✅ **SharedArrayBuffer for state only** - Don't store data, just coordination flags
-- ✅ **postMessage for data only** - Keep complex objects in messages  
-- ❌ **Mixing sync and async paradigms** - Extremely difficult to get right
-- ❌ **Time-based solutions** - Always indicate deeper architectural problems
+## Implementation Notes
 
-## Alternative Approaches to Consider
+- **Race condition eliminated**: Single SBA channel avoids postMessage timing issues  
+- **Memory efficient**: 50MB allows caching substantial portions of TeXLive
+- **Backward compatible**: Falls back gracefully to direct downloads when SBA unavailable
+- **Engine agnostic**: Works with XeTeX, DviPDFm, and can extend to PDFTeX
 
-### 1. Asyncify (Rebuild WASM)
-Rebuild SwiftLaTeX with Emscripten's Asyncify feature to support async function calls from WASM.
+---
 
-**Pros**: Clean async/await throughout call chain
-**Cons**: Requires rebuilding WASM, increased binary size, complexity
-
-### 2. Pre-population Strategy  
-Background-load common files into IndexedDB, keep sync lookup for cache hits only.
-
-**Pros**: Maintains sync interface, improves cache hit performance
-**Cons**: Cache misses still require network requests, limited coverage
-
-### 3. Service Worker Interception
-Use Service Worker to intercept TeXLive network requests and serve from cache.
-
-**Pros**: Transparent to application, works with existing sync code
-**Cons**: Limited browser support in workers, complex SW lifecycle
-
-### 4. OPFS with Synchronous Access  
-Use Origin Private File System's sync APIs available in dedicated workers.
-
-**Pros**: True synchronous file operations
-**Cons**: Limited browser support (no Firefox), still requires cross-origin isolation
-
-## Current State
-
-The persistent cache implementation is **functionally complete** but **unreliable due to race conditions**. The code successfully:
-
-- ✅ Initializes IndexedDB with proper schema
-- ✅ Stores and retrieves files with TTL
-- ✅ Handles cache version invalidation  
-- ✅ Falls back gracefully to in-memory cache
-- ❌ **Has race conditions in worker/main thread coordination**
-
-## Recommendation
-
-**Abandon the SharedArrayBuffer approach** due to fundamental race condition issues. Consider:
-
-1. **Service Worker approach** for transparent network interception
-2. **Asyncify rebuild** if willing to modify WASM build process  
-3. **Enhanced in-memory caching** with background pre-population
-4. **Wait for OPFS broader browser support** and revisit in 6-12 months
-
-The investigation proved that **synchronous-over-async patterns are extremely difficult to implement reliably** in JavaScript's event-driven environment.
-
-## Files Modified
-
-- `swiftlatex-shared.js` - Centralized cache logic with persistent storage
-- `main-thread-indexeddb.js` - Main thread IndexedDB operations handler
-- `swiftlatexxetex.js` - Updated to use shared cache functions  
-- `swiftlatexdvipdfm.js` - Updated to use shared cache functions
-- `swiftlatexpdftex.js` - Updated to use shared cache functions
-- `test-cache.html` - Testing harness for cache functionality
-
-The DRY refactoring (moving duplicate code to shared functions) was **successful and should be kept**. Only the persistent cache layer needs to be removed/reworked.
+**Status**: Core infrastructure complete, path handling logic needs refinement based on empirical testing and WASM behavior analysis.
