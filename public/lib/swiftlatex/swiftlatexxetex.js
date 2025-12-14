@@ -181,18 +181,6 @@ function setTexliveEndpoint(url) {
     }
 }
 
-function initSBACacheSystem(sharedBuffer) {
-    console.log('[WORKER] Initializing SBA cache system with buffer:', sharedBuffer.byteLength, 'bytes');
-    
-    // Initialize SBA integration in the shared module
-    if (typeof initSBAIntegration === 'function') {
-        initSBAIntegration(sharedBuffer);
-        console.log('[WORKER] SBA cache integration initialized successfully');
-    } else {
-        console.error('[WORKER] initSBAIntegration function not found in shared module');
-    }
-}
-
 self["onmessage"] = function (ev) {
     let data = ev["data"];
     let cmd = data["cmd"];
@@ -208,8 +196,6 @@ self["onmessage"] = function (ev) {
         writeFileRoutine(data["url"], data["src"])
     } else if (cmd === "setmainfile") {
         self.mainfile = data["url"]
-    } else if (cmd === "init_sba_cache") {
-        initSBACacheSystem(data["sharedBuffer"])
     } else if (cmd === "grace") {
         console.error("Gracefully Close");
         self.close()
