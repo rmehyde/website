@@ -1,13 +1,13 @@
 'use client';
 
-import React, {useState, useRef, useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {DimensionScores} from "@/app/lib/content/scoring";
 import {useContactStore} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
 import {Button} from "@/components/ui/button";
 import {Spinner} from "@/components/ui/spinner";
 import {Download} from "lucide-react";
-import {XeTeXEngine} from "@/app/lib/swiftlatex/XeTeXEngine";
+import {EngineStatus, XeTeXEngine} from "@/app/lib/swiftlatex/XeTeXEngine";
 import {DvipdfmxEngine} from "@/app/lib/swiftlatex/DvipdfmxEngine";
 
 const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&sidebar=0&view=fitH"
@@ -41,17 +41,14 @@ export default function PDFComponent({onWeightsComplete}: {
         // Clear any pending render since we're starting fresh
         pendingWeightsRef.current = null;
         try {
-            console.log('About to load XeTeX engine...');
-            console.log('XeTeX engine status:', xetexEngine.latexWorkerStatus);
-            await xetexEngine.loadEngine().then(() => {
-                console.log('XeTeX engine loaded successfully');
-                xetexEngine.setTexliveEndpoint(TEX_ENDPOINT)
-            }).catch(error => {
-                console.error('XeTeX engine failed to load:', error);
-            });
-
-            console.log("completed loading engine and setting endpoint")
-
+            if (xetexEngine.latexWorkerStatus === EngineStatus.Init) {
+                await xetexEngine.loadEngine().then(() => {
+                    console.log('XeTeX engine loaded successfully');
+                    xetexEngine.setTexliveEndpoint(TEX_ENDPOINT)
+                }).catch(error => {
+                    console.error('XeTeX engine failed to load:', error);
+                });
+            }
             const latex = await generateResumeLatex(weightsToRender, contact);
 
             // const pdfBlob = new Blob([result.pdf], { type: "application/pdf" });
@@ -67,14 +64,14 @@ export default function PDFComponent({onWeightsComplete}: {
             const result = await xetexEngine.compileLaTeX();
             console.log("got result from xetex", result.log)
 
-
-            console.log("loading divpdfmxEngine")
-            await divpdfmxEngine.loadEngine().then(() => {
-                console.log('Dvipdfmx engine loaded successfully');
-                divpdfmxEngine.setTexliveEndpoint(TEX_ENDPOINT)
-            }).catch(error => {
-                console.error('Dvipdfmx engine failed to load:', error);
-            });
+            if (divpdfmxEngine.latexWorkerStatus === EngineStatus.Init) {
+                await divpdfmxEngine.loadEngine().then(() => {
+                    console.log('Dvipdfmx engine loaded successfully');
+                    divpdfmxEngine.setTexliveEndpoint(TEX_ENDPOINT)
+                }).catch(error => {
+                    console.error('Dvipdfmx engine failed to load:', error);
+                });
+            }
 
             // Write the .xdv file to the engine's virtual file system
             divpdfmxEngine.writeMemFSFile("main.xdv", result.pdf);
