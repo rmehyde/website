@@ -14,6 +14,9 @@ const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&sidebar=0&view=fitH"
 const TEX_ENDPOINT = "/lib/";
 // const TEX_ENDPOINT = "http://localhost:5000/";
 
+// TODO: broke the "queueing" mechanism. rapid changes now gives:
+//   LaTeX compile failed: Error: Engine is still spinning or not ready yet!
+
 const xetexEngine = new XeTeXEngine();
 const divpdfmxEngine = new DvipdfmxEngine();
 
@@ -60,15 +63,17 @@ export default function PDFComponent({onWeightsComplete}: {
             xetexEngine.setEngineMainFile("main.tex");
 
             // Compile to .xdv
+            console.log("calling xetex compileLaTeX()...")
             const result = await xetexEngine.compileLaTeX();
-            console.log(result.log)
+            console.log("got result from xetex", result.log)
 
 
+            console.log("loading divpdfmxEngine")
             await divpdfmxEngine.loadEngine().then(() => {
-                console.log('XeTeX engine loaded successfully');
+                console.log('Dvipdfmx engine loaded successfully');
                 divpdfmxEngine.setTexliveEndpoint(TEX_ENDPOINT)
             }).catch(error => {
-                console.error('XeTeX engine failed to load:', error);
+                console.error('Dvipdfmx engine failed to load:', error);
             });
 
             // Write the .xdv file to the engine's virtual file system

@@ -22,6 +22,7 @@ export enum EngineStatus {
 	Error
 }
 
+
 // TODO: clean up!! the latter is for statically-hosted engine but we want to get the former working
 // const ENGINE_PATH = new URL('./swiftlatexxetex.js', import.meta.url).toString();
 const ENGINE_PATH = '/lib/swiftlatex/swiftlatexxetex.js';
