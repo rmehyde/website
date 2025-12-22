@@ -1,20 +1,23 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
-@dataclass
-class Roundedness:
-    top_left: float
-    top_right: float
-    mid_right_up: float
-    mid_right_down: float
+class Roundedness(BaseModel):
+    top_left: float = 20.
+    top_right: float = 20.
+    mid_right_up: float = 20.
+    mid_right_down: float = 20.
+
+class LogoParams(BaseModel):
+    width: int = 130
+    height: int = 200
+    line_thickness: float = 20
+    crossbar_pos: float = 0.5   # 0 = top, 1 = bottom (relative)
+    base_color: str = "#000000"
+    cap_color: str = "#000000"
+    roundedness: Roundedness | float = 20.
+
 
 def generate_logo_svg(
-    width: float = 200,
-    height: float = 200,
-    line_thickness: float = 30,
-    crossbar_pos: float = 0.5,   # 0 = top, 1 = bottom (relative)
-    roundedness: float | Roundedness = 20.0,   # radius of the curved right angles
-    base_color: str = "#000000",
-    cap_color: str = "#000000",
+    params: LogoParams = LogoParams(),
     allow_invalid: bool = False,
 ) -> str:
     """
@@ -31,6 +34,15 @@ def generate_logo_svg(
     crossbar_pos: vertical position of middle bar as a fraction of height (0..1 from top)
     roundedness: geometric radius r of the curved corners (in SVG units)
     """
+    # pull out params
+    width = params.width
+    height = params.height
+    line_thickness = params.line_thickness
+    crossbar_pos = params.crossbar_pos
+    base_color = params.base_color
+    cap_color = params.cap_color
+    roundedness = params.roundedness
+
     if isinstance(roundedness, (float, int)):
         roundedness = Roundedness(
             top_left=roundedness,
@@ -38,7 +50,6 @@ def generate_logo_svg(
             mid_right_up=roundedness,
             mid_right_down=roundedness,
         )
-    # TODO: use per-corner values instead of fixed float below!
 
     # basic sanity and aliases
     if width < 10 or height < 10:
