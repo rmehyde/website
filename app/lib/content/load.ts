@@ -5,7 +5,7 @@ import {ContentSchema, Content, ContentByType, ContentTypeEnum, Job, Duty} from 
 const contentModules = (require as any).context(
     '@/public/content',
     true,
-    /\.(?:ya?ml)$/
+    /\.\/.+\/.+\.(?:ya?ml)$/
 )
 
 function filterAndSortedContent(
