@@ -18,8 +18,10 @@ type RadialSelectorProps = {
     onChange: (newValues: Record<string, number>) => void;
     onComplete?: (finalValues: Record<string, number>) => void;
     plotRadius?: number;
+    labelTextClass?: string;
     minRadiusRatio?: number;
-    labelMargin?: number;
+    labelDistance?: number;
+    labelSpace?: number;
 };
 
 function splitLines(text: string, maxLen: number): string[] {
@@ -63,8 +65,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   onChange,
                                                                   onComplete,
                                                                   plotRadius = 150,
+                                                                  labelTextClass = "text-sm",
                                                                   minRadiusRatio = 0.1,
-                                                                  labelMargin = 20,
+                                                                  labelDistance = 20,
+    // TODO: consider replacing labelSpace with bbox-based dynamic rerender
+                                                                  labelSpace = 110,
                                                               }) => {
     const [activeDim, setActiveDim] = useState<string | null>(null);
     const svgRef = useRef<SVGSVGElement>(null);
@@ -76,7 +81,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         )
     );
     // total svg size includes extra space for labels
-    const total = (plotRadius + 75) * 2;
+    const total = (plotRadius + labelSpace) * 2;
     const cx = total / 2;
     const cy = total / 2;
     const innerR = plotRadius * minRadiusRatio;
@@ -142,7 +147,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     return (
         <div
             className="relative"
-            style={{width: total, height: total, 'marginLeft': 'auto', 'marginRight': 'auto'}}
+            style={{width: total, height: total}}
         >
             <svg
                 ref={svgRef}
@@ -226,8 +231,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             {dimensions.map((dim, i) => {
                 // compute the same label anchor point you used before
                 const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                const lx = cx + Math.cos(angle) * (plotRadius + labelMargin * 0.8);
-                const ly = cy + Math.sin(angle) * (plotRadius + labelMargin * 0.8);
+                const lx = cx + Math.cos(angle) * (plotRadius + labelDistance * 0.8);
+                const ly = cy + Math.sin(angle) * (plotRadius + labelDistance * 0.8);
                 const tx = -50 + 50 * Math.cos(angle);
                 const ty = -50 + 50 * Math.sin(angle);
 
@@ -242,7 +247,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                             textAlign: "center",
                             whiteSpace: "nowrap",  // let <br/> drive line breaks
                         }}
-                        className="text-xs font-medium"
+                        className={labelTextClass + " font-medium"}
                     >
                         {dimensionLabelLines[dim].map((line, idx) => (
                             <React.Fragment key={idx}>

@@ -16,7 +16,7 @@ import {pages} from "@/app/lib/nav";
 
 export default async function Home() {
     return (
-        <div className="min-h-screen flex flex-col justify-center md:pl-12">
+        <div className="min-h-screen flex flex-col justify-center md:pl-8">
             <div className="max-w-xl">
                 <div className="text-8xl">
                     {"Hi, I'm Reese."}

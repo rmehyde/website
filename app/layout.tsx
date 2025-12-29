@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     description: "Reese Hyde's portfolio website",
 }
 
+// TODO: on laptop without internet this becomes serif'd
+//  need to investigate and ensure the fallback is sans serif
 const roboto = Roboto({
     subsets: ['latin'],
     variable: '--font-sans',        // maps to Tailwind’s var(--font-sans)
@@ -17,11 +19,11 @@ const roboto = Roboto({
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
-            <body className="min-h-screen max-w-7xl mx-auto px-4 md:px-14">
+            <body className="min-h-screen max-w-7xl m-auto px-4 md:px-14">
                 <header>
                     <NavigationHeader/>
                 </header>
-                <main className="">
+                <main>
                     {children}
                 </main>
             </body>

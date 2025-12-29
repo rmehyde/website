@@ -44,6 +44,7 @@ export default function DynamicProjects() {
 
     return (
         <div>
+        {/*<div className="flex flex-col justify-center md:pl-8">*/}
             {/* TODO: fix scroll issue on mobile */}
             {/* radial selector drives the weights */}
             <RadialSelector

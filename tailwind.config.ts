@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import type { Config } from 'tailwindcss'
+import { screens } from "./app/lib/tailwind/screens";
 
 const config: Config = {
     darkMode: ['class'],
@@ -10,6 +11,7 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+	screens,
   	extend: {
   		colors: {
   			skygray: {
