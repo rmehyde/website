@@ -21,26 +21,36 @@ export default function DynamicProjects() {
 
     return (
         <div>
-            <div className="flex flex-col justify-evenly md:flex-row">
+            {/* TODO: this needs some better spacing as it looks fucky with the project
+            spacing */}
+            <div className="flex flex-col justify-evenly md:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
-                <div className="flex items-center justify-center text-3xl">
-                    What kind of projects do you want to see?
+                <div className="flex items-center justify-center text-3xl text-center">
+                    What kind of projects
                 </div>
                 {/* radial selector drives the weights */}
-                <RadialSelector
-                    dimensionLabels={dimensionLabels}
-                    values={values}
-                    levels={maxScore}
-                    max={maxScore}
-                    onChange={setValues}
-                    plotRadius={isMdUp ? 100 : 75}
-                    labelDistance={isMdUp ? 25 :  20}
-                    labelTextClass={isMdUp ? "text-sm" : "text-xs"}
-                />
+                <div className="self-center">
+                    <RadialSelector
+                        dimensionLabels={dimensionLabels}
+                        values={values}
+                        levels={maxScore}
+                        max={maxScore}
+                        onChange={setValues}
+                        plotRadius={isMdUp ? 100 : 75}
+                        labelDistance={isMdUp ? 25 :  20}
+                        labelTextClass={isMdUp ? "text-sm" : "text-xs"}
+                    />
+                </div>
+                {/* TODO: the right side of the graph pushes up against this text
+                 when */}
+                <div className="flex items-center justify-center text-3xl text-center">
+                    do you want to see?
+                </div>
             </div>
             {/* content cards re-sort based on those weights */}
             {}
             <ContentCards weights={dimensionScoresSchema.parse(values)} />
+            <div className="h-10"/>
         </div>
     )
 }

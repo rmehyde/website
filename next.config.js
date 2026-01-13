@@ -5,7 +5,7 @@ withMDX = require('@next/mdx')();
 const nextConfig = {
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
     // flag for static vs server
-    output: 'export',
+    // output: 'export',
     typescript: {
         ignoreBuildErrors: true,
     },

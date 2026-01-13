@@ -1,5 +1,6 @@
 contentType: project
 title: NYC Subway Map
+icon: train-front
 priority: 8
 summary: Android app with a map of the NYC Subway
 detail:

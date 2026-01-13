@@ -1,5 +1,6 @@
 contentType: project
 title: Traffic Race VR
+icon: car
 priority: 55
 summary: Multiplayer Frogger-like VR game
 detail: A Google Cardboard mobile VR game in which players on a local network race each other across a highway.

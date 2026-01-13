@@ -1,5 +1,6 @@
 contentType: project
 title: RiCSR SpMV
+icon: microchip
 priority: 30
 summary: Multi-GPU sparse matrix-vector multiplication CUDA implementation
 detail:

@@ -1,10 +1,18 @@
-import React from "react";
-import {ReactNode} from "react";
+import { type ReactNode } from "react";
 
-export function H1({ children }: {children: ReactNode}): React.JSX.Element {
+type H1Props = {
+    children: ReactNode;
+    className?: string;
+    prefix?: ReactNode;
+};
+
+export function H1({ children, className = "", prefix }: H1Props): React.JSX.Element {
     return (
-        <h1 className={'text-xl pb-2'}>{children}</h1>
-    )
+        <h1 className={`text-2xl font-medium pb-2 ${className}`.trim()}>
+            {prefix}
+            {children}
+        </h1>
+    );
 }
 
 export function Link(content: {href: string, children: ReactNode}): React.JSX.Element {

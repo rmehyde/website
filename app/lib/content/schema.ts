@@ -24,6 +24,7 @@ export const BaseContentSchema = z.object(
     {
         contentType: ContentTypeEnum,
         title: z.string(),
+        icon: z.string().optional(),
         summary: z.string(),
         detail: z.string(),
         links: z.array(LinkSchema).optional(),

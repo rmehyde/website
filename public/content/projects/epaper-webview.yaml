@@ -1,5 +1,6 @@
 contentType: project
 title: E-Paper Web Viewer
+icon: newspaper
 priority: 20
 summary: E-Paper screen library with Python wrappers and webpage viewer
 detail:

@@ -17,9 +17,11 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
             const allContent = getFilteredAndSortedContent(weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
-                <Card key={c.title} className="block box-content p-5 my-4">
+                <div key={c.title}
+                      className="w-full md:basis-[32rem] md:max-w-[32rem] text-justify"
+                >
                     {generateContentElements(c)}
-                </Card>
+                </div>
             ))
             console.log(items)
             if (!cancelled) setCards(items)
@@ -30,8 +32,16 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
     }, [weights])
 
     if (!cards) {
+        // TODO: center and so on, make it look better
         return <p>Loading content…</p>
     }
 
-    return <div>{cards}</div>
+    // TODO: fix these being pushed to the left
+    return (
+        <div className="mx-auto max-w-6xl">
+            <div className="flex flex-wrap justify-start gap-20">
+                {cards}
+            </div>
+        </div>
+    )
 }
