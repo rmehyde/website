@@ -42,7 +42,8 @@ export default function DynamicProjects() {
                     />
                 </div>
                 {/* TODO: the right side of the graph pushes up against this text
-                 when */}
+                        when the page is pretty narrow but not quite vertical
+                */}
                 <div className="flex items-center justify-center text-3xl text-center">
                     do you want to see?
                 </div>
@@ -50,7 +51,8 @@ export default function DynamicProjects() {
             {/* content cards re-sort based on those weights */}
             {}
             <ContentCards weights={dimensionScoresSchema.parse(values)} />
-            <div className="h-10"/>
+            {/* TODO: use a global footer */}
+            <div className="h-20"/>
         </div>
     )
 }

@@ -24,7 +24,6 @@ function filterAndSortedContent(
 
             // if it's a Job, recurse into duties
             if (item.contentType === ContentTypeEnum.enum.job) {
-                console.log(`filtering and sorting duties in ${item.title}`)
                 const job = item as Job
                 const sortedDuties = filterAndSortedContent(
                     job.duties as Content[],
@@ -34,7 +33,6 @@ function filterAndSortedContent(
             }
             // if it's a Duty, recurse into subduties
             else if (item.contentType === ContentTypeEnum.enum.duty) {
-                console.log(`filtering and sorting subduties in ${item.title}`)
                 const duty = item as Duty
                 const sortedSubduties = filterAndSortedContent(
                     (duty.subduties ?? []) as unknown as Content[],

@@ -18,7 +18,7 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
                 <div key={c.title}
-                      className="w-full md:basis-[32rem] md:max-w-[32rem] text-justify"
+                     className="w-full p-5 lg:w-[32rem]"
                 >
                     {generateContentElements(c)}
                 </div>
@@ -36,12 +36,9 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
         return <p>Loading content…</p>
     }
 
-    // TODO: fix these being pushed to the left
     return (
-        <div className="mx-auto max-w-6xl">
-            <div className="flex flex-wrap justify-start gap-20">
-                {cards}
-            </div>
+        <div className="grid grid-cols-1 justify-items-center lg:grid-cols-[repeat(2,32rem)] lg:justify-center lg:justify-items-stretch xl:gap-20">
+            {cards}
         </div>
     )
 }
