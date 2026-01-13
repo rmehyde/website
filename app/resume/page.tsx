@@ -47,9 +47,10 @@ export default function DynamicProjects() {
         <div>
             {/*<div className="flex flex-col justify-center md:pl-8">*/}
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                {/* TODO: clicking this selector fucks up the entire page */}
+                <ProfileSelector />
                 {/* TODO: fix scroll issue on mobile */}
                 {/* radial selector drives the weights */}
-                <ProfileSelector />
                 <RadialSelector
                     dimensionLabels={dimensionLabels}
                     values={values}
@@ -62,9 +63,9 @@ export default function DynamicProjects() {
             </div>
             {/* TODO: probably this padding should be global as well */}
             <div className="pb-8">
-                <PDFComponent
-                    onWeightsComplete={handlePDFReady}
-                />
+                {/*<PDFComponent*/}
+                {/*    onWeightsComplete={handlePDFReady}*/}
+                {/*/>*/}
             </div>
         </div>
     )
