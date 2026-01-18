@@ -19,13 +19,15 @@ const roboto = Roboto({
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
-            <body className="min-h-screen max-w-7xl m-auto px-4 md:px-14">
-                <header>
-                    <NavigationHeader/>
-                </header>
-                <main>
-                    {children}
-                </main>
+            <body>
+                <div className="min-h-screen max-w-7xl m-auto px-4 md:px-14">
+                    <header>
+                        <NavigationHeader/>
+                    </header>
+                    <main>
+                        {children}
+                    </main>
+                </div>
             </body>
         </html>
     )
