@@ -2,7 +2,6 @@
 
 import { profiles } from "../lib/content/profiles";
 import {
-    AnimatedSelect, AnimatedSelectTrigger,
     Select,
     SelectContent,
     SelectItem,
@@ -15,14 +14,14 @@ export default function ProfileSelector() {
     return (
         <div className="flex flex-col gap-3 md:min-w-[240px]">
             <div className="text-2xl">Reese is a</div>
-            <AnimatedSelect
-                introValues={profiles.map((p) => p.name)}
+            <Select
+                // introValues={profiles.map((p) => p.name)}
                 defaultValue={profiles[0]?.name}
-                introTicks={Dimension.options.length * 3}
+                // introTicks={Dimension.options.length * 3}
             >
-                <AnimatedSelectTrigger className="w-full">
+                <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choose a profile" />
-                </AnimatedSelectTrigger>
+                </SelectTrigger>
 
                 <SelectContent>
                     {profiles.map((p) => (
@@ -31,7 +30,7 @@ export default function ProfileSelector() {
                         </SelectItem>
                     ))}
                 </SelectContent>
-            </AnimatedSelect>
+            </Select>
         </div>
     );
 }
