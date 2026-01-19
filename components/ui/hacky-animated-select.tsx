@@ -1,4 +1,10 @@
+
 // animated select
+
+import * as React from "react";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import {cn} from "@/components/lib/utils";
+import {SelectTrigger} from "@/components/ui/select";
 
 type AnimatedSelectCtx = {
     introRunning: boolean;

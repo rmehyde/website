@@ -4,7 +4,7 @@ import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxS
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState, useRef} from "react";
 import PDFComponent from "@/app/ui/pdf";
-import ProfileSelector from "@/app/ui/profiles";
+import ProfileSelector from "@/app/ui/profiles-wheel";
 
 export default function DynamicProjects() {
     // initialize weights to maxScore for each dimension
@@ -47,7 +47,6 @@ export default function DynamicProjects() {
         <div>
             {/*<div className="flex flex-col justify-center md:pl-8">*/}
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                {/* TODO: clicking this selector fucks up the entire page */}
                 <ProfileSelector />
                 {/* TODO: fix scroll issue on mobile */}
                 {/* radial selector drives the weights */}
