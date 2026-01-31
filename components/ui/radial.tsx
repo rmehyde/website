@@ -6,7 +6,7 @@ import {
     curveCatmullRomClosed,
     curveBundle,
 } from "d3-shape";
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect, useCallback} from "react";
 import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 
@@ -22,6 +22,10 @@ type RadialSelectorProps = {
     minRadiusRatio?: number;
     labelDistance?: number;
     labelSpace?: number;
+    // Transition props
+    transitionDuration?: number; // if provided, enables smooth transitions
+    onTransitionStart?: () => void;
+    onTransitionEnd?: () => void;
 };
 
 function splitLines(text: string, maxLen: number): string[] {
@@ -70,9 +74,80 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   labelDistance = 20,
     // TODO: consider replacing labelSpace with bbox-based dynamic rerender
                                                                   labelSpace = 110,
+                                                                  transitionDuration,
+                                                                  onTransitionStart,
+                                                                  onTransitionEnd,
                                                               }) => {
     const [activeDim, setActiveDim] = useState<string | null>(null);
     const svgRef = useRef<SVGSVGElement>(null);
+    
+    // Transition state management
+    const [displayValues, setDisplayValues] = useState<Record<string, number>>(values);
+    const animationRef = useRef<number | null>(null);
+    
+    // Transition animation function
+    const startTransition = useCallback((fromValues: Record<string, number>, toValues: Record<string, number>) => {
+        if (!transitionDuration || transitionDuration <= 0) {
+            // No transition - set immediately
+            setDisplayValues(toValues);
+            return;
+        }
+        
+        // Cancel any existing animation
+        if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+        }
+        
+        onTransitionStart?.();
+        const startTime = performance.now();
+        const dimensionKeys = Object.keys(fromValues);
+        
+        const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / transitionDuration, 1);
+            
+            // Ease-out cubic for smooth deceleration
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            
+            // Interpolate each dimension (using floating point, not rounded)
+            const interpolatedValues: Record<string, number> = {};
+            for (const dim of dimensionKeys) {
+                const from = fromValues[dim] ?? 0;
+                const to = toValues[dim] ?? 0;
+                interpolatedValues[dim] = from + (to - from) * easedProgress;
+            }
+            
+            setDisplayValues(interpolatedValues);
+            
+            // Continue animation or finish
+            if (progress < 1) {
+                animationRef.current = requestAnimationFrame(animate);
+            } else {
+                animationRef.current = null;
+                setDisplayValues(toValues); // Ensure exact final values
+                onTransitionEnd?.();
+            }
+        };
+        
+        animationRef.current = requestAnimationFrame(animate);
+    }, [transitionDuration, onTransitionStart, onTransitionEnd]);
+    
+    // Cancel any active transition
+    const cancelTransition = useCallback(() => {
+        if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+            animationRef.current = null;
+        }
+    }, []);
+    
+    // Detect when values prop changes and start transition
+    useEffect(() => {
+        if (transitionDuration && transitionDuration > 0) {
+            startTransition(displayValues, values);
+        } else {
+            setDisplayValues(values);
+        }
+    }, [values, transitionDuration, startTransition]);
 
     const dimensions = Object.keys(dimensionLabels);
     const dimensionLabelLines: Record<string, string[]> = Object.fromEntries(
@@ -87,9 +162,10 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const innerR = plotRadius * minRadiusRatio;
     const handleR = 6
 
+    // Use displayValues for rendering (either current values or transitioning values)
     const dataPoints = dimensions.map((dim, i) => {
         const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-        const v = Math.max(0, Math.min(values[dim] ?? 0, max));
+        const v = Math.max(0, Math.min(displayValues[dim] ?? 0, max));
         const radius = innerR + (plotRadius - innerR) * (v / max);
         return {angle, radius};
     });
@@ -103,6 +179,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
 
     // pointer down begins drag
     const onHandleDown = (dim: string) => (e: React.PointerEvent) => {
+        // Cancel any ongoing transition when user starts interacting
+        cancelTransition();
+        // Snap displayValues to current values prop immediately
+        setDisplayValues(values);
+        
         e.currentTarget.setPointerCapture(e.pointerId);
         setActiveDim(dim);
     };
@@ -206,7 +287,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 {/* draggable handles */}
                 {dimensions.map((dim, i) => {
                     const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                    const v = Math.max(0, Math.min(values[dim] ?? 0, max));
+                    const v = Math.max(0, Math.min(displayValues[dim] ?? 0, max));
                     const r = innerR + (plotRadius - innerR) * (v / max);
                     const ux = Math.cos(angle);
                     const uy = Math.sin(angle);

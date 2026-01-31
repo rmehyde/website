@@ -9,7 +9,7 @@ import {profiles} from '@/app/lib/content/profiles';
 
 type Mode = 'intro' | 'interactive';
 
-export default function DynamicProjects() {
+export default function DynamicResume() {
     // Page-level state management
     const [mode, setMode] = useState<Mode>('intro');
     
@@ -81,9 +81,9 @@ export default function DynamicProjects() {
     const handlePreviewProfileChange = (profileName: string) => {
         setPreviewProfile(profileName);
         
-        // Update preview weights to match the preview profile
+        // Update preview weights to match the preview profile with smooth transition
         const profile = profiles.find(p => p.name === profileName);
-        if (profile) {
+        if (profile && mode === 'intro') {
             setPreviewWeights(profile.scores);
         }
     };
@@ -133,6 +133,7 @@ export default function DynamicProjects() {
                     onChange={setValues}
                     onComplete={handleWeightsComplete}
                     plotRadius={100}  // TODO: should be 75 on mobile
+                    transitionDuration={mode === 'intro' ? 50 : undefined}
                 />
             </div>
             {/* TODO: probably this padding should be global as well */}
