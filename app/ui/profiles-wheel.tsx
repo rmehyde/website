@@ -291,15 +291,6 @@ export default function ProfileSelector({
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                
-                {/* Debug info */}
-                <div className="absolute top-full left-0 mt-1 text-xs text-gray-500 whitespace-nowrap">
-                    Mode: {mode} | Animating: {isAnimating ? 'Yes' : 'No'}
-                    <br />
-                    Selected: {selectedProfile} | Preview: {previewProfile}
-                    <br />
-                    Sequence length: {profileSequence.length}
-                </div>
             </div>
         </div>
     );
