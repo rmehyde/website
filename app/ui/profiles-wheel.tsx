@@ -19,6 +19,7 @@ interface ProfileSelectorProps {
     previewProfile: string;
     onProfileChange: (profileName: string) => void;
     onPreviewChange: (profileName: string) => void;
+    previewChangeOffsetMillis: number;
     onUserIntent: (reason: 'user') => void;
     onIntroComplete: () => void;
 }
@@ -28,9 +29,10 @@ export default function ProfileSelector({
     selectedProfile, 
     previewProfile, 
     onProfileChange, 
-    onPreviewChange, 
+    onPreviewChange,
+    previewChangeOffsetMillis,
     onUserIntent,
-    onIntroComplete 
+    onIntroComplete,
 }: ProfileSelectorProps) {
     const [isAnimating, setIsAnimating] = useState(false);
     // TODO: there's some weird empty state: initial page load shows first element with no top margin which is wrong
@@ -184,7 +186,7 @@ export default function ProfileSelector({
                 const timeout = setTimeout(() => {
                     onPreviewChange(timing.profileName);
                     console.log(`Preview updated to: ${timing.profileName} at ${timing.cumulativeTime}ms`);
-                }, timing.cumulativeTime);
+                }, timing.cumulativeTime + previewChangeOffsetMillis);
                 timeouts.push(timeout);
             });
             

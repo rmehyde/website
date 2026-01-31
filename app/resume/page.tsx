@@ -120,6 +120,7 @@ export default function DynamicResume() {
                     previewProfile={previewProfile}
                     onProfileChange={handleProfileSelection}
                     onPreviewChange={handlePreviewProfileChange}
+                    previewChangeOffsetMillis={-25}
                     onUserIntent={exitIntro}
                     onIntroComplete={() => exitIntro('auto')}
                 />

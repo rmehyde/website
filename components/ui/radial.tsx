@@ -6,6 +6,9 @@ import {
     curveCatmullRomClosed,
     curveBundle,
 } from "d3-shape";
+import { transition } from "d3-transition";
+import { interpolate } from "d3-interpolate";
+import { easeCubicOut } from "d3-ease";
 import React, {useState, useRef, useEffect, useCallback} from "react";
 import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
@@ -83,9 +86,9 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     
     // Transition state management
     const [displayValues, setDisplayValues] = useState<Record<string, number>>(values);
-    const animationRef = useRef<number | null>(null);
+    const transitionRef = useRef<any>(null);
     
-    // Transition animation function
+    // Transition animation function using D3
     const startTransition = useCallback((fromValues: Record<string, number>, toValues: Record<string, number>) => {
         if (!transitionDuration || transitionDuration <= 0) {
             // No transition - set immediately
@@ -93,50 +96,47 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             return;
         }
         
-        // Cancel any existing animation
-        if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
+        // Cancel any existing transition by setting a flag
+        if (transitionRef.current) {
+            transitionRef.current.cancelled = true;
         }
         
         onTransitionStart?.();
-        const startTime = performance.now();
-        const dimensionKeys = Object.keys(fromValues);
         
-        const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / transitionDuration, 1);
+        // Create interpolator for the values object
+        const valuesInterpolator = interpolate(fromValues, toValues);
+        
+        // Create transition state object
+        const transitionState = { cancelled: false };
+        transitionRef.current = transitionState;
+        
+        // Create D3 transition
+        const t = transition()
+            .duration(transitionDuration)
+            .ease(easeCubicOut);
             
-            // Ease-out cubic for smooth deceleration
-            const easedProgress = 1 - Math.pow(1 - progress, 3);
-            
-            // Interpolate each dimension (using floating point, not rounded)
-            const interpolatedValues: Record<string, number> = {};
-            for (const dim of dimensionKeys) {
-                const from = fromValues[dim] ?? 0;
-                const to = toValues[dim] ?? 0;
-                interpolatedValues[dim] = from + (to - from) * easedProgress;
-            }
-            
-            setDisplayValues(interpolatedValues);
-            
-            // Continue animation or finish
-            if (progress < 1) {
-                animationRef.current = requestAnimationFrame(animate);
-            } else {
-                animationRef.current = null;
+        // Apply the transition
+        t.tween('values', () => {
+            return (progress: number) => {
+                // Check if this transition was cancelled
+                if (transitionState.cancelled) return;
+                
+                setDisplayValues(valuesInterpolator(progress));
+            };
+        }).on('end', () => {
+            if (!transitionState.cancelled) {
+                transitionRef.current = null;
                 setDisplayValues(toValues); // Ensure exact final values
                 onTransitionEnd?.();
             }
-        };
-        
-        animationRef.current = requestAnimationFrame(animate);
+        });
     }, [transitionDuration, onTransitionStart, onTransitionEnd]);
     
     // Cancel any active transition
     const cancelTransition = useCallback(() => {
-        if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
-            animationRef.current = null;
+        if (transitionRef.current) {
+            transitionRef.current.cancelled = true;
+            transitionRef.current = null;
         }
     }, []);
     
@@ -147,7 +147,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         } else {
             setDisplayValues(values);
         }
-    }, [values, transitionDuration, startTransition]);
+    }, [values, transitionDuration, startTransition, displayValues]);
 
     const dimensions = Object.keys(dimensionLabels);
     const dimensionLabelLines: Record<string, string[]> = Object.fromEntries(
