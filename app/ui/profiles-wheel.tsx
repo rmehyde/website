@@ -19,6 +19,7 @@ interface ProfileSelectorProps {
     selectedProfile: string;
     previewProfile: string;
     profiles?: Profile[];  // Optional, falls back to default profiles
+    prefersReducedMotion?: boolean; // Skip animations if user prefers reduced motion
     onProfileChange: (profileName: string) => void;
     onPreviewChange: (profileName: string) => void;
     previewChangeOffsetMillis: number;
@@ -31,6 +32,7 @@ export default function ProfileSelector({
     selectedProfile, 
     previewProfile, 
     profiles = defaultProfiles,
+    prefersReducedMotion = false,
     onProfileChange, 
     onPreviewChange,
     previewChangeOffsetMillis,
@@ -71,9 +73,9 @@ export default function ProfileSelector({
     const animationRef = useRef<HTMLDivElement>(null);
 
 
-    // Start animation when component mounts
+    // Start animation when component mounts (unless motion is reduced)
     useEffect(() => {
-        if (mode === 'intro' && animationRef.current) {
+        if (mode === 'intro' && animationRef.current && !prefersReducedMotion) {
             setIsAnimating(true);
 
             // generate animation positions and timings
@@ -214,8 +216,11 @@ export default function ProfileSelector({
                 animation.cancel();
                 timeouts.forEach(timeout => clearTimeout(timeout));
             };
+        } else if (mode === 'intro' && prefersReducedMotion) {
+            // Skip animation entirely for reduced motion users
+            onIntroComplete();
         }
-    }, [mode]);
+    }, [mode, prefersReducedMotion]);
 
     const handleSelectChange = (value: string) => {
         onProfileChange(value);
@@ -237,21 +242,33 @@ export default function ProfileSelector({
                         className="w-full text-xl gap-1 py-0 overflow-hidden"
                         onPointerDown={handleUserIntent}
                         onKeyDown={handleUserIntent}
+                        aria-label={`Current profile: ${selectedProfile}`}
                     >
                         {mode === 'intro' ? (
-                            <div className="flex-1 overflow-hidden relative h-full">
-                                <div
-                                    ref={animationRef}
-                                    className="flex flex-col gap-2 absolute left-0 w-full"
-                                    style={{ marginTop: `${centeringOffset}px` }}
+                            <>
+                                {/* Stable content for screen readers */}
+                                <span className="sr-only">
+                                    Loading profile selector. Current profile: {selectedProfile}
+                                </span>
+                                
+                                {/* Visual animated content - hidden from screen readers */}
+                                <div 
+                                    className="flex-1 overflow-hidden relative h-full"
+                                    aria-hidden="true"
                                 >
-                                    {profileSequence.map((profileName, index) => (
-                                        <div key={index} className="h-full leading-6 flex items-center flex-shrink-0 whitespace-nowrap">
-                                            {profileName}
-                                        </div>
-                                    ))}
+                                    <div
+                                        ref={animationRef}
+                                        className="flex flex-col gap-2 absolute left-0 w-full"
+                                        style={{ marginTop: `${centeringOffset}px` }}
+                                    >
+                                        {profileSequence.map((profileName, index) => (
+                                            <div key={index} className="h-full leading-6 flex items-center flex-shrink-0 whitespace-nowrap">
+                                                {profileName}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            </>
                         ) : (
                             <SelectValue placeholder="Choose a profile"/>
                         )}

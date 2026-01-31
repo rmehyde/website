@@ -42,8 +42,13 @@ const getInitialWeights = (): Record<string, number> => {
 };
 
 export default function DynamicResume() {
-    // Page-level state management
-    const [mode, setMode] = useState<Mode>('intro');
+    // Check for reduced motion preference
+    const prefersReducedMotion = typeof window !== 'undefined' 
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
+    
+    // Page-level state management - skip intro if motion is reduced
+    const [mode, setMode] = useState<Mode>(prefersReducedMotion ? 'interactive' : 'intro');
     
     // Committed state - the authoritative weights
     const [committedWeights, setCommittedWeights] = useState<Record<string, number>>(getInitialWeights());
@@ -207,6 +212,7 @@ export default function DynamicResume() {
                     selectedProfile={selectedProfile}
                     previewProfile={previewProfile}
                     profiles={extendedProfiles}
+                    prefersReducedMotion={prefersReducedMotion}
                     onProfileChange={handleProfileSelection}
                     onPreviewChange={handlePreviewProfileChange}
                     previewChangeOffsetMillis={-25}
@@ -223,7 +229,7 @@ export default function DynamicResume() {
                     onChange={handleWeightsChange}
                     onComplete={handleWeightsComplete}
                     plotRadius={100}  // TODO: should be 75 on mobile
-                    transitionDuration={mode === 'intro' ? 50 : undefined}
+                    transitionDuration={mode === 'intro' && !prefersReducedMotion ? 50 : undefined}
                 />
             </div>
             {/* TODO: probably this padding should be global as well */}
