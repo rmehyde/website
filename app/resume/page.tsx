@@ -5,9 +5,18 @@ import {RadialSelector} from "@/components/ui/radial";
 import React, {useState, useRef} from "react";
 import PDFComponent from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
-import {profiles} from '@/app/lib/content/profiles';
+import {profiles, Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
 
 type Mode = 'intro' | 'interactive';
+
+// Helper function to find matching profile for given weights
+const findMatchingProfile = (weights: Record<string, number>) => {
+    return profiles.find(profile => {
+        return Object.keys(weights).every(key => 
+            profile.scores[key as keyof DimensionScores] === weights[key]
+        );
+    });
+};
 
 export default function DynamicResume() {
     // Page-level state management
@@ -53,6 +62,14 @@ export default function DynamicResume() {
         
         const parsedWeights = dimensionScoresSchema.parse(newValues);
         setCommittedWeights(newValues);
+        
+        // Detect if new weights match any existing profile
+        const matchingProfile = findMatchingProfile(newValues);
+        if (matchingProfile) {
+            setSelectedProfile(matchingProfile.name);
+        } else {
+            setSelectedProfile(CUSTOM_PROFILE_NAME);
+        }
 
         // Check if weights actually changed
         const hasChanged = !previousWeightsRef.current || Object.keys(parsedWeights).some(
@@ -82,33 +99,62 @@ export default function DynamicResume() {
         setPreviewProfile(profileName);
         
         // Update preview weights to match the preview profile with smooth transition
-        const profile = profiles.find(p => p.name === profileName);
+        const profile = extendedProfiles.find(p => p.name === profileName);
         if (profile && mode === 'intro') {
             setPreviewWeights(profile.scores);
         }
     };
     
+    // Create extended profiles list including custom option
+    const extendedProfiles: Profile[] = [
+        ...profiles,
+        { 
+            name: CUSTOM_PROFILE_NAME, 
+            scores: Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {} as Record<string, number>) as any
+        }
+    ];
+
     // Callbacks for ProfileSelector
     const handleProfileSelection = (profileName: string) => {
         setSelectedProfile(profileName);
-        const profile = profiles.find(p => p.name === profileName);
-        if (profile) {
-            setCommittedWeights(profile.scores);
-            
-            // Update radial selector immediately
-            setValues(profile.scores);
-            
-            // Trigger PDF generation if in interactive mode
-            if (mode === 'interactive' && triggerRenderRef.current) {
-                const parsedWeights = dimensionScoresSchema.parse(profile.scores);
-                previousWeightsRef.current = parsedWeights;
-                triggerRenderRef.current(parsedWeights);
+        
+        // Only apply profile weights if it's not a custom profile
+        if (profileName !== CUSTOM_PROFILE_NAME) {
+            const profile = profiles.find(p => p.name === profileName);
+            if (profile) {
+                setCommittedWeights(profile.scores);
+                
+                // Update radial selector immediately
+                setValues(profile.scores);
+                
+                // Trigger PDF generation if in interactive mode
+                if (mode === 'interactive' && triggerRenderRef.current) {
+                    const parsedWeights = dimensionScoresSchema.parse(profile.scores);
+                    previousWeightsRef.current = parsedWeights;
+                    triggerRenderRef.current(parsedWeights);
+                }
             }
         }
+        // For custom profiles, don't change the weights - user has set them manually
     };
     
     // For backwards compatibility
     const [values, setValues] = useState<Record<string, number>>(committedWeights);
+    
+    // Handle real-time weight changes during dragging to update profile preview
+    const handleWeightsChange = (newValues: Record<string, number>) => {
+        setValues(newValues);
+        
+        // In interactive mode, detect if weights match any profile
+        if (mode === 'interactive') {
+            const matchingProfile = findMatchingProfile(newValues);
+            if (matchingProfile) {
+                setSelectedProfile(matchingProfile.name);
+            } else {
+                setSelectedProfile(CUSTOM_PROFILE_NAME);
+            }
+        }
+    };
 
     return (
         <div>
@@ -118,6 +164,7 @@ export default function DynamicResume() {
                     mode={mode}
                     selectedProfile={selectedProfile}
                     previewProfile={previewProfile}
+                    profiles={extendedProfiles}
                     onProfileChange={handleProfileSelection}
                     onPreviewChange={handlePreviewProfileChange}
                     previewChangeOffsetMillis={-25}
@@ -131,7 +178,7 @@ export default function DynamicResume() {
                     values={mode === 'intro' ? previewWeights : values}
                     levels={maxScore}
                     max={maxScore}
-                    onChange={setValues}
+                    onChange={handleWeightsChange}
                     onComplete={handleWeightsComplete}
                     plotRadius={100}  // TODO: should be 75 on mobile
                     transitionDuration={mode === 'intro' ? 50 : undefined}

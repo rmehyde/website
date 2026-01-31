@@ -1,5 +1,7 @@
 'use client'
 
+// TODO: delete
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface CarouselConfig {

@@ -1,10 +1,11 @@
 'use client'
 
-import { profiles } from "../lib/content/profiles";
+import {profiles as defaultProfiles, Profile, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
 import {
     Select,
     SelectContent,
     SelectItem,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -17,6 +18,7 @@ interface ProfileSelectorProps {
     mode: Mode;
     selectedProfile: string;
     previewProfile: string;
+    profiles?: Profile[];  // Optional, falls back to default profiles
     onProfileChange: (profileName: string) => void;
     onPreviewChange: (profileName: string) => void;
     previewChangeOffsetMillis: number;
@@ -28,6 +30,7 @@ export default function ProfileSelector({
     mode, 
     selectedProfile, 
     previewProfile, 
+    profiles = defaultProfiles,
     onProfileChange, 
     onPreviewChange,
     previewChangeOffsetMillis,
@@ -64,7 +67,7 @@ export default function ProfileSelector({
         sequence.push(profiles[targetIndex]?.name || '');
         
         return sequence;
-    }, [targetIndex, iterations]);
+    }, [targetIndex, iterations, profiles]);
     const animationRef = useRef<HTMLDivElement>(null);
 
 
@@ -255,11 +258,20 @@ export default function ProfileSelector({
                     </SelectTrigger>
 
                     <SelectContent>
-                        {profiles.map((p) => (
+                        {profiles.filter(p => p.name !== CUSTOM_PROFILE_NAME).map((p) => (
                             <SelectItem key={p.name} value={p.name} className="text-xl">
                                 {p.name}
                             </SelectItem>
                         ))}
+                        <SelectSeparator />
+                        <SelectItem 
+                            key={CUSTOM_PROFILE_NAME}
+                            value={CUSTOM_PROFILE_NAME}
+                            className="text-xl text-muted-foreground"
+                            disabled
+                        >
+                            {CUSTOM_PROFILE_NAME}
+                        </SelectItem>
                     </SelectContent>
                 </Select>
                 

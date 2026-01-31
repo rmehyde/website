@@ -2,6 +2,8 @@
 import { z } from "zod/v4";
 import {Dimension, DimensionScores, dimensionScoresSchema, maxScore} from "@/app/lib/content/scoring";
 
+// Special profile name for custom weight combinations
+export const CUSTOM_PROFILE_NAME = "Utility Player";
 
 // load exactly /public/content/profiles.yaml (or .yml)
 const profilesModule = (require as any).context(
