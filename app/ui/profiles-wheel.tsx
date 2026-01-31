@@ -239,7 +239,9 @@ export default function ProfileSelector({
             <div className="relative w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
-                        className="w-full text-xl gap-1 py-0 overflow-hidden"
+                        className={`w-full text-xl gap-1 py-0 overflow-hidden ${
+                            selectedProfile === CUSTOM_PROFILE_NAME ? 'text-muted-foreground' : ''
+                        }`}
                         onPointerDown={handleUserIntent}
                         onKeyDown={handleUserIntent}
                         aria-label={`Current profile: ${selectedProfile}`}
