@@ -1,8 +1,8 @@
 'use client'
 
-import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
+import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxScore, dimensionScoresToParams, dimensionScoresFromParams} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import PDFComponent from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
 import {profiles, Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
@@ -18,25 +18,67 @@ const findMatchingProfile = (weights: Record<string, number>) => {
     });
 };
 
+// Helper to get initial weights from URL or default profile
+const getInitialWeights = (): Record<string, number> => {
+    if (typeof window === 'undefined') {
+        // Server-side: use default profile
+        return profiles.find(p => p.name === "Machine Learning Engineer")?.scores || 
+               Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {});
+    }
+    
+    // Client-side: check URL params
+    const params = new URLSearchParams(window.location.search);
+    const urlWeights = dimensionScoresFromParams(params);
+    
+    if (Object.keys(urlWeights).length > 0) {
+        // Found weights in URL - merge with defaults for missing dimensions
+        const defaultWeights = Dimension.options.reduce((acc, dim) => ({...acc, [dim]: 0}), {});
+        return { ...defaultWeights, ...urlWeights };
+    }
+    
+    // No URL params: use default profile
+    return profiles.find(p => p.name === "Machine Learning Engineer")?.scores || 
+           Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {});
+};
+
 export default function DynamicResume() {
     // Page-level state management
     const [mode, setMode] = useState<Mode>('intro');
     
     // Committed state - the authoritative weights
-    const [committedWeights, setCommittedWeights] = useState<Record<string, number>>(
-        profiles.find(p => p.name === "Machine Learning Engineer")?.scores || 
-        Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {})
-    );
+    const [committedWeights, setCommittedWeights] = useState<Record<string, number>>(getInitialWeights());
     
     // Preview state - only used during intro
     const [previewWeights, setPreviewWeights] = useState<Record<string, number>>(committedWeights);
     
+    // Helper to get initial profile from weights
+    const getInitialProfile = (weights: Record<string, number>): string => {
+        const matchingProfile = findMatchingProfile(weights);
+        return matchingProfile ? matchingProfile.name : CUSTOM_PROFILE_NAME;
+    };
+    
     // Profile states
-    const [selectedProfile, setSelectedProfile] = useState<string>("Machine Learning Engineer");
-    const [previewProfile, setPreviewProfile] = useState<string>("Machine Learning Engineer");
+    const [selectedProfile, setSelectedProfile] = useState<string>(getInitialProfile(committedWeights));
+    const [previewProfile, setPreviewProfile] = useState<string>(getInitialProfile(committedWeights));
 
     const triggerRenderRef = useRef<((weights: DimensionScores) => void) | null>(null);
     const previousWeightsRef = useRef<DimensionScores | null>(null);
+    
+    // Update URL when weights change (debounced to avoid excessive updates)
+    useEffect(() => {
+        if (typeof window === 'undefined' || mode === 'intro') return;
+        
+        const timeoutId = setTimeout(() => {
+            const params = dimensionScoresToParams(committedWeights as DimensionScores);
+            const newUrl = params.toString() 
+                ? `${window.location.pathname}?${params.toString()}`
+                : window.location.pathname;
+                
+            window.history.replaceState({}, '', newUrl);
+        }, 500); // 500ms debounce
+        
+        return () => clearTimeout(timeoutId);
+    }, [committedWeights, mode]);
 
     // Exit intro mode and transition to interactive
     const exitIntro = (reason: 'auto' | 'user') => {

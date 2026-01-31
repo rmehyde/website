@@ -39,11 +39,57 @@ export const dimensionScoresSchema = z.object(
 )
 export type DimensionScores = z.infer<typeof dimensionScoresSchema>;
 
+// Bidirectional mapping between dimension keys and short abbreviations
+const createDimensionShortKeys = () => {
+    const dimToShort: Record<Dimension, string> = {} as Record<Dimension, string>;
+    const shortToDim: Record<string, Dimension> = {};
+    
+    Dimension.options.forEach(dim => {
+        const shortKey = (dimensionLabels[dim].match(/[A-Z]/g) || []).join("").toLowerCase();
+        dimToShort[dim] = shortKey;
+        shortToDim[shortKey] = dim;
+    });
+    
+    return { dimToShort, shortToDim };
+};
+
+const { dimToShort, shortToDim } = createDimensionShortKeys();
+
+// URL query parameter utilities for dimension scores
+export function dimensionScoresToParams(scores: DimensionScores): URLSearchParams {
+    const params = new URLSearchParams();
+    Object.entries(scores).forEach(([dim, score]) => {
+        if (score > 0) { // Only include non-zero scores to keep URLs cleaner
+            const shortKey = dimToShort[dim as Dimension];
+            params.set(shortKey, score.toString());
+        }
+    });
+    return params;
+}
+
+export function dimensionScoresFromParams(params: URLSearchParams): Partial<DimensionScores> {
+    const scores: Partial<DimensionScores> = {};
+    
+    // Parse each short key from query params
+    Object.entries(shortToDim).forEach(([shortKey, dim]) => {
+        const value = params.get(shortKey);
+        if (value !== null) {
+            const score = parseInt(value, 10);
+            if (!isNaN(score) && score >= 0 && score <= maxScore) {
+                scores[dim] = score;
+            }
+        }
+    });
+    
+    return scores;
+}
+
+// Backwards compatibility - refactored to use the new param system
 export function dimensionScoresString(scores: DimensionScores): string {
     return Object.entries(scores).map(([dim, score]) => {
-        const tag = (dimensionLabels[dim as Dimension].match(/[A-Z]/g) || []).join("").toLowerCase();
-        return `${tag}${score}`;
-    }).join("")
+        const shortKey = dimToShort[dim as Dimension];
+        return `${shortKey}${score}`;
+    }).join("");
 }
 
 // combine dimension preference scores with a content score
