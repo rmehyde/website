@@ -22,6 +22,9 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
     const [selectedProfile, setSelectedProfile] = useState<string>(defaultProfileName);
     const [previewProfile, setPreviewProfile] = useState<string>(defaultProfileName);
     const [isAnimating, setIsAnimating] = useState(false);
+    // TODO: there's some weird empty state: initial page load shows first element with no top margin which is wrong
+    //  what we should be doing is setting this to null at the beginning but hiding the content until we can properly set the margin
+    const [centeringOffset, setCenteringOffset] = useState(5);
 
     // Animation constants
     const iterations = 4;
@@ -54,21 +57,20 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
     const animationRef = useRef<HTMLDivElement>(null);
 
     // generate animation positions and timings
-    const generateAnimationData = (containerHeight: number, elementHeight: number, gapHeight: number) => {
-        const totalSteps = iterations * profiles.length;
-        const timings: { profileName: string; cumulativeTime: number; stepIndex: number }[] = [];
-        
+    const generateAnimationData = (rowSizePx: number) => {
+
         let cumulativeTime = 0;
         
-        // Build timing for each step (matches sequence generation)
+        // Build timing for each forward step
+        const mainTimings: { profileName: string; cumulativeTime: number; stepIndex: number }[] = [];
         for (let i = 0; i < profileSequence.length; i++) {
-            timings.push({
+            mainTimings.push({
                 profileName: profileSequence[i],
                 cumulativeTime,
                 stepIndex: i
             });
             
-            // Calculate delay for NEXT step (if not the last step)
+            // Calculate delay for next step (if not the last step)
             if (i < profileSequence.length - 1) {
                 const progress = i / Math.max(1, profileSequence.length - 2);
                 const easedProgress = Math.pow(progress, easingPower);
@@ -77,30 +79,86 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
             }
         }
         
-        const totalDuration = cumulativeTime;
+        // Rock effect
+        // TODO: needs some tuning
+        const rockSteps = 0;
+        const rockDistance = .6; // row heights to overshoot
+        const rockForwardStartSpeed = rockDistance / endDelayMs; // rows per ms
+        const rockInflectionSpeed = rockForwardStartSpeed / 4; // rows per ms
+        const rockBackEndSpeed = rockInflectionSpeed * 3; // rows per ms
+        const rockEasingPower = 2;
+
+        const lastStepIndex = profileSequence.length - 1;
+        const rockTimings: { travelDistanceInRows: number; cumulativeTime: number;}[] = [];
+        // Rock forward (overshoot)
+        const forwardStepDistance = rockDistance / rockSteps;
+        for (let i = 1; i <= rockSteps; i++) {
+            const progress = i / rockSteps;
+            const easedProgress = Math.pow(progress, rockEasingPower); // ease-in curve
+            const stepSpeed = rockForwardStartSpeed + (easedProgress * (rockInflectionSpeed - rockForwardStartSpeed));
+            const stepDuration = forwardStepDistance / stepSpeed; // distance / speed = time
+
+            cumulativeTime += stepDuration;
+            rockTimings.push({
+                travelDistanceInRows: i * forwardStepDistance, // cumulative distance
+                cumulativeTime,
+            });
+        }
+        // Rock back (settle to target)
+        const backStepDistance = rockDistance / rockSteps;
+        for (let i = 1; i <= rockSteps; i++) {
+            const progress = i / rockSteps;
+            const easedProgress = 1 - Math.pow(1 - progress, rockEasingPower); // ease-out curve
+            const stepSpeed = rockInflectionSpeed + (easedProgress * (rockBackEndSpeed - rockInflectionSpeed)); // slow down dramatically
+            const stepDuration = backStepDistance / stepSpeed; // distance / speed = time
+            
+            cumulativeTime += stepDuration;
+            const remainingDistance = rockDistance * (1 - progress); // linear decrease from rockDistance to 0
+            rockTimings.push({
+                travelDistanceInRows: remainingDistance,
+                cumulativeTime,
+            });
+        }
         
         // Convert to animation keyframes
-        const rowSize = (elementHeight + gapHeight) / containerHeight;
-        console.log("actual row size, estimated row size", rowSize, 1 / totalSteps);
-        const keyframes = timings.map(({ cumulativeTime, stepIndex }) => ({
-            transform: `translateY(-${100 * stepIndex * rowSize}%)`,
+        const totalDuration = cumulativeTime;
+        const keyframes = mainTimings.map(({ cumulativeTime, stepIndex }) => ({
+            transform: `translateY(-${stepIndex * rowSizePx}px)`,
             offset: totalDuration > 0 ? cumulativeTime / totalDuration : 0
         }));
+        for (const rt of rockTimings) {
+            console.log("rt ", rt);
+            keyframes.push({
+                transform: `translateY(-${(lastStepIndex + rt.travelDistanceInRows) * rowSizePx}px)`,
+                offset: totalDuration > 0 ? rt.cumulativeTime / totalDuration : 0
+            })
+        }
 
-        return { keyframes, totalDuration, timings };
+        return { keyframes, totalDuration, timings: mainTimings };
     };
 
     // Start animation when component mounts
     useEffect(() => {
         if (mode === 'intro' && animationRef.current) {
             setIsAnimating(true);
-            
-            // Calculate real measurements
+
+            // Get overflow container height to calculate top gap required to center text
+            const overflowContainer = animationRef.current.parentElement;
+            const buttonHeight = overflowContainer?.getBoundingClientRect().height || 0;
+            const textElementHeight = animationRef.current.children[0]?.getBoundingClientRect().height || 0;
+            const centeringOffsetPx = (buttonHeight - textElementHeight) / 2;
+            console.log({buttonHeight: buttonHeight, textElementHeight: textElementHeight, centeringOffsetPx: centeringOffsetPx})
+
+            // Calculate real measurements BEFORE setting padding
             const containerHeight = animationRef.current.scrollHeight;
             const elementHeight = animationRef.current.children[0]?.getBoundingClientRect().height || 0;
             const gapHeight = elementHeight > 0 ? (containerHeight - (animationRef.current.children.length * elementHeight)) / (animationRef.current.children.length - 1) : 0;
+            console.log({containerHeight: containerHeight, elementHeight: elementHeight, gapHeight: gapHeight});
+
+            // Set padding after measurements
+            setCenteringOffset(centeringOffsetPx);
             
-            const animationData = generateAnimationData(containerHeight, elementHeight, gapHeight);
+            const animationData = generateAnimationData(elementHeight + gapHeight);
             
             console.log('Starting animation with keyframes:', animationData.keyframes);
             console.log('Total duration:', animationData.totalDuration);
@@ -161,14 +219,14 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
                             <div className="flex-1 overflow-hidden relative h-full">
                                 <div
                                     ref={animationRef}
-                                    className="flex flex-col gap-2 absolute top-2 left-0 w-full"
+                                    className="flex flex-col gap-2 absolute left-0 w-full"
+                                    style={{ marginTop: `${centeringOffset}px` }}
                                 >
                                     {profileSequence.map((profileName, index) => (
                                         <div key={index} className="h-full leading-6 flex items-center flex-shrink-0 whitespace-nowrap">
                                             {profileName}
                                         </div>
                                     ))}
-                                    {/*<div className="h-0.45" />*/}
                                 </div>
                             </div>
                         ) : (
