@@ -47,7 +47,7 @@ export default function DynamicProjects() {
         <div>
             {/*<div className="flex flex-col justify-center md:pl-8">*/}
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <ProfileSelector />
+                <ProfileSelector defaultProfileName="Machine Learning Engineer" />
                 {/* TODO: fix scroll issue on mobile */}
                 {/* radial selector drives the weights */}
                 <RadialSelector
