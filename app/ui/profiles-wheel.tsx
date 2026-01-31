@@ -14,13 +14,24 @@ import { useState, useEffect, useRef, useMemo } from "react";
 type Mode = 'intro' | 'interactive';
 
 interface ProfileSelectorProps {
-    defaultProfileName?: string;
+    mode: Mode;
+    selectedProfile: string;
+    previewProfile: string;
+    onProfileChange: (profileName: string) => void;
+    onPreviewChange: (profileName: string) => void;
+    onUserIntent: (reason: 'user') => void;
+    onIntroComplete: () => void;
 }
 
-export default function ProfileSelector({ defaultProfileName = profiles[0]?.name || '' }: ProfileSelectorProps) {
-    const [mode, setMode] = useState<Mode>('intro');
-    const [selectedProfile, setSelectedProfile] = useState<string>(defaultProfileName);
-    const [previewProfile, setPreviewProfile] = useState<string>(defaultProfileName);
+export default function ProfileSelector({ 
+    mode, 
+    selectedProfile, 
+    previewProfile, 
+    onProfileChange, 
+    onPreviewChange, 
+    onUserIntent,
+    onIntroComplete 
+}: ProfileSelectorProps) {
     const [isAnimating, setIsAnimating] = useState(false);
     // TODO: there's some weird empty state: initial page load shows first element with no top margin which is wrong
     //  what we should be doing is setting this to null at the beginning but hiding the content until we can properly set the margin
@@ -33,10 +44,10 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
     const easingPower = 2.2;
 
     // Find the target profile index (where we want to end up)
-    const targetIndex = profiles.findIndex(p => p.name === defaultProfileName);
+    const targetIndex = profiles.findIndex(p => p.name === selectedProfile);
 
     // Generate sequence for rendering elements
-    const generateProfileNameSequence = () => {
+    const profileSequence = useMemo(() => {
         const startIndex = (targetIndex - 1 + profiles.length) % profiles.length;
         const sequence: string[] = [];
         
@@ -51,96 +62,94 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
         sequence.push(profiles[targetIndex]?.name || '');
         
         return sequence;
-    };
-
-    const profileSequence = useMemo(() => generateProfileNameSequence(), [targetIndex]);
+    }, [targetIndex, iterations]);
     const animationRef = useRef<HTMLDivElement>(null);
 
-    // generate animation positions and timings
-    const generateAnimationData = (rowSizePx: number) => {
-
-        let cumulativeTime = 0;
-        
-        // Build timing for each forward step
-        const mainTimings: { profileName: string; cumulativeTime: number; stepIndex: number }[] = [];
-        for (let i = 0; i < profileSequence.length; i++) {
-            mainTimings.push({
-                profileName: profileSequence[i],
-                cumulativeTime,
-                stepIndex: i
-            });
-            
-            // Calculate delay for next step (if not the last step)
-            if (i < profileSequence.length - 1) {
-                const progress = i / Math.max(1, profileSequence.length - 2);
-                const easedProgress = Math.pow(progress, easingPower);
-                const delay = startDelayMs + (endDelayMs - startDelayMs) * easedProgress;
-                cumulativeTime += delay;
-            }
-        }
-        
-        // Rock effect
-        // TODO: needs some tuning
-        const rockSteps = 0;
-        const rockDistance = .6; // row heights to overshoot
-        const rockForwardStartSpeed = rockDistance / endDelayMs; // rows per ms
-        const rockInflectionSpeed = rockForwardStartSpeed / 4; // rows per ms
-        const rockBackEndSpeed = rockInflectionSpeed * 3; // rows per ms
-        const rockEasingPower = 2;
-
-        const lastStepIndex = profileSequence.length - 1;
-        const rockTimings: { travelDistanceInRows: number; cumulativeTime: number;}[] = [];
-        // Rock forward (overshoot)
-        const forwardStepDistance = rockDistance / rockSteps;
-        for (let i = 1; i <= rockSteps; i++) {
-            const progress = i / rockSteps;
-            const easedProgress = Math.pow(progress, rockEasingPower); // ease-in curve
-            const stepSpeed = rockForwardStartSpeed + (easedProgress * (rockInflectionSpeed - rockForwardStartSpeed));
-            const stepDuration = forwardStepDistance / stepSpeed; // distance / speed = time
-
-            cumulativeTime += stepDuration;
-            rockTimings.push({
-                travelDistanceInRows: i * forwardStepDistance, // cumulative distance
-                cumulativeTime,
-            });
-        }
-        // Rock back (settle to target)
-        const backStepDistance = rockDistance / rockSteps;
-        for (let i = 1; i <= rockSteps; i++) {
-            const progress = i / rockSteps;
-            const easedProgress = 1 - Math.pow(1 - progress, rockEasingPower); // ease-out curve
-            const stepSpeed = rockInflectionSpeed + (easedProgress * (rockBackEndSpeed - rockInflectionSpeed)); // slow down dramatically
-            const stepDuration = backStepDistance / stepSpeed; // distance / speed = time
-            
-            cumulativeTime += stepDuration;
-            const remainingDistance = rockDistance * (1 - progress); // linear decrease from rockDistance to 0
-            rockTimings.push({
-                travelDistanceInRows: remainingDistance,
-                cumulativeTime,
-            });
-        }
-        
-        // Convert to animation keyframes
-        const totalDuration = cumulativeTime;
-        const keyframes = mainTimings.map(({ cumulativeTime, stepIndex }) => ({
-            transform: `translateY(-${stepIndex * rowSizePx}px)`,
-            offset: totalDuration > 0 ? cumulativeTime / totalDuration : 0
-        }));
-        for (const rt of rockTimings) {
-            console.log("rt ", rt);
-            keyframes.push({
-                transform: `translateY(-${(lastStepIndex + rt.travelDistanceInRows) * rowSizePx}px)`,
-                offset: totalDuration > 0 ? rt.cumulativeTime / totalDuration : 0
-            })
-        }
-
-        return { keyframes, totalDuration, timings: mainTimings };
-    };
 
     // Start animation when component mounts
     useEffect(() => {
         if (mode === 'intro' && animationRef.current) {
             setIsAnimating(true);
+
+            // generate animation positions and timings
+            const generateAnimationData = (rowSizePx: number) => {
+                let cumulativeTime = 0;
+                
+                // Build timing for each forward step
+                const mainTimings: { profileName: string; cumulativeTime: number; stepIndex: number }[] = [];
+                for (let i = 0; i < profileSequence.length; i++) {
+                    mainTimings.push({
+                        profileName: profileSequence[i],
+                        cumulativeTime,
+                        stepIndex: i
+                    });
+                    
+                    // Calculate delay for next step (if not the last step)
+                    if (i < profileSequence.length - 1) {
+                        const progress = i / Math.max(1, profileSequence.length - 2);
+                        const easedProgress = Math.pow(progress, easingPower);
+                        const delay = startDelayMs + (endDelayMs - startDelayMs) * easedProgress;
+                        cumulativeTime += delay;
+                    }
+                }
+                
+                // Rock effect
+                // TODO: needs some tuning
+                const rockSteps = 0;
+                const rockDistance = .6; // row heights to overshoot
+                const rockForwardStartSpeed = rockDistance / endDelayMs; // rows per ms
+                const rockInflectionSpeed = rockForwardStartSpeed / 4; // rows per ms
+                const rockBackEndSpeed = rockInflectionSpeed * 3; // rows per ms
+                const rockEasingPower = 2;
+
+                const lastStepIndex = profileSequence.length - 1;
+                const rockTimings: { travelDistanceInRows: number; cumulativeTime: number;}[] = [];
+                // Rock forward (overshoot)
+                const forwardStepDistance = rockDistance / rockSteps;
+                for (let i = 1; i <= rockSteps; i++) {
+                    const progress = i / rockSteps;
+                    const easedProgress = Math.pow(progress, rockEasingPower); // ease-in curve
+                    const stepSpeed = rockForwardStartSpeed + (easedProgress * (rockInflectionSpeed - rockForwardStartSpeed));
+                    const stepDuration = forwardStepDistance / stepSpeed; // distance / speed = time
+
+                    cumulativeTime += stepDuration;
+                    rockTimings.push({
+                        travelDistanceInRows: i * forwardStepDistance, // cumulative distance
+                        cumulativeTime,
+                    });
+                }
+                // Rock back (settle to target)
+                const backStepDistance = rockDistance / rockSteps;
+                for (let i = 1; i <= rockSteps; i++) {
+                    const progress = i / rockSteps;
+                    const easedProgress = 1 - Math.pow(1 - progress, rockEasingPower); // ease-out curve
+                    const stepSpeed = rockInflectionSpeed + (easedProgress * (rockBackEndSpeed - rockInflectionSpeed)); // slow down dramatically
+                    const stepDuration = backStepDistance / stepSpeed; // distance / speed = time
+                    
+                    cumulativeTime += stepDuration;
+                    const remainingDistance = rockDistance * (1 - progress); // linear decrease from rockDistance to 0
+                    rockTimings.push({
+                        travelDistanceInRows: remainingDistance,
+                        cumulativeTime,
+                    });
+                }
+                
+                // Convert to animation keyframes
+                const totalDuration = cumulativeTime;
+                const keyframes = mainTimings.map(({ cumulativeTime, stepIndex }) => ({
+                    transform: `translateY(-${stepIndex * rowSizePx}px)`,
+                    offset: totalDuration > 0 ? cumulativeTime / totalDuration : 0
+                }));
+                for (const rt of rockTimings) {
+                    console.log("rt ", rt);
+                    keyframes.push({
+                        transform: `translateY(-${(lastStepIndex + rt.travelDistanceInRows) * rowSizePx}px)`,
+                        offset: totalDuration > 0 ? rt.cumulativeTime / totalDuration : 0
+                    })
+                }
+
+                return { keyframes, totalDuration, timings: mainTimings };
+            };
 
             // Get overflow container height to calculate top gap required to center text
             const overflowContainer = animationRef.current.parentElement;
@@ -168,12 +177,12 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
             const timeouts: NodeJS.Timeout[] = [];
             
             // Set initial preview profile
-            setPreviewProfile(profileSequence[0] || selectedProfile);
+            onPreviewChange(profileSequence[0] || selectedProfile);
             
             // Schedule updates for each timing step
             animationData.timings.forEach((timing) => {
                 const timeout = setTimeout(() => {
-                    setPreviewProfile(timing.profileName);
+                    onPreviewChange(timing.profileName);
                     console.log(`Preview updated to: ${timing.profileName} at ${timing.cumulativeTime}ms`);
                 }, timing.cumulativeTime);
                 timeouts.push(timeout);
@@ -192,8 +201,7 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
             // Complete animation and switch mode
             animation.onfinish = () => {
                 setIsAnimating(false);
-                setMode('interactive');
-                setPreviewProfile(selectedProfile);
+                onIntroComplete();
                 console.log(`Intro complete, selected: ${selectedProfile}`);
             };
             
@@ -205,8 +213,14 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
     }, [mode]);
 
     const handleSelectChange = (value: string) => {
-        setSelectedProfile(value);
+        onProfileChange(value);
         console.log(`Selected: ${value}`);
+    };
+    
+    const handleUserIntent = () => {
+        if (mode === 'intro') {
+            onUserIntent('user');
+        }
     };
 
     return (
@@ -214,7 +228,11 @@ export default function ProfileSelector({ defaultProfileName = profiles[0]?.name
             <div className="text-2xl whitespace-nowrap">Reese is a</div>
             <div className="relative w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
-                    <SelectTrigger className="w-full text-xl gap-1 py-0 overflow-hidden">
+                    <SelectTrigger 
+                        className="w-full text-xl gap-1 py-0 overflow-hidden"
+                        onPointerDown={handleUserIntent}
+                        onKeyDown={handleUserIntent}
+                    >
                         {mode === 'intro' ? (
                             <div className="flex-1 overflow-hidden relative h-full">
                                 <div
