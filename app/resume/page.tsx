@@ -77,6 +77,17 @@ export default function DynamicProjects() {
         }
     };
     
+    // Handle preview profile changes during intro animation
+    const handlePreviewProfileChange = (profileName: string) => {
+        setPreviewProfile(profileName);
+        
+        // Update preview weights to match the preview profile
+        const profile = profiles.find(p => p.name === profileName);
+        if (profile) {
+            setPreviewWeights(profile.scores);
+        }
+    };
+    
     // Callbacks for ProfileSelector
     const handleProfileSelection = (profileName: string) => {
         setSelectedProfile(profileName);
@@ -108,7 +119,7 @@ export default function DynamicProjects() {
                     selectedProfile={selectedProfile}
                     previewProfile={previewProfile}
                     onProfileChange={handleProfileSelection}
-                    onPreviewChange={setPreviewProfile}
+                    onPreviewChange={handlePreviewProfileChange}
                     onUserIntent={exitIntro}
                     onIntroComplete={() => exitIntro('auto')}
                 />
