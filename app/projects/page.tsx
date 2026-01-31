@@ -25,6 +25,7 @@ export default function DynamicProjects() {
             spacing */}
             <div className="flex flex-col justify-evenly md:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
+                {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
                 <div className="flex items-center justify-center text-3xl text-center">
                     What kind of projects
                 </div>
