@@ -210,7 +210,6 @@ export default function DynamicResume() {
                 <ProfileSelector 
                     mode={mode}
                     selectedProfile={selectedProfile}
-                    previewProfile={previewProfile}
                     profiles={extendedProfiles}
                     prefersReducedMotion={prefersReducedMotion}
                     onProfileChange={handleProfileSelection}

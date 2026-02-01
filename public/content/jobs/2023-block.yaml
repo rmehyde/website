@@ -42,5 +42,7 @@ duties:
     priority: 55
     scores:
       ml-eng: 5
-      backend: 5
+      backend: 4
       data-eng: 4
+
+# TODO: halved p99 latency for all risk evals

@@ -3,21 +3,21 @@
 import {profiles as defaultProfiles, Profile, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
 import {
     Select,
-    SelectContent,
-    SelectItem,
+    SelectContent, SelectGroup,
+    SelectItem, SelectLabel,
     SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
 import {Dimension, dimensionLabels} from "@/app/lib/content/scoring";
 import { useState, useEffect, useRef, useMemo } from "react";
+import {ArrowRight} from "lucide-react";
 
 type Mode = 'intro' | 'interactive';
 
 interface ProfileSelectorProps {
     mode: Mode;
     selectedProfile: string;
-    previewProfile: string;
     profiles?: Profile[];  // Optional, falls back to default profiles
     prefersReducedMotion?: boolean; // Skip animations if user prefers reduced motion
     onProfileChange: (profileName: string) => void;
@@ -29,8 +29,7 @@ interface ProfileSelectorProps {
 
 export default function ProfileSelector({ 
     mode, 
-    selectedProfile, 
-    previewProfile, 
+    selectedProfile,
     profiles = defaultProfiles,
     prefersReducedMotion = false,
     onProfileChange, 
@@ -240,7 +239,7 @@ export default function ProfileSelector({
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
                         className={`w-full text-xl gap-1 py-0 overflow-hidden ${
-                            selectedProfile === CUSTOM_PROFILE_NAME ? 'text-muted-foreground' : ''
+                            selectedProfile === CUSTOM_PROFILE_NAME && !isAnimating ? 'text-muted-foreground' : ''
                         }`}
                         onPointerDown={handleUserIntent}
                         onKeyDown={handleUserIntent}
@@ -283,14 +282,20 @@ export default function ProfileSelector({
                             </SelectItem>
                         ))}
                         <SelectSeparator />
-                        <SelectItem 
-                            key={CUSTOM_PROFILE_NAME}
-                            value={CUSTOM_PROFILE_NAME}
-                            className="text-xl text-muted-foreground"
-                            disabled
-                        >
-                            {CUSTOM_PROFILE_NAME}
-                        </SelectItem>
+                        {/* TODO small bug: when you load the page with non-profile, the text window is greyed out since the "final value" has disabled style */}
+                        <SelectGroup>
+                            <SelectItem
+                                key={CUSTOM_PROFILE_NAME}
+                                value={CUSTOM_PROFILE_NAME}
+                                className="text-xl"
+                                disabled
+                            >
+                                {CUSTOM_PROFILE_NAME}
+                            </SelectItem>
+                            <SelectLabel className="text-xs text-muted-foreground font-normal -mt-2 flex items-center gap-1">
+                                Customize graph <ArrowRight className="h-3 w-3" />
+                            </SelectLabel>
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
             </div>
