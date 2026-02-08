@@ -162,13 +162,11 @@ export default function ProfileSelector({
             const buttonHeight = overflowContainer?.getBoundingClientRect().height || 0;
             const textElementHeight = animationRef.current.children[0]?.getBoundingClientRect().height || 0;
             const centeringOffsetPx = (buttonHeight - textElementHeight) / 2;
-            console.log({buttonHeight: buttonHeight, textElementHeight: textElementHeight, centeringOffsetPx: centeringOffsetPx})
 
-            // Calculate real measurements BEFORE setting padding
+            // Calculate size of row from scroll content
             const containerHeight = animationRef.current.scrollHeight;
             const elementHeight = animationRef.current.children[0]?.getBoundingClientRect().height || 0;
             const gapHeight = elementHeight > 0 ? (containerHeight - (animationRef.current.children.length * elementHeight)) / (animationRef.current.children.length - 1) : 0;
-            console.log({containerHeight: containerHeight, elementHeight: elementHeight, gapHeight: gapHeight});
 
             // Set padding after measurements
             setCenteringOffset(centeringOffsetPx);
@@ -189,7 +187,6 @@ export default function ProfileSelector({
             animationData.timings.forEach((timing) => {
                 const timeout = setTimeout(() => {
                     onPreviewChange(timing.profileName);
-                    console.log(`Preview updated to: ${timing.profileName} at ${timing.cumulativeTime}ms`);
                 }, timing.cumulativeTime + previewChangeOffsetMillis);
                 timeouts.push(timeout);
             });

@@ -42,7 +42,6 @@ export async function generateResumeLatex(weights: DimensionScores, contact: Con
     const jobsContent = sortJobsByDate(contentByType[ContentTypeEnum.enum.job])
         .map(job => jobToLatex(job)).join("\n")
     const template = await loadTemplate("/templates/resume.tex.mustache")
-    console.log("generating latex, contact info:", contact)
     const latex = mustache.render(
         template,
         {
@@ -52,6 +51,5 @@ export async function generateResumeLatex(weights: DimensionScores, contact: Con
             phone: contact.phone,
         }
     );
-    console.log(latex);
     return latex;
 }
