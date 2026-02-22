@@ -42,7 +42,8 @@
     devops-infra: 1
     backend: 1
     data-eng: 1
-    
+
+# TODO: this one is currently first for MLE which sucks.. maybe use a different sort strategy for these or something
 - contentType: soft-skill
   title: Organization
   summary: Highly organized and process-conscious to ensure consistent and communicable results
