@@ -1,0 +1,18 @@
+contentType: education
+title: New York University
+summary: Bachelor's Degree, Artificial Intelligence & Consciousness, 2018
+detail: Bachelor's Degree in Computer Science with a concentration in Artificial Intelligence & Consciousness
+institution: New York University
+degree: Bachelor's Degree, Artificial Intelligence & Consciousness
+year: 2018
+location: New York, NY
+scores:
+  ml-eng: 5
+  ml-science: 4
+  data-analytics: 3
+  leadership: 4
+  sales-eng: 3
+  frontend: 3
+  devops-infra: 2
+  backend: 4
+  data-eng: 3

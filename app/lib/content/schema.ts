@@ -9,6 +9,7 @@ export const ContentTypeEnum = z.enum(
         "oss",
         "job",
         "duty",
+        "education",
     ]
 );
 export type ContentType = z.infer<typeof ContentTypeEnum>;
@@ -43,6 +44,15 @@ export const OpenSourceSchema = BaseContentSchema.extend({
 });
 export type OpenSource = z.infer<typeof OpenSourceSchema>;
 
+export const EducationSchema = BaseContentSchema.extend({
+    contentType: z.literal(ContentTypeEnum.enum.education),
+    institution: z.string(),
+    degree: z.string(),
+    year: z.number(),
+    location: z.string(),
+});
+export type Education = z.infer<typeof EducationSchema>;
+
 export const DutySchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.duty),
     // TODO: add a projects matcher/exclusion
@@ -66,7 +76,7 @@ export const JobSchema = BaseContentSchema.extend({
 export type Job = z.infer<typeof JobSchema>;
 
 export const ContentSchema = z.discriminatedUnion(
-    "contentType", [ProjectSchema, OpenSourceSchema, JobSchema, DutySchema]
+    "contentType", [ProjectSchema, OpenSourceSchema, EducationSchema, JobSchema, DutySchema]
 );
 export type Content = z.infer<typeof ContentSchema>;
 

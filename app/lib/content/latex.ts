@@ -1,4 +1,4 @@
-import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project} from "@/app/lib/content/schema";
+import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project, Education} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
 export enum Verbosity {
@@ -151,4 +151,12 @@ export function projectsAndOssToLatex(content: ContentByType) {
         : ""
     console.log(projectsContent, ossContent)
     return ossContent + maybeSeparator + projectsContent;
+}
+
+export function educationToLatex(education: Education[]): string {
+    return education.map(edu => {
+        const degreeYear = `${escapeLatex(edu.degree)}, ${edu.year}`;
+        const institutionLocation = `${escapeLatex(edu.institution)}, ${escapeLatex(edu.location)}`;
+        return `${institutionLocation} — ${degreeYear}`;
+    }).join("\\\\\n");
 }
