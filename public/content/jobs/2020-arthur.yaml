@@ -2,7 +2,8 @@ contentType: job
 title: MLE Lead @ Arthur
 summary: Machine Learning Engineering Tech Lead at Arthur
 detail:
-  TODO
+  Scaled and let Machine Learning Engineering team at Arthur, building and productionizing novel ML models to improve 
+  observability of customer ML model.
 company: Arthur
 roles:
   - Machine Learning Engineer
@@ -48,8 +49,8 @@ duties:
     summary: Designed and implemented scalable internal ML platform for dynamically-created schema-agnostic models 
       operating over tabular, text, and image data
     detail:
-#       TODO!!!!
-      TODO!!!
+      Designed and implemented scalable internal ML platform for models dynamically trained and deployed over 
+      arbitrary customer datasets across tabular, text, and image data.
     priority: 20
     scores:
       ml-eng: 5
@@ -61,8 +62,8 @@ duties:
     contentType: duty
     summary: Productionized novel machine learning models
     detail:
-      #       TODO!!!!
-      TODO!!!
+      Worked closely with ML researchers to productionize novel machine learning models for ML observability. Models 
+      were dynamically trained and deployed on arbitrary customer datasets.
     priority: 25
     scores:
       ml-eng: 5
@@ -72,8 +73,8 @@ duties:
         contentType: duty
         summary: Anomaly detection across tabular, text, and image data
         detail:
-          #       TODO!!!!
-          TODO!!!
+          Productionized novel anomaly detection algorithm utilizing autoencoder reconstruction loss over embeddings 
+          from any tabular, text, or image data.
         priority: 40
         links:
           - tag: patent
@@ -84,14 +85,14 @@ duties:
           ml-science: 5
       - title: RL-Based Counterfactuals
         contentType: duty
-        summary: Counterfactual explanations thruogh reinforcement learning
+        summary: Counterfactual explanations through reinforcement learning
         detail:
-          #       TODO!!!!
-          TODO!!!
+          Worked with research fellow to generalize reinforcement learning-based counterfactual generation for tabular 
+          models, and mentored junior engineer to productionize model.
         priority: 50
         scores:
           ml-eng: 5
-          ml-science: 4
+          ml-science: 5
         links:
           - tag: paper
             detail: Paper on arXiv
@@ -100,8 +101,8 @@ duties:
         contentType: duty
         summary: Highlighting pockets of model inaccuracy
         detail:
-          #       TODO!!!!
-          TODO!!!
+          Productionized decision tree-based algorithm to identify pockets of model inaccuracies within tabular model 
+          input space.
         priority: 60
         scores:
           ml-eng: 5
