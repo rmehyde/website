@@ -137,3 +137,135 @@ export function scoreContentCosine(
 
     return dot / denom;
 }
+
+// compute dot product between weights and content scores
+//   this considers both direction and magnitude
+//   helpful for tie-breaking when cosine similarity is equal
+export function scoreContentDotProduct(
+    weights: DimensionScores,
+    contentScores: DimensionScores
+): number {
+    const dims = Object.keys(weights) as (keyof DimensionScores)[];
+    
+    let dot = 0;
+    for (const dim of dims) {
+        const w = weights[dim] ?? 0;
+        const c = contentScores[dim] ?? 0;
+        dot += w * c;
+    }
+    
+    return dot;
+}
+
+// composite scoring for sorting: primary by cosine, secondary by dot product
+export function scoreContentComposite(
+    weights: DimensionScores,
+    contentScores: DimensionScores
+): { cosine: number; dotProduct: number } {
+    return {
+        cosine: scoreContentCosine(weights, contentScores),
+        dotProduct: scoreContentDotProduct(weights, contentScores)
+    };
+}
+
+// length limiting with global budget and hierarchical constraints
+export function applyGlobalBudgetLimit<T extends { contentType: string; duties?: T[]; subduties?: T[] }>(
+    content: T[],
+    weights: DimensionScores,
+    budget: number
+): T[] {
+    // flatten all duties and subduties with their parent relationships
+    const flatItems: Array<{
+        item: T;
+        parent: T | null;
+        path: string; // unique identifier for this item
+        scores: { cosine: number; dotProduct: number };
+    }> = [];
+
+    function flattenContent(items: T[], parent: T | null = null, pathPrefix: string = '') {
+        items.forEach((item, index) => {
+            const path = pathPrefix ? `${pathPrefix}.${index}` : `${index}`;
+            const scores = scoreContentComposite(weights, (item as any).scores);
+            
+            flatItems.push({ item, parent, path, scores });
+            
+            // recurse into duties and subduties
+            if (item.duties) {
+                flattenContent(item.duties, item, `${path}.duties`);
+            }
+            if (item.subduties) {
+                flattenContent(item.subduties, item, `${path}.subduties`);
+            }
+        });
+    }
+
+    flattenContent(content);
+
+    // sort by composite score (cosine desc, dotProduct desc)
+    flatItems.sort((a, b) => {
+        if (Math.abs(a.scores.cosine - b.scores.cosine) > 1e-10) {
+            return b.scores.cosine - a.scores.cosine;
+        }
+        return b.scores.dotProduct - a.scores.dotProduct;
+    });
+
+    // greedily select items within budget
+    const selectedPaths = new Set<string>();
+    let budgetUsed = 0;
+
+    for (const { item, parent, path } of flatItems) {
+        // calculate cost: 1 for this item + 1 for parent if not already selected
+        let cost = 1;
+        let parentPath: string | null = null;
+        
+        if (parent) {
+            // find parent path by removing the last segment
+            const pathSegments = path.split('.');
+            pathSegments.pop(); // remove current item
+            if (pathSegments[pathSegments.length - 1] === 'duties' || 
+                pathSegments[pathSegments.length - 1] === 'subduties') {
+                pathSegments.pop(); // remove duties/subduties
+            }
+            parentPath = pathSegments.join('.');
+            
+            if (parentPath && !selectedPaths.has(parentPath)) {
+                cost += 1; // add cost for parent
+            }
+        }
+
+        if (budgetUsed + cost <= budget) {
+            selectedPaths.add(path);
+            if (parentPath && !selectedPaths.has(parentPath)) {
+                selectedPaths.add(parentPath);
+            }
+            budgetUsed += cost;
+        }
+    }
+
+    // rebuild structure with only selected items
+    function rebuildStructure(items: T[], pathPrefix: string = ''): T[] {
+        return items.map((item, index) => {
+            const path = pathPrefix ? `${pathPrefix}.${index}` : `${index}`;
+            
+            if (!selectedPaths.has(path)) {
+                return null;
+            }
+
+            let rebuilt = { ...item };
+            
+            if (item.duties) {
+                const filteredDuties = rebuildStructure(item.duties, `${path}.duties`).filter(Boolean) as T[];
+                rebuilt = { ...rebuilt, duties: filteredDuties as any };
+            }
+            
+            if (item.subduties) {
+                const filteredSubduties = rebuildStructure(item.subduties, `${path}.subduties`).filter(Boolean) as T[];
+                rebuilt = { ...rebuilt, subduties: filteredSubduties as any };
+            }
+            
+            return rebuilt;
+        }).filter(Boolean) as T[];
+    }
+
+    return rebuildStructure(content);
+}

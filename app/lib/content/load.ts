@@ -1,4 +1,4 @@
-import {DimensionScores, scoreContentAbsolute, scoreContentCosine} from "@/app/lib/content/scoring";
+import {DimensionScores, scoreContentAbsolute, scoreContentComposite, applyGlobalBudgetLimit} from "@/app/lib/content/scoring";
 import {ContentSchema, Content, ContentByType, ContentTypeEnum, Job, Duty} from "@/app/lib/content/schema";
 
 // load all .yaml/.yml content files as objects at build time
@@ -15,7 +15,7 @@ function filterAndSortedContent(
     type ScoredContent = {
         content: Content
         absoluteScores: DimensionScores
-        directionScore: number
+        compositeScores: { cosine: number; dotProduct: number }
     }
 
     const scoredArray: ScoredContent[] = content.map(
@@ -50,7 +50,7 @@ function filterAndSortedContent(
                 weights,
                 updatedContent.scores,
             )
-            const cosineScore = scoreContentCosine(
+            const compositeScores = scoreContentComposite(
                 weights,
                 updatedContent.scores,
             )
@@ -58,7 +58,7 @@ function filterAndSortedContent(
             return {
                 content: updatedContent,
                 absoluteScores: contentScores,
-                directionScore: cosineScore,
+                compositeScores,
             }
         })
 
@@ -67,10 +67,14 @@ function filterAndSortedContent(
         .filter((item: ScoredContent) =>
             Object.values(item.absoluteScores).some(v => v > 0),
         )
-        // sort by direction similarity (inverting since it sorts ascending)
+        // sort by composite scores (cosine desc, dotProduct desc)
         .toSorted(
-            (a: ScoredContent, b: ScoredContent) =>
-                b.directionScore - a.directionScore,
+            (a: ScoredContent, b: ScoredContent) => {
+                if (Math.abs(a.compositeScores.cosine - b.compositeScores.cosine) > 1e-10) {
+                    return b.compositeScores.cosine - a.compositeScores.cosine;
+                }
+                return b.compositeScores.dotProduct - a.compositeScores.dotProduct;
+            }
         )
         // drop scores and return just content
         .map((item: ScoredContent) => item.content)
@@ -87,6 +91,21 @@ export function getFilteredAndSortedContent(
         })
 
     return filterAndSortedContent(content, weights)
+}
+
+export function getFilteredSortedAndLimitedContent(
+    weights: DimensionScores,
+    budget: number
+): Content[] {
+    const content = contentModules
+        .keys()
+        .map((key: string): Content => {
+            const raw: string = contentModules(key) as string
+            return ContentSchema.parse(raw)
+        })
+
+    const filteredAndSorted = filterAndSortedContent(content, weights)
+    return applyGlobalBudgetLimit(filteredAndSorted, weights, budget)
 }
 
 export function groupContentByType(content: Content[]): ContentByType {
