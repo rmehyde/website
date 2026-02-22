@@ -17,9 +17,7 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
             const allContent = getFilteredAndSortedContent(weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
-                <div key={c.title}
-                     className="w-full p-5 lg:w-[32rem]"
-                >
+                <div key={c.title} className="w-full p-5 lg:w-[32rem]">
                     {generateContentElements(c)}
                 </div>
             ))

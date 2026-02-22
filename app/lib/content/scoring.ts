@@ -1,4 +1,5 @@
 import {z} from "zod/v4";
+import type {Content} from "./schema";
 
 export const maxScore = 5
 
@@ -169,32 +170,32 @@ export function scoreContentComposite(
 }
 
 // length limiting with global budget and hierarchical constraints
-export function applyGlobalBudgetLimit<T extends { contentType: string; duties?: T[]; subduties?: T[] }>(
-    content: T[],
+export function applyGlobalBudgetLimit(
+    content: Content[],
     weights: DimensionScores,
     budget: number
-): T[] {
+): Content[] {
     // flatten all duties and subduties with their parent relationships
     const flatItems: Array<{
-        item: T;
-        parent: T | null;
+        item: Content;
+        parent: Content | null;
         path: string; // unique identifier for this item
         scores: { cosine: number; dotProduct: number };
     }> = [];
 
-    function flattenContent(items: T[], parent: T | null = null, pathPrefix: string = '') {
+    function flattenContent(items: Content[], parent: Content | null = null, pathPrefix: string = '') {
         items.forEach((item, index) => {
             const path = pathPrefix ? `${pathPrefix}.${index}` : `${index}`;
-            const scores = scoreContentComposite(weights, (item as any).scores);
+            const scores = scoreContentComposite(weights, item.scores);
             
             flatItems.push({ item, parent, path, scores });
             
             // recurse into duties and subduties
-            if (item.duties) {
+            if (item.contentType === 'job' && item.duties) {
                 flattenContent(item.duties, item, `${path}.duties`);
             }
-            if (item.subduties) {
-                flattenContent(item.subduties, item, `${path}.subduties`);
+            if (item.contentType === 'duty' && item.subduties) {
+                flattenContent(item.subduties as Content[], item, `${path}.subduties`);
             }
         });
     }
@@ -243,7 +244,7 @@ export function applyGlobalBudgetLimit<T extends { contentType: string; duties?:
     }
 
     // rebuild structure with only selected items
-    function rebuildStructure(items: T[], pathPrefix: string = ''): T[] {
+    function rebuildStructure(items: Content[], pathPrefix: string = ''): Content[] {
         return items.map((item, index) => {
             const path = pathPrefix ? `${pathPrefix}.${index}` : `${index}`;
             
@@ -253,18 +254,18 @@ export function applyGlobalBudgetLimit<T extends { contentType: string; duties?:
 
             let rebuilt = { ...item };
             
-            if (item.duties) {
-                const filteredDuties = rebuildStructure(item.duties, `${path}.duties`).filter(Boolean) as T[];
-                rebuilt = { ...rebuilt, duties: filteredDuties as any };
+            if (item.contentType === 'job' && item.duties) {
+                const filteredDuties = rebuildStructure(item.duties, `${path}.duties`);
+                rebuilt = { ...rebuilt, duties: filteredDuties };
             }
             
-            if (item.subduties) {
-                const filteredSubduties = rebuildStructure(item.subduties, `${path}.subduties`).filter(Boolean) as T[];
-                rebuilt = { ...rebuilt, subduties: filteredSubduties as any };
+            if (item.contentType === 'duty' && item.subduties) {
+                const filteredSubduties = rebuildStructure(item.subduties as Content[], `${path}.subduties`);
+                rebuilt = { ...rebuilt, subduties: filteredSubduties };
             }
             
             return rebuilt;
-        }).filter(Boolean) as T[];
+        }).filter((item): item is Content => item !== null);
     }
 
     return rebuildStructure(content);

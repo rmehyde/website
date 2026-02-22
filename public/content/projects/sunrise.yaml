@@ -1,7 +1,6 @@
 contentType: project
 title: Sunrise
 icon: sun
-priority: 16
 summary: Clock, weather, and NYC Subway arrivals web app
 detail: A web app that displays a clock, the daily weather, and upcoming NYC Subway arrivals.
 links:

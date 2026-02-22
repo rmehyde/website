@@ -23,10 +23,11 @@ export default function DynamicProjects() {
         <div>
             {/* TODO: this needs some better spacing as it looks fucky with the project
             spacing */}
-            <div className="flex flex-col justify-evenly md:flex-row mb-16">
+            {/* TODO: 'lg' isn't quite right here, we need to dial in the perfect breakpoint */}w
+            <div className="flex flex-col justify-evenly lg:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
                 {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
-                <div className="flex items-center justify-center text-3xl text-center">
+                <div className="flex items-center justify-center text-3xl text-center whitespace-nowrap">
                     What kind of projects
                 </div>
                 {/* radial selector drives the weights */}
@@ -45,7 +46,7 @@ export default function DynamicProjects() {
                 {/* TODO: the right side of the graph pushes up against this text
                         when the page is pretty narrow but not quite vertical
                 */}
-                <div className="flex items-center justify-center text-3xl text-center">
+                <div className="flex items-center justify-center text-3xl text-center whitespace-nowrap">
                     do you want to see?
                 </div>
             </div>

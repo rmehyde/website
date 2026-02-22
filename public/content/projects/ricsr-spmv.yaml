@@ -1,7 +1,6 @@
 contentType: project
 title: RiCSR SpMV
 icon: microchip
-priority: 30
 summary: Multi-GPU sparse matrix-vector multiplication CUDA implementation
 detail:
   A research project exploring sparse matrix-vector multiplication using the novel Ribboned Compressed Sparse Row 

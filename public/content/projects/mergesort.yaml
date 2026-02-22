@@ -1,7 +1,6 @@
 contentType: project
 title: Parallel Merge Sort
 icon: merge
-priority: 60
 summary: Parallelized merge sort implementation
 detail:
   A parallelized implementation of the merge sort algorithm for sorting arrays in Java. This is an alternative to Java 

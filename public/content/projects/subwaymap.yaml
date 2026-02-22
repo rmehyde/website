@@ -1,7 +1,6 @@
 contentType: project
 title: NYC Subway Map
 icon: train-front
-priority: 8
 summary: Android app with a map of the NYC Subway
 detail:
   An Android app containing a high-quality, no-frills offline map of the New York City subway system. No ads for a 

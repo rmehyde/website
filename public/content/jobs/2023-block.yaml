@@ -10,7 +10,6 @@ roles:
   - ML Platform Engineer
 location: New York, NY
 start: "2023-10-01"
-priority: 5
 scores:
   ml-eng: 5
   ml-science: 2
@@ -27,7 +26,6 @@ duties:
     detail:
       Collaborated with Machine Learning Modeler to bring experimental model to determine customer send/receive/transfer
       limits into production, netting $2.1M additional annual profit
-    priority: 35
     scores:
       ml-eng: 5
       ml-science: 1
@@ -39,7 +37,6 @@ duties:
     detail:
       Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices, unblocking
       expiration of costly data center contract
-    priority: 55
     scores:
       ml-eng: 5
       backend: 4

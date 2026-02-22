@@ -9,7 +9,6 @@
     devops-infra: 2
     backend: 3
     data-eng: 3
-# TODO: populate scores, these will all max
 - name: Tech Lead
   scores:
     ml-eng: 3

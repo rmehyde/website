@@ -1,7 +1,6 @@
 contentType: project
 title: Calendupe
 icon: calendars
-priority: 5
 summary: Google Calendar event duplicator
 detail: A cloud program to automatically copy obfuscated events from one Google Calendar to another.
 links:

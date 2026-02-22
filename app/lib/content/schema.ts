@@ -28,7 +28,6 @@ export const BaseContentSchema = z.object(
         summary: z.string(),
         detail: z.string(),
         links: z.array(LinkSchema).optional(),
-        priority: z.number(),
         scores: dimensionScoresSchema,
     }
 );

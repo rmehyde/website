@@ -1,6 +1,5 @@
 contentType: oss
 title: SHAP
-priority: 35
 summary: Leading explainable AI library
 detail: Removed unnecessary dependency cap in leading explainable AI library to unblock modern dependencies
 links:

@@ -1,6 +1,5 @@
 contentType: oss
 title: CPython
-priority: 15
 summary: Standard Python implementation
 detail: Added support for source-specific multicast IGMPv3 socket options to the standard Python language implementation
 links:

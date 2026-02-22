@@ -1,5 +1,5 @@
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {getFilteredSortedAndLimitedContent, groupContentByType, sortJobsByDate} from "@/app/lib/content/load";
+import {getFilteredAndSortedContent, groupContentByType, sortJobsByDate} from "@/app/lib/content/load";
 import {jobToLatex, loadTemplate, projectsAndOssToLatex} from "@/app/lib/content/latex";
 import mustache from "mustache";
 import {ContactInfo} from "@/app/contact/contactContext";
@@ -10,7 +10,7 @@ export async function generateResumeLatex(
     contact: ContactInfo, 
     budget: number = 50
 ): Promise<String> {
-    const allContent = getFilteredSortedAndLimitedContent(weights, budget)
+    const allContent = getFilteredAndSortedContent(weights, budget)
     const contentByType = groupContentByType(allContent)
     const projectsOssContent = projectsAndOssToLatex(contentByType);
     const jobsContent = sortJobsByDate(contentByType[ContentTypeEnum.enum.job])

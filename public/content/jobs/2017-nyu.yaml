@@ -9,7 +9,6 @@ roles:
 location: New York, NY
 start: "2017-05-01"
 end: "2017-11-01"
-priority: 60
 scores:
   ml-eng: 4
   backend: 2
@@ -19,7 +18,6 @@ duties:
     summary: Created novel CUDA algorithm for optimizing sparse matrix-vector multiplication
     detail:
       TODO (from project)
-    priority: 22
     links:
       - tag: repo
         detail: Source on GitHub

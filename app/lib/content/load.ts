@@ -81,31 +81,29 @@ function filterAndSortedContent(
 }
 
 export function getFilteredAndSortedContent(
-    weights: DimensionScores
-): Content[] {
-    const content = contentModules
-        .keys()
-        .map((key: string): Content => {
-            const raw: string = contentModules(key) as string
-            return ContentSchema.parse(raw)
-        })
-
-    return filterAndSortedContent(content, weights)
-}
-
-export function getFilteredSortedAndLimitedContent(
     weights: DimensionScores,
-    budget: number
+    budget?: number
 ): Content[] {
     const content = contentModules
         .keys()
-        .map((key: string): Content => {
+        .flatMap((key: string): Content[] => {
             const raw: string = contentModules(key) as string
-            return ContentSchema.parse(raw)
+            
+            // Handle both single objects and arrays of objects
+            if (Array.isArray(raw)) {
+                return raw.map(item => ContentSchema.parse(item))
+            } else {
+                return [ContentSchema.parse(raw)]
+            }
         })
 
     const filteredAndSorted = filterAndSortedContent(content, weights)
-    return applyGlobalBudgetLimit(filteredAndSorted, weights, budget)
+    
+    if (budget !== undefined) {
+        return applyGlobalBudgetLimit(filteredAndSorted, weights, budget)
+    }
+    
+    return filteredAndSorted
 }
 
 export function groupContentByType(content: Content[]): ContentByType {

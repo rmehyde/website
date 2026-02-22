@@ -11,7 +11,6 @@ roles:
 location: New York, NY
 start: "2020-11-01"
 end: "2023-09-01"
-priority: 15
 scores:
   ml-eng: 5
   ml-science: 4
@@ -28,7 +27,6 @@ duties:
     detail:
       Led MLE team responsible for productionizing internal models, building and maintaining MLOps platform's Python 
       SDK, and ML subject-matter expertise. Designed and conducted interviews, scaling team from 2 to 5.
-    priority: 7
     scores:
       ml-eng: 5
       ml-science: 2
@@ -38,7 +36,6 @@ duties:
     summary: Mentored junior and mid-level engineers and researchers across organization
     detail:
       Mentored ML engineers, ML researchers, software engineers, and sales engineers across the company.
-    priority: 68
     scores:
       ml-eng: 2
       backend: 2
@@ -51,7 +48,6 @@ duties:
     detail:
       Designed and implemented scalable internal ML platform for models dynamically trained and deployed over 
       arbitrary customer datasets across tabular, text, and image data.
-    priority: 20
     scores:
       ml-eng: 5
       data-eng: 4
@@ -64,7 +60,6 @@ duties:
     detail:
       Worked closely with ML researchers to productionize novel machine learning models for ML observability. Models 
       were dynamically trained and deployed on arbitrary customer datasets.
-    priority: 25
     scores:
       ml-eng: 5
       ml-science: 4
@@ -75,7 +70,6 @@ duties:
         detail:
           Productionized novel anomaly detection algorithm utilizing autoencoder reconstruction loss over embeddings 
           from any tabular, text, or image data.
-        priority: 40
         links:
           - tag: patent
             detail: Patent on Google Patents
@@ -89,7 +83,6 @@ duties:
         detail:
           Worked with research fellow to generalize reinforcement learning-based counterfactual generation for tabular 
           models, and mentored junior engineer to productionize model.
-        priority: 50
         scores:
           ml-eng: 5
           ml-science: 5
@@ -103,7 +96,6 @@ duties:
         detail:
           Productionized decision tree-based algorithm to identify pockets of model inaccuracies within tabular model 
           input space.
-        priority: 60
         scores:
           ml-eng: 5
           ml-science: 5
