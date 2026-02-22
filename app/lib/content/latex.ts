@@ -1,4 +1,4 @@
-import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project, Education, SoftSkill} from "@/app/lib/content/schema";
+import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project, Education, SoftSkill, TechnicalSkill} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
 export enum Verbosity {
@@ -165,4 +165,9 @@ export function softSkillsToLatex(softSkills: SoftSkill[]): string {
     return softSkills.map(skill => 
         `\\item ${escapeLatex(skill.summary)}`
     ).join("\n");
+}
+
+export function technicalSkillsToLatex(technicalSkills: TechnicalSkill[]): string {
+    const skillItems = technicalSkills.map(skill => escapeLatex(skill.title));
+    return "\\tb~" + skillItems.map(s => s.replace(" ", "~")).join(" \\tb~") + " \\tb~(\\&~more)";
 }
