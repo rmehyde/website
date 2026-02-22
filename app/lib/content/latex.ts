@@ -1,4 +1,4 @@
-import {BaseContent, Duty, Job, Link, Project} from "@/app/lib/content/schema";
+import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
 export enum Verbosity {
@@ -125,4 +125,30 @@ export async function loadTemplate(filePath: string): Promise<string> {
         throw new Error(`Failed to fetch template: ${response.status} ${response.statusText}`);
     }
     return await response.text()
+}
+
+export function projectsAndOssToLatex(content: ContentByType) {
+    const projectsContent = projectsToLatex(
+        content[ContentTypeEnum.enum.project],
+        Verbosity.Concise,
+        5,
+        false,
+    );
+    const ossContent = baseContentToLatex(
+        content[ContentTypeEnum.enum.oss],
+        Verbosity.Concise,
+        true
+    );
+    const maybeSeparator = (projectsContent.length > 0 && ossContent.length > 0)
+        // TODO: the second vspace isn't doing anything?
+        ? dedent(String.raw`
+            \vspace{-.5em}
+            \par\noindent
+            \makebox[\linewidth][c]{\rule{0.25\linewidth}{0.75pt}}
+            \vspace{-1.25em}
+            \par\noindent
+            `)
+        : ""
+    console.log(projectsContent, ossContent)
+    return ossContent + maybeSeparator + projectsContent;
 }

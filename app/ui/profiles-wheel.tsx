@@ -290,7 +290,7 @@ export default function ProfileSelector({
                                 {CUSTOM_PROFILE_NAME}
                             </SelectItem>
                             <SelectLabel className="text-xs text-muted-foreground font-normal -mt-2 flex items-center gap-1">
-                                Customize graph <ArrowRight className="h-3 w-3" />
+                                Customize graph
                             </SelectLabel>
                         </SelectGroup>
                     </SelectContent>

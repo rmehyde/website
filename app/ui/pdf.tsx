@@ -26,12 +26,12 @@ export const initializeLatexEngines = async () => {
         console.log("Initializing latex engines...");
         if (!xetexEngine) {
             xetexEngine = new XeTeXEngine();
+            await xetexEngine.loadEngine("/lib/swiftlatex/swiftlatexxetex.js");
         }
         if (!dviEngine) {
             dviEngine = new DvipdfmxEngine();
+            await dviEngine.loadEngine("/lib/swiftlatex/swiftlatexdvipdfm.js");
         }
-        await xetexEngine.loadEngine("/lib/swiftlatex/swiftlatexxetex.js");
-        await dviEngine.loadEngine("/lib/swiftlatex/swiftlatexdvipdfm.js");
         console.log("Engines loaded");
     } catch (e) {
         console.error("Engine initialization failed:", e);
