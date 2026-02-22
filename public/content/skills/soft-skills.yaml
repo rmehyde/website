@@ -1,0 +1,59 @@
+- contentType: soft-skill
+  title: Mentorship
+  summary: Experienced mentor with humble and collaborative approach to leadership
+  detail: Experienced mentor with humble and collaborative approach to leadership, having guided junior engineers and researchers across multiple teams and organizations
+  scores:
+    ml-eng: 3
+    ml-science: 3
+    data-analytics: 1
+    leadership: 5
+    sales-eng: 3
+    frontend: 0
+    devops-infra: 2
+    backend: 3
+    data-eng: 2
+
+- contentType: soft-skill
+  title: Technical Communication
+  summary: Well-versed in distilling technical concepts to engage non-technical stakeholders
+  detail: Well-versed in distilling complex technical concepts into accessible language for non-technical stakeholders, including executives, product managers, and cross-functional teams
+  scores:
+    ml-eng: 3
+    ml-science: 3
+    data-analytics: 4
+    leadership: 5
+    sales-eng: 4
+    frontend: 1
+    devops-infra: 1
+    backend: 3
+    data-eng: 2
+    
+- contentType: soft-skill
+  title: Strategic Curiosity
+  summary: Immense curiosity, initiative, and ability to align specific role with overall firm strategy
+  detail: Immense curiosity and initiative with demonstrated ability to align specific technical work with broader organizational strategy and business objectives
+  scores:
+    ml-eng: 1
+    ml-science: 1
+    data-analytics: 3
+    leadership: 5
+    sales-eng: 2
+    frontend: 1
+    devops-infra: 1
+    backend: 1
+    data-eng: 1
+    
+- contentType: soft-skill
+  title: Organization
+  summary: Highly organized and process-conscious to ensure consistent and communicable results
+  detail: Highly organized and process-conscious approach to software development, ensuring consistent, reproducible, and communicable results across teams and projects
+  scores:
+    ml-eng: 2
+    ml-science: 2
+    data-analytics: 3
+    leadership: 3
+    sales-eng: 2
+    frontend: 2
+    devops-infra: 3
+    backend: 2
+    data-eng: 2

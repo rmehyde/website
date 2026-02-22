@@ -11,6 +11,7 @@ const contentModules = (require as any).context(
 function filterAndSortedContent(
     content: Content[],
     weights: DimensionScores,
+    thresholdOverrides: Record<string, number> = {}
 ): Content[] {
     type ScoredContent = {
         content: Content
@@ -28,6 +29,7 @@ function filterAndSortedContent(
                 const sortedDuties = filterAndSortedContent(
                     job.duties as Content[],
                     weights,
+                    thresholdOverrides
                 ) as Duty[]
                 updatedContent = { ...job, duties: sortedDuties }
             }
@@ -37,6 +39,7 @@ function filterAndSortedContent(
                 const sortedSubduties = filterAndSortedContent(
                     (duty.subduties ?? []) as unknown as Content[],
                     weights,
+                    thresholdOverrides
                 ) as Duty[]
                 updatedContent = {
                     ...duty,
@@ -63,10 +66,11 @@ function filterAndSortedContent(
         })
 
     return scoredArray
-        // filter to "has any dimension greater than zero"
-        .filter((item: ScoredContent) =>
-            Object.values(item.absoluteScores).some(v => v > 0),
-        )
+        // filter using threshold (default 0, with per-content-type overrides)
+        .filter((item: ScoredContent) => {
+            const threshold = thresholdOverrides[item.content.contentType] ?? 0;
+            return Object.values(item.absoluteScores).some(v => v > threshold);
+        })
         // sort by composite scores (cosine desc, dotProduct desc)
         .toSorted(
             (a: ScoredContent, b: ScoredContent) => {
@@ -82,7 +86,8 @@ function filterAndSortedContent(
 
 export function getFilteredAndSortedContent(
     weights: DimensionScores,
-    budget?: number
+    budget?: number,
+    thresholdOverrides: Record<string, number> = {}
 ): Content[] {
     const content = contentModules
         .keys()
@@ -97,7 +102,7 @@ export function getFilteredAndSortedContent(
             }
         })
 
-    const filteredAndSorted = filterAndSortedContent(content, weights)
+    const filteredAndSorted = filterAndSortedContent(content, weights, thresholdOverrides)
     
     if (budget !== undefined) {
         return applyGlobalBudgetLimit(filteredAndSorted, weights, budget)
