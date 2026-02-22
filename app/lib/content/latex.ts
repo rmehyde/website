@@ -118,13 +118,15 @@ export function jobToLatex(job: Job): string {
 }
 
 
-// TODO: rather than fetching, bundle the templates to prevent loads
-export async function loadTemplate(filePath: string): Promise<string> {
-    const response = await fetch(filePath);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch template: ${response.status} ${response.statusText}`);
+import resumeTemplate from '@/app/templates/resume.tex.mustache';
+
+export function getTemplate(templateName: string): string {
+    switch (templateName) {
+        case 'resume':
+            return resumeTemplate;
+        default:
+            throw new Error(`Unknown template: ${templateName}`);
     }
-    return await response.text()
 }
 
 export function projectsAndOssToLatex(content: ContentByType) {

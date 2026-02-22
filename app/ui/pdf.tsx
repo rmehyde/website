@@ -76,7 +76,7 @@ export default function PDFComponent({onWeightsComplete}: {
             // LaTeX generation
             let latex: string;
             try {
-                latex = await generateResumeLatex(weightsToRender, contact);
+                latex = generateResumeLatex(weightsToRender, contact);
                 console.log("LaTeX generated", latex);
             } catch (e) {
                 throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) };

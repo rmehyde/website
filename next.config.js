@@ -19,6 +19,11 @@ const nextConfig = {
             use: 'js-yaml-loader',
         });
 
+        config.module.rules.push({
+            test: /\.mustache$/,
+            type: 'asset/source',
+        });
+
         return config;
     },
 }
