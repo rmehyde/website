@@ -2,7 +2,8 @@ contentType: job
 title: Undergraduate Researcher @ NYU Courant
 summary: Undergraduate Researcher in GPU-accelerated computing at NYU Courant
 detail:
-  TODO
+  Summer research project advised by Professor Mohamed Zahran exploring novel GPU acceleration 
+  algorithms for scientific computing and machine learning
 company: NYU Courant
 roles:
   - Undergraduate Researcher
@@ -11,13 +12,17 @@ start: "2017-05-01"
 end: "2017-11-01"
 scores:
   ml-eng: 4
+  ml-science: 3
   backend: 2
+# TODO: need exclusion with project so that only one shows up?
 duties:
   - title: Novel RiCSR SpMV CUDA Algorithm
     contentType: duty
-    summary: Created novel CUDA algorithm for optimizing sparse matrix-vector multiplication
+    summary: Created novel CUDA algorithm for optimizing sparse matrix-vector multiplication across multiple GPUs
     detail:
-      TODO (from project)
+      A research project exploring sparse matrix-vector multiplication using the novel Ribboned Compressed Sparse Row 
+      (RiCSR) data structure and accompanying CUDA computation implementation to exploit NVIDIA GPU architecture and scale 
+      across multiple devices.
     links:
       - tag: repo
         detail: Source on GitHub

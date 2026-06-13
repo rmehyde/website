@@ -19,6 +19,8 @@ scores:
   devops-infra: 3
   backend: 4
   data-eng: 4
+  sales-eng: 4
+  frontend: 1
 duties:
   - title: Led MLE Team
     contentType: duty
@@ -41,6 +43,16 @@ duties:
       backend: 2
       ml-science: 1
       leadership: 4
+  - title: JIRA Automations & Dashboards
+    contentType: duty
+    summary: Built JIRA automations & dashboards for engineer-friendly work tracking and leadership-friendly metrics & 
+      analytics
+    detail: Built JIRA automations for engineer-friendly work tracking with minimal overhead and dashboards for leadership-friendly 
+      metrics & visibility into roadmap progress without polling engineers.
+    scores:
+      data-analytics: 4
+      leadership: 4
+      frontend: 3
   - title: Built Internal ML Platform
     contentType: duty
     summary: Designed and implemented scalable internal ML platform for dynamically-created schema-agnostic models 
@@ -54,9 +66,22 @@ duties:
       backend: 3
       ml-science: 2
       leadership: 2
+  - title: Dynamic Infrastructure Provisioning
+    contentType: duty
+    summary: Built system to dynamically provision K8s training and inference workloads per customer model
+    detail:
+      Built services that dynamically spun up Kubernetes training jobs and autoscaling inference deployments 
+      based on API configurations of enabled features
+    scores:
+      ml-eng: 1
+      devops-infra: 5
+      data-eng: 2
+      backend: 3
+      leadership: 1
   - title: Productionized ML Models
     contentType: duty
     summary: Productionized novel machine learning models
+    # TODO: probably need "joiner" whenever subduties aren't filtered, like before I had ", including for:" suffix
     detail:
       Worked closely with ML researchers to productionize novel machine learning models for ML observability. Models 
       were dynamically trained and deployed on arbitrary customer datasets.
@@ -103,6 +128,25 @@ duties:
           - tag: patent
             detail: Patent on Google Patents
             target: https://patents.google.com/patent/US20230098255A1
+  - title: Backend Microservices
+    contentType: duty
+    summary: Built Go microservices for ML data ingestion, querying, and alerting
+    detail: "Built and maintained Go microservices powering the ML Observability platform: batch and streaming ingestion 
+      of customer ML inputs/outputs, query-building and execution against ClickHouse, and alert evaluation and firing."
+    scores:
+      ml-eng: 2
+      backend: 5
+      data-eng: 3
+  - title: Sales & Solutions Engineering
+    contentType: duty
+    summary: Trusted technical partner for customer integrations, from startups to global banks
+    detail: Hands-on solutions engineer for customer integrations across startups and enterprises, including the  
+      the largest domestic bank. Guided SDK usage within customer systems, built requested features, fixed integration 
+      bugs, and assisted with on-prem deployments via Replicated.
+    scores:
+      sales-eng: 5
+      devops-infra: 3
+      ml-eng: 2
+      data-eng: 2
 
-
-# TODO: dynamic infra
+# TODO: SDK?

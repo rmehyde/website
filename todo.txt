@@ -1,0 +1,1 @@
+- when you click to select a profile/role it snaps to the new value, should transition like the scroller

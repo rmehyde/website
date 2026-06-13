@@ -2,7 +2,8 @@ contentType: job
 title: MLE @ Dstillery
 summary: Machine Learning Engineer at Dstillery
 detail:
-  TODO
+  Backend and Machine Learning Engineer at adtech company building peta-scale data pipelines 
+  and productionizing novel privacy-preserving machine learning techniques for online ad targeting
 company: Dstillery
 roles:
   - Software Engineer
@@ -22,7 +23,8 @@ duties:
     contentType: duty
     summary: Worked with Data Scientists to productionize ML models and novel algorithms
     detail:
-      TODO
+      Worked with Data Scientists to productize ML models and novel algorithms for online ad 
+      targeting using privacy-preserving demographic and cookie-free audiences.
     scores:
       ml-eng: 5
       ml-science: 3
@@ -30,7 +32,7 @@ duties:
     contentType: duty
     summary: Created and optimized Spark jobs to run analysis and ETL operations against peta-scale data
     detail:
-      TODO
+      Created and optimized Spark jobs to run analysis and ETL operations against peta-scale Hive data warehouse.
     scores:
       data-analytics: 4
       data-eng: 5
@@ -38,15 +40,17 @@ duties:
     contentType: duty
     summary: Designed and implemented data ingestion pipeline that processes 100 billion daily events
     detail:
-      TODO
+      Designed and implemented data ingestion pipeline that processes 100 billion daily events to power 
+      privacy-preserving cookie-free online advertising target audiences.
     scores:
-      data-analytics: 5
       data-eng: 5
+      backend: 3
   - title: Java Profiler Visualization
     contentType: duty
     summary: Created interactive profiler data visualizer to analyze and optimize Java program performance
     detail:
-      TODO
+      Created Java profile data visualizer to explore call stacks in an interactive Sankey diagram and 
+      optimize performance.
     scores:
       data-analytics: 5
       frontend: 4

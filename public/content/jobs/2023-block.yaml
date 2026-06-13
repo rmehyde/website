@@ -1,9 +1,10 @@
 contentType: job
 title: MLE @ Block
-summary: Machine Learning Engineer on Cash App's Identity ML team
+summary: Machine Learning Engineer on Block's ML Platform team
 detail:
-  Work as Machine Learning Engineer on Cash App's Identity ML team at Block. Our mandate is to detect users who are 
-  misrepresenting their identity on Cash App, for example by using a stolen identity.
+  Work as Machine Learning Engineer on Block's ML Platform team, currently focused on ML Observability 
+  in our realtime evaluation systems. Previously on Cash App's Identity ML team rooting out fraudulent 
+  accounts on Cash App.
 company: Block
 roles:
   - Applied MLE (Cash App)
@@ -25,7 +26,7 @@ duties:
     summary: Productionized send/receive/transfer limit model netting $2.1M additional annual profit
     detail:
       Collaborated with Machine Learning Modeler to bring experimental model to determine customer send/receive/transfer
-      limits into production, netting $2.1M additional annual profit
+      limits into production, netting $2.1M additional annual profit.
     scores:
       ml-eng: 5
       ml-science: 1
@@ -36,10 +37,40 @@ duties:
     summary: Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices
     detail:
       Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices, unblocking
-      expiration of costly data center contract
+      expiration of costly data center contract.
     scores:
       ml-eng: 5
       backend: 4
       data-eng: 4
+  - title: Halved Risk Evaluation p99 Latency
+    contentType: duty
+    summary: Optimized ML feature resolution service's refresh process, halving p99 latency across every transaction on Square and Cash App
+    detail:
+      Optimized refresh connection strategy of ML feature resolution Go service, halving p99 latency of 120M daily risk evaluations 
+      across every Square and Cash App transaction.
+    scores:
+      backend: 5
+      ml-eng: 1
+  - title: SHAP Toolkit
+    contentType: duty
+    summary: Built internal ML explainability library providing turnkey SHAP feature attributions to any ML model at Block
+    detail: Built internal ML explainability library providing turnkey SHAP feature attributions to any ML model at Block, 
+      abstracting model retrieval, environment recreation, historical input fetch, and perturbation of one-hot-encoded features.
+    scores:
+      ml-eng: 4
+      ml-science: 2
+      data-eng: 2
+      data-analytics: 1
 
-# TODO: halved p99 latency for all risk evals
+
+# TODO:
+# - [DONE] halved p99 latency for all risk evals
+# - [DONE] spotlight / xai
+# - trust & controls stuff, stakeholder management
+# - new tables
+# - CLIs
+# - DGL / graphs?
+
+
+
+# TODO: sales eng -> solutions eng to better support Cash

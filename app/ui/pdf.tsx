@@ -169,6 +169,7 @@ export default function PDFComponent({onWeightsComplete}: {
                 ) : error ? (
                     <Button onClick={() => setError(null)} variant="outline">
                         <RefreshCw className="mr-2 h-4 w-4" />
+                        {/* TODO: state issue. Fail -> Try Again. Does nothing, you get "Download Resume" button */}
                         Try Again
                     </Button>
                 ) : (
