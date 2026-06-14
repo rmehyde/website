@@ -1,99 +1,132 @@
-- name: Machine Learning Engineer
+- name: ML Platform Engineer
   scores:
-    ml-eng: 5
-    ml-science: 3
+    libs-tooling: 5
+    science: 2
+    ml: 5
     data-analytics: 2
     leadership: 2
-    sales-eng: 0
+    solutions: 1
+    devops-infra: 4
+    backend: 4
     frontend: 1
+    data-eng: 3
+- name: Applied ML Engineer
+  scores:
+    libs-tooling: 2
+    science: 3
+    ml: 5
+    data-analytics: 2
+    leadership: 2
+    solutions: 4
     devops-infra: 2
-    backend: 3
+    backend: 4
+    frontend: 1
     data-eng: 3
 - name: Tech Lead
   scores:
-    ml-eng: 3
-    ml-science: 2
+    libs-tooling: 3
+    science: 2
+    ml: 3
     data-analytics: 2
     leadership: 5
-    sales-eng: 1
-    frontend: 2
-    devops-infra: 2
+    solutions: 2
+    devops-infra: 1
     backend: 3
-    data-eng: 3
+    frontend: 1
+    data-eng: 2
 - name: Backend Engineer
   scores:
-    ml-eng: 2
-    ml-science: 1
+    libs-tooling: 2
+    science: 1
+    ml: 1
     data-analytics: 2
     leadership: 2
-    sales-eng: 0
-    frontend: 1
+    solutions: 1
     devops-infra: 3
     backend: 5
+    frontend: 1
     data-eng: 4
 - name: Machine Learning Scientist
   scores:
-    ml-eng: 3
-    ml-science: 5
+    libs-tooling: 2
+    science: 5
+    ml: 5
     data-analytics: 3
     leadership: 2
-    sales-eng: 1
-    frontend: 2
-    devops-infra: 2
+    solutions: 1
+    devops-infra: 1
     backend: 2
+    frontend: 1
     data-eng: 3
 - name: Sales Engineer
   scores:
-    ml-eng: 2
-    ml-science: 2
+    libs-tooling: 2
+    science: 1
+    ml: 2
     data-analytics: 3
     leadership: 3
-    sales-eng: 5
-    frontend: 3
+    solutions: 5
     devops-infra: 1
-    backend: 1
-    data-eng: 2
+    backend: 2
+    frontend: 2
+    data-eng: 3
 - name: Devops Engineer
   scores:
-    ml-eng: 2
-    ml-science: 2
+    libs-tooling: 3
+    science: 1
+    ml: 1
     data-analytics: 2
-    leadership: 2
-    sales-eng: 0
-    frontend: 1
+    leadership: 1
+    solutions: 1
     devops-infra: 5
-    backend: 2
+    backend: 3
+    frontend: 1
     data-eng: 2
 - name: Data Engineer
   scores:
-    ml-eng: 2
-    ml-science: 1
+    libs-tooling: 2
+    science: 1
+    ml: 1
     data-analytics: 3
     leadership: 2
-    sales-eng: 1
-    frontend: 1
+    solutions: 1
     devops-infra: 3
     backend: 3
+    frontend: 1
     data-eng: 5
 - name: Frontend Engineer
   scores:
-    ml-eng: 1
-    ml-science: 1
-    data-analytics: 2
+    libs-tooling: 1
+    science: 1
+    ml: 1
+    data-analytics: 3
     leadership: 2
-    sales-eng: 1
+    solutions: 2
+    devops-infra: 1
+    backend: 2
     frontend: 5
-    devops-infra: 2
-    backend: 1
     data-eng: 1
 - name: Data Analyst
   scores:
-    ml-eng: 2
-    ml-science: 2
+    libs-tooling: 2
+    science: 2
+    ml: 2
     data-analytics: 5
     leadership: 2
-    sales-eng: 3
-    frontend: 3
+    solutions: 3
     devops-infra: 1
     backend: 1
+    frontend: 3
     data-eng: 2
+- name: Full-Stack Engineer
+  scores:
+    libs-tooling: 3
+    science: 1
+    ml: 1
+    data-analytics: 2
+    leadership: 2
+    solutions: 2
+    devops-infra: 3
+    backend: 4
+    frontend: 4
+    data-eng: 3

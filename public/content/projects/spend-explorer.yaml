@@ -1,0 +1,14 @@
+contentType: project
+title: Spend Explorer
+icon: circle-dollar-sign
+summary: Web app for visualizing transaction data
+detail: A privacy-conscious web app for visualizing spend data from Amex® transaction logs
+links:
+  - tag: app
+    detail: View the App
+    # TODO: switch to HTTPS!
+    target: http://rmehyde.com/spend
+scores:
+  frontend: 5
+  data-analytics: 5
+  data-eng: 1

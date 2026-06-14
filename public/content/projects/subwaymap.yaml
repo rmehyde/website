@@ -14,5 +14,4 @@ links:
     # TODO: make secure link once working
     target: http://rmehyde.com/subwaymap.html
 scores:
-  backend: 3
   frontend: 5

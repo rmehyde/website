@@ -1,0 +1,11 @@
+contentType: oss
+title: SwiftLaTeX
+summary: In-Browser LaTeX Engines
+detail: Added support for statically-hosted TeX files and fixed memory-allocation bugs
+links:
+  - tag: fork
+    detail: Fork on GitHub
+    target: https://github.com/rmehyde/SwiftLaTeX
+scores:
+  libs-tooling: 5
+  frontend: 3

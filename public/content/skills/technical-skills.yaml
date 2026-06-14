@@ -3,20 +3,22 @@
   summary: "Expert in the Python programming language"
   detail: "Expert-level proficiency in Python for data science, machine learning, and backend development"
   scores:
-    ml-eng: 5
-    ml-science: 5
-    data-eng: 5
-    backend: 5
-    data-analytics: 5
-    
+    libs-tooling: 5
+    ml: 4
+    data-eng: 4
+    data-analytics: 4
+    backend: 3
+    science: 2
+
 - contentType: technical-skill
   title: "PyTorch, TensorFlow"
   summary: "Strong experience with leading deep learning frameworks"
   detail: "Extensive experience with PyTorch and TensorFlow for model development, training, and deployment"
   scores:
-    ml-eng: 5
-    ml-science: 5
-    data-analytics: 3
+    ml: 5
+    science: 4
+    libs-tooling: 2
+    data-analytics: 1
 
 - contentType: technical-skill
   title: "Docker, Kubernetes"
@@ -25,8 +27,7 @@
   scores:
     devops-infra: 5
     backend: 3
-    data-eng: 3
-    ml-eng: 2
+    data-eng: 2
 
 - contentType: technical-skill
   title: "Go"
@@ -34,8 +35,9 @@
   detail: "High-performance systems programming with Go for scalable backend services"
   scores:
     backend: 5
-    devops-infra: 4
+    devops-infra: 3
     data-eng: 2
+    libs-tooling: 1
 
 - contentType: technical-skill
   title: "AWS, GCP"
@@ -43,9 +45,9 @@
   detail: "Deep experience with Amazon Web Services and Google Cloud Platform for scalable cloud infrastructure"
   scores:
     devops-infra: 5
-    ml-eng: 2
     backend: 3
     data-eng: 3
+    ml: 1
 
 - contentType: technical-skill
   title: "Kafka"
@@ -54,7 +56,8 @@
   scores:
     data-eng: 5
     backend: 4
-    ml-eng: 2
+    devops-infra: 3
+    ml: 1
 
 - contentType: technical-skill
   title: "Spark"
@@ -62,17 +65,18 @@
   detail: "Large-scale data processing with Apache Spark for distributed computing workloads"
   scores:
     data-eng: 5
-    data-analytics: 4
-    ml-eng: 3
+    data-analytics: 3
+    ml: 2
+    devops-infra: 1
 
 - contentType: technical-skill
   title: "Snowflake, Hive"
   summary: "Analytical experience with data warehouses including Snowflake and Hive"
   detail: "Experience with Snowflake and Apache Hive for large-scale data warehousing and analytics"
   scores:
-    data-eng: 5
-    data-analytics: 4
-    ml-eng: 2
+    data-analytics: 5
+    data-eng: 4
+    ml: 1
 
 - contentType: technical-skill
   title: "Java, Kotlin, Spring, Guice"
@@ -80,8 +84,8 @@
   detail: "Enterprise Java development with Spring framework, Kotlin for modern JVM applications, and dependency injection with Guice"
   scores:
     backend: 5
-    data-eng: 3
-    ml-eng: 2
+    data-eng: 1
+    libs-tooling: 1
 
 - contentType: technical-skill
   title: "SQL, ClickHouse"
@@ -89,9 +93,9 @@
   detail: "Advanced SQL for data analysis and ClickHouse for high-performance analytical databases"
   scores:
     data-analytics: 5
-    data-eng: 5
+    data-eng: 4
     backend: 3
-    ml-eng: 2
+    ml: 1
 
 - contentType: technical-skill
   title: "GitLab, Buildkite, Jenkins"
@@ -99,17 +103,18 @@
   detail: "Continuous integration and deployment with GitLab CI and Jenkins for automated software delivery"
   scores:
     devops-infra: 5
-    backend: 3
-    ml-eng: 1
+    backend: 2
+    libs-tooling: 2
 
 - contentType: technical-skill
   title: "CUDA"
   summary: "Targeted CUDA programming for ML acceleration"
   detail: "CUDA programming for high-performance computing and accelerated machine learning workloads"
   scores:
-    ml-eng: 5
-    ml-science: 4
-    devops-infra: 2
+    ml: 4
+    science: 4
+    libs-tooling: 3
+    backend: 2
 
 - contentType: technical-skill
   title: "D3, JavaScript"
@@ -118,4 +123,4 @@
   scores:
     frontend: 5
     data-analytics: 4
-    sales-eng: 3
+    solutions: 2

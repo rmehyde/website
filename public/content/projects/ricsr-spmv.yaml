@@ -11,6 +11,7 @@ links:
     detail: Source on GitHub
     target: https://github.com/rmehyde/ricsr-spmv
 scores:
-  ml-eng: 5
-  backend: 3
+  science: 4
+  libs-tooling: 3
+  ml: 3
   data-eng: 1

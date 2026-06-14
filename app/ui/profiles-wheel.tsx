@@ -231,6 +231,7 @@ export default function ProfileSelector({
 
     return (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            {/* TODO: needs to switch to an on some */}
             <div className="text-2xl whitespace-nowrap">Reese is a</div>
             <div className="relative w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>

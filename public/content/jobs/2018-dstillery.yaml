@@ -12,30 +12,33 @@ location: New York, NY
 start: "2018-10-01"
 end: "2020-10-01"
 scores:
-  ml-eng: 5
-  ml-science: 3
-  data-analytics: 1
+  libs-tooling: 3
+  ml: 5
+  science: 3
+  data-analytics: 2
   backend: 5
   data-eng: 4
   frontend: 1
 duties:
   - title: Productionized ML Models
     contentType: duty
-    summary: Worked with Data Scientists to productionize ML models and novel algorithms
+    summary: Worked with Data Scientists to productionize ML models and novel algorithms for ad targeting
     detail:
-      Worked with Data Scientists to productize ML models and novel algorithms for online ad 
+      Worked with Data Scientists to productionize ML models and novel algorithms for online ad 
       targeting using privacy-preserving demographic and cookie-free audiences.
     scores:
-      ml-eng: 5
-      ml-science: 3
+      ml: 5
+      science: 3
+      data-eng: 2
+      backend: 2
   - title: Built Spark ETLs
     contentType: duty
     summary: Created and optimized Spark jobs to run analysis and ETL operations against peta-scale data
     detail:
       Created and optimized Spark jobs to run analysis and ETL operations against peta-scale Hive data warehouse.
     scores:
-      data-analytics: 4
       data-eng: 5
+      data-analytics: 2
   - title: Built Firehose Event Ingestion
     contentType: duty
     summary: Designed and implemented data ingestion pipeline that processes 100 billion daily events
@@ -54,4 +57,5 @@ duties:
     scores:
       data-analytics: 5
       frontend: 4
-      backend: 4
+      backend: 2
+      libs-tooling: 2

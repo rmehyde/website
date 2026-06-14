@@ -11,9 +11,10 @@ location: New York, NY
 start: "2017-05-01"
 end: "2017-11-01"
 scores:
-  ml-eng: 4
-  ml-science: 3
-  backend: 2
+  science: 4
+  libs-tooling: 3
+  ml: 3
+  data-eng: 1
 # TODO: need exclusion with project so that only one shows up?
 duties:
   - title: Novel RiCSR SpMV CUDA Algorithm
@@ -28,5 +29,7 @@ duties:
         detail: Source on GitHub
         target: https://github.com/rmehyde/ricsr-spmv
     scores:
-      ml-eng: 4
-      backend: 2
+      science: 4
+      libs-tooling: 3
+      ml: 3
+      data-eng: 1

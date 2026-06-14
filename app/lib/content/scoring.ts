@@ -5,29 +5,31 @@ export const maxScore = 5
 
 export const Dimension = z.enum(
     [
-        "ml-eng",
-        "ml-science",
+        "libs-tooling",
+        "science",
+        "ml",
         "data-analytics",
         "leadership",
-        "sales-eng",
-        "frontend",
+        "solutions",
         "devops-infra",
         "backend",
+        "frontend",
         "data-eng",
     ]
 )
 export type Dimension = z.infer<typeof Dimension>;
 
 export const dimensionLabels: Readonly<Record<Dimension, string>> = {
-    "ml-eng": "Machine Learning Engineering",
-    "ml-science": "Machine Learning Science",
+    "libs-tooling": "Tooling & Libraries",
+    "science": "Science & Research",
+    "ml": "Machine Learning",
     "data-analytics": "Data Analytics & Visualization",
     "leadership": "Leadership",
-    "sales-eng": "Sales Engineering",
-    "frontend": "Frontend Engineering",
-    "devops-infra": "DevOps & Infra Engineering",
-    "backend": "Backend Engineering",
-    "data-eng": "Data Engineering",
+    "solutions": "Solutions & Integration",
+    "devops-infra": "DevOps & Infrastructure",
+    "backend": "Backend & Server",
+    "frontend": "Frontend & Client",
+    "data-eng": "Data Pipelines",
 };
 
 export const dimensionScoresSchema = z.object(

@@ -8,4 +8,5 @@ links:
     detail: Source on GitHub
     target: https://github.com/rmehyde/nfl-scraper
 scores:
-  backend: 4
+  libs-tooling: 3
+  data-eng: 2

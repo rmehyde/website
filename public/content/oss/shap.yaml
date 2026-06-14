@@ -7,7 +7,7 @@ links:
     detail: Pull Requests on GitHub
     target: https://github.com/search?q=repo%3Ashap%2Fshap+is%3Apr+author%3Armehyde+author%3Areesehyde+&type=pullrequests
 scores:
-  ml-eng: 5
-  ml-science: 3
-  devops-infra: 2
-  backend: 1
+  ml: 3
+  libs-tooling: 4
+  science: 2
+  devops-infra: 1

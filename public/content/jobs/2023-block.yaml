@@ -12,15 +12,15 @@ roles:
 location: New York, NY
 start: "2023-10-01"
 scores:
-  ml-eng: 5
-  ml-science: 2
-  data-analytics: 2
+  ml: 4
+  libs-tooling: 4
   leadership: 3
-  devops-infra: 2
   backend: 3
   data-eng: 3
+  science: 2
+  data-analytics: 2
+  devops-infra: 2
 duties:
-  # TODO: consider how much to add sub-duties
   - title: Limits Model
     contentType: duty
     summary: Productionized send/receive/transfer limit model netting $2.1M additional annual profit
@@ -28,49 +28,63 @@ duties:
       Collaborated with Machine Learning Modeler to bring experimental model to determine customer send/receive/transfer
       limits into production, netting $2.1M additional annual profit.
     scores:
-      ml-eng: 5
-      ml-science: 1
-      data-analytics: 4
+      ml: 4
+      data-analytics: 3
+      backend: 3
+      data-eng: 3
       leadership: 2
-  - title: Suspension Migration
+      science: 1
+  - title: Compliance-Driven Risk Controls
     contentType: duty
-    summary: Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices
-    detail:
-      Migrated user suspension ML pipeline from legacy data-center monolith to Cloud-native microservices, unblocking
-      expiration of costly data center contract.
+    summary: Led technical delivery of compliance-driven risk controls under regulatory deadlines
+    detail: Led technical delivery of various compliance-driven risk controls, translating engineering constraints into 
+      product decisions across Server Engineering, Risk ML, Product, and Compliance organizations.
     scores:
-      ml-eng: 5
-      backend: 4
-      data-eng: 4
-  - title: Halved Risk Evaluation p99 Latency
+      solutions: 4
+      leadership: 3
+      backend: 2
+      data-eng: 2
+      ml: 1
+  - title: Halved Risk Evaluation Tail Latency
     contentType: duty
-    summary: Optimized ML feature resolution service's refresh process, halving p99 latency across every transaction on Square and Cash App
+    summary: Optimized ML feature-resolution service, halving p99 risk-evaluation latency on all 120M daily transactions
     detail:
       Optimized refresh connection strategy of ML feature resolution Go service, halving p99 latency of 120M daily risk evaluations 
       across every Square and Cash App transaction.
     scores:
       backend: 5
-      ml-eng: 1
+      ml: 1
   - title: SHAP Toolkit
     contentType: duty
     summary: Built internal ML explainability library providing turnkey SHAP feature attributions to any ML model at Block
     detail: Built internal ML explainability library providing turnkey SHAP feature attributions to any ML model at Block, 
       abstracting model retrieval, environment recreation, historical input fetch, and perturbation of one-hot-encoded features.
     scores:
-      ml-eng: 4
-      ml-science: 2
+      libs-tooling: 5
+      ml: 4
+      science: 2
       data-eng: 2
       data-analytics: 1
-
-
-# TODO:
-# - [DONE] halved p99 latency for all risk evals
-# - [DONE] spotlight / xai
-# - trust & controls stuff, stakeholder management
-# - new tables
-# - CLIs
-# - DGL / graphs?
-
-
-
-# TODO: sales eng -> solutions eng to better support Cash
+  - title: Offline Risk Management Platform
+    contentType: duty
+    summary: Re-architected Cash App's batch account-actioning system, from two hardcoded actions to extensible risk-action platform
+    detail: "Re-architected Cash App's batch account-actioning system from a modeler-built codebase hardcoded to two actions 
+      into an extensible platform for arbitrary risk actions: granular suspensions, device blocks, and reverts of false positives"
+    scores:
+      libs-tooling: 5
+      ml: 3
+      backend: 2
+      data-eng: 2
+      leadership: 2
+      devops-infra: 1
+  - title: Graph Neural Network Fraud Detection
+    contentType: duty
+    summary: Built data pipeline and generalized training framework enabling rapid GNN experimentation for graph-based fraud detection
+    detail: Partnered with a modeler on exploratory graph neural network models predicting fraudulent accounts from
+      inter-account connections. Built the DGL data pipeline to pre-fetch and format graph data for efficient training
+      and generalized the PyTorch model code into a config-driven framework for rapid architecture experimentation
+    scores:
+      science: 4
+      ml: 4
+      data-eng: 3
+      libs-tooling: 1

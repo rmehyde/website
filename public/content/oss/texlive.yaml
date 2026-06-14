@@ -1,0 +1,12 @@
+contentType: oss
+title: Texlive-Ondemand
+summary: On-demand TeX Live Server
+detail: Added proxy and local cache to support statically hosting case-specific files
+links:
+  - tag: fork
+    detail: Fork on GitHub
+    target: https://github.com/rmehyde/Texlive-Ondemand
+scores:
+  libs-tooling: 3
+  backend: 3
+  frontend: 1

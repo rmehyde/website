@@ -10,4 +10,5 @@ links:
     detail: Source on GitHub
     target: https://github.com/rmehyde/parallelmergesort
 scores:
-  backend: 5
+  libs-tooling: 5
+  backend: 2

@@ -2,7 +2,7 @@ contentType: job
 title: MLE Lead @ Arthur
 summary: Machine Learning Engineering Tech Lead at Arthur
 detail:
-  Scaled and let Machine Learning Engineering team at Arthur, building and productionizing novel ML models to improve 
+  Scaled and led Machine Learning Engineering team at Arthur, building and productionizing novel ML models to improve 
   observability of customer ML model.
 company: Arthur
 roles:
@@ -12,14 +12,15 @@ location: New York, NY
 start: "2020-11-01"
 end: "2023-09-01"
 scores:
-  ml-eng: 5
-  ml-science: 4
-  data-analytics: 3
+  ml: 5
   leadership: 5
-  devops-infra: 3
+  science: 4
+  solutions: 4
   backend: 4
   data-eng: 4
-  sales-eng: 4
+  libs-tooling: 3
+  devops-infra: 3
+  data-analytics: 2
   frontend: 1
 duties:
   - title: Led MLE Team
@@ -30,8 +31,9 @@ duties:
       Led MLE team responsible for productionizing internal models, building and maintaining MLOps platform's Python 
       SDK, and ML subject-matter expertise. Designed and conducted interviews, scaling team from 2 to 5.
     scores:
-      ml-eng: 5
-      ml-science: 2
+      ml: 4
+      science: 2
+      libs-tooling: 2
       leadership: 5
   - title: Mentored Junior Engineers
     contentType: duty
@@ -39,10 +41,12 @@ duties:
     detail:
       Mentored ML engineers, ML researchers, software engineers, and sales engineers across the company.
     scores:
-      ml-eng: 2
-      backend: 2
-      ml-science: 1
       leadership: 4
+      ml: 2
+      backend: 2
+      science: 1
+      libs-tooling: 1
+      solutions: 1
   - title: JIRA Automations & Dashboards
     contentType: duty
     summary: Built JIRA automations & dashboards for engineer-friendly work tracking and leadership-friendly metrics & 
@@ -61,10 +65,10 @@ duties:
       Designed and implemented scalable internal ML platform for models dynamically trained and deployed over 
       arbitrary customer datasets across tabular, text, and image data.
     scores:
-      ml-eng: 5
+      ml: 5
       data-eng: 4
       backend: 3
-      ml-science: 2
+      science: 2
       leadership: 2
   - title: Dynamic Infrastructure Provisioning
     contentType: duty
@@ -73,10 +77,10 @@ duties:
       Built services that dynamically spun up Kubernetes training jobs and autoscaling inference deployments 
       based on API configurations of enabled features
     scores:
-      ml-eng: 1
       devops-infra: 5
       data-eng: 2
       backend: 3
+      ml: 1
       leadership: 1
   - title: Productionized ML Models
     contentType: duty
@@ -86,8 +90,10 @@ duties:
       Worked closely with ML researchers to productionize novel machine learning models for ML observability. Models 
       were dynamically trained and deployed on arbitrary customer datasets.
     scores:
-      ml-eng: 5
-      ml-science: 4
+      ml: 5
+      science: 4
+      data-eng: 2
+      backend: 1
     subduties:
       - title: Multimodal Anomaly Detection
         contentType: duty
@@ -100,8 +106,11 @@ duties:
             detail: Patent on Google Patents
             target: https://patents.google.com/patent/US11568167B2/
         scores:
-          ml-eng: 5
-          ml-science: 5
+          ml: 5
+          science: 4
+          data-eng: 2
+          libs-tooling: 2
+          backend: 1
       - title: RL-Based Counterfactuals
         contentType: duty
         summary: Counterfactual explanations through reinforcement learning
@@ -109,8 +118,12 @@ duties:
           Worked with research fellow to generalize reinforcement learning-based counterfactual generation for tabular 
           models, and mentored junior engineer to productionize model.
         scores:
-          ml-eng: 5
-          ml-science: 5
+          ml: 5
+          science: 3
+          leadership: 2
+          data-eng: 2
+          libs-tooling: 2
+          backend: 1
         links:
           - tag: paper
             detail: Paper on arXiv
@@ -122,8 +135,11 @@ duties:
           Productionized decision tree-based algorithm to identify pockets of model inaccuracies within tabular model 
           input space.
         scores:
-          ml-eng: 5
-          ml-science: 5
+          ml: 5
+          science: 3
+          data-eng: 2
+          libs-tooling: 2
+          backend: 1
         links:
           - tag: patent
             detail: Patent on Google Patents
@@ -134,19 +150,33 @@ duties:
     detail: "Built and maintained Go microservices powering the ML Observability platform: batch and streaming ingestion 
       of customer ML inputs/outputs, query-building and execution against ClickHouse, and alert evaluation and firing."
     scores:
-      ml-eng: 2
+      ml: 2
       backend: 5
       data-eng: 3
   - title: Sales & Solutions Engineering
     contentType: duty
     summary: Trusted technical partner for customer integrations, from startups to global banks
     detail: Hands-on solutions engineer for customer integrations across startups and enterprises, including the  
-      the largest domestic bank. Guided SDK usage within customer systems, built requested features, fixed integration 
+      largest domestic bank. Guided SDK usage within customer systems, built requested features, fixed integration 
       bugs, and assisted with on-prem deployments via Replicated.
     scores:
-      sales-eng: 5
+      solutions: 5
       devops-infra: 3
-      ml-eng: 2
+      ml: 2
       data-eng: 2
-
-# TODO: SDK?
+  - title: ML Observability SDK
+    contentType: duty
+    summary: Owned customer-facing Python SDK for integrating and analyzing ML models on the Observability platform
+    detail: Owned the customer-facing Python SDK that customers used to instrument their models on the ML Observability 
+      platform and analyze model performance.
+    scores:
+      libs-tooling: 5
+      ml: 3
+      science: 1
+      data-analytics: 2
+      leadership: 3
+      devops-infra: 1
+      backend: 1
+      data-eng: 2
+      solutions: 2
+      frontend: 1

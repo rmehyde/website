@@ -11,6 +11,6 @@ links:
     detail: Source on GitHub
     target: https://github.com/rmehyde/IT8951
 scores:
-  backend: 5
+  libs-tooling: 5
   frontend: 3
   data-eng: 2

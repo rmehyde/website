@@ -152,7 +152,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const dimensions = Object.keys(dimensionLabels);
     const dimensionLabelLines: Record<string, string[]> = Object.fromEntries(
         Object.entries(dimensionLabels).map(
-            ([key, label]) => [key, splitLines(label, 17)]
+            ([key, label]) => [key, splitLines(label, 20)]
         )
     );
     // total svg size includes extra space for labels

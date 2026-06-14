@@ -23,7 +23,7 @@ export default function DynamicProjects() {
         <div>
             {/* TODO: this needs some better spacing as it looks fucky with the project
             spacing */}
-            {/* TODO: 'lg' isn't quite right here, we need to dial in the perfect breakpoint */}w
+            {/* TODO: 'lg' isn't quite right here, we need to dial in the perfect breakpoint */}
             <div className="flex flex-col justify-evenly lg:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
                 {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}

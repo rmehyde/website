@@ -15,3 +15,6 @@ links:
     target: http://rmehyde.com/
 scores:
   frontend: 5
+  libs-tooling: 2
+  backend: 2
+  data-analytics: 1
