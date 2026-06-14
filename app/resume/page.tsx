@@ -209,9 +209,10 @@ export default function DynamicResume() {
         <div>
             {/*<div className="flex flex-col justify-center md:pl-8">*/}
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <ProfileSelector 
+                <ProfileSelector
                     mode={mode}
                     selectedProfile={selectedProfile}
+                    previewProfile={previewProfile}
                     profiles={extendedProfiles}
                     prefersReducedMotion={prefersReducedMotion}
                     onProfileChange={handleProfileSelection}

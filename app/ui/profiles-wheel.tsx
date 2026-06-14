@@ -15,9 +15,18 @@ import {ArrowRight} from "lucide-react";
 
 type Mode = 'intro' | 'interactive';
 
+// Choose "a" vs "an" for the profile name. "an" before a vowel sound — including
+// "ML…" (reads as "em-el"). CUSTOM_PROFILE_NAME ("Utility Player") reads as "yoo", so it stays "a".
+function articleFor(name: string | undefined): string {
+    if (!name || name === CUSTOM_PROFILE_NAME) return 'a';
+    if (name.startsWith('ML')) return 'an';
+    return /^[aeiou]/i.test(name) ? 'an' : 'a';
+}
+
 interface ProfileSelectorProps {
     mode: Mode;
     selectedProfile: string;
+    previewProfile?: string;  // Current displayed value during the intro spin
     profiles?: Profile[];  // Optional, falls back to default profiles
     prefersReducedMotion?: boolean; // Skip animations if user prefers reduced motion
     onProfileChange: (profileName: string) => void;
@@ -27,9 +36,10 @@ interface ProfileSelectorProps {
     onIntroComplete: () => void;
 }
 
-export default function ProfileSelector({ 
-    mode, 
+export default function ProfileSelector({
+    mode,
     selectedProfile,
+    previewProfile,
     profiles = defaultProfiles,
     prefersReducedMotion = false,
     onProfileChange, 
@@ -229,10 +239,17 @@ export default function ProfileSelector({
         }
     };
 
+    // Article tracks the displayed name: the preview during the spin, the selection after.
+    const displayProfile = (mode === 'intro' ? previewProfile : selectedProfile) ?? selectedProfile;
+    const article = articleFor(displayProfile);
+
     return (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            {/* TODO: needs to switch to an on some */}
-            <div className="text-2xl whitespace-nowrap">Reese is a</div>
+            {/* "Reese is a" is fixed; the "n" always reserves its width (visibility, not display) and only
+                shows when needed — so the wheel never shifts and just the "n" fades in/out. */}
+            <div className="text-2xl whitespace-nowrap" aria-label={`Reese is ${article}`}>
+                Reese is a<span aria-hidden="true" className={article === 'an' ? '' : 'invisible'}>n</span>
+            </div>
             <div className="relative w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
