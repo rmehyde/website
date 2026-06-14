@@ -9,6 +9,8 @@ import {profiles, Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles
 
 type Mode = 'intro' | 'interactive';
 
+const DEFAULT_PROFILE_NAME = "ML Platform Engineer";
+
 // Helper function to find matching profile for given weights
 const findMatchingProfile = (weights: Record<string, number>) => {
     return profiles.find(profile => {
@@ -22,7 +24,7 @@ const findMatchingProfile = (weights: Record<string, number>) => {
 const getInitialWeights = (): Record<string, number> => {
     if (typeof window === 'undefined') {
         // Server-side: use default profile
-        return profiles.find(p => p.name === "Machine Learning Engineer")?.scores || 
+        return profiles.find(p => p.name === DEFAULT_PROFILE_NAME)?.scores ||
                Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {});
     }
     
@@ -37,7 +39,7 @@ const getInitialWeights = (): Record<string, number> => {
     }
     
     // No URL params: use default profile
-    return profiles.find(p => p.name === "Machine Learning Engineer")?.scores || 
+    return profiles.find(p => p.name === DEFAULT_PROFILE_NAME)?.scores ||
            Dimension.options.reduce((acc, dim) => ({...acc, [dim]: maxScore}), {});
 };
 
