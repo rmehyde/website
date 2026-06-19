@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { DimensionScores, } from '@/app/lib/content/scoring'
 import {generateContentElements} from "@/app/lib/content/jsx";
 import {getFilteredAndSortedContent, groupContentByType} from "@/app/lib/content/load";
+import {loadAllContent} from "@/app/lib/content/content-io";
 import {ContentTypeEnum} from "@/app/lib/content/schema";
 import {Card} from "@/components/ui/card";
 
@@ -14,7 +15,7 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
         let cancelled = false
 
         function load() {
-            const allContent = getFilteredAndSortedContent(weights)
+            const allContent = getFilteredAndSortedContent(loadAllContent(), weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
                 <div key={c.title} className="w-full p-5 lg:w-[32rem]">

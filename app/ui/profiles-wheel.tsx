@@ -1,6 +1,7 @@
 'use client'
 
-import {profiles as defaultProfiles, Profile, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
+import {profiles as defaultProfiles} from "../lib/content/content-io";
+import {Profile, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
 import {
     Select,
     SelectContent, SelectGroup,

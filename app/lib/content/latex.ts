@@ -118,17 +118,6 @@ export function jobToLatex(job: Job): string {
 }
 
 
-import resumeTemplate from '@/app/templates/resume.tex.mustache';
-
-export function getTemplate(templateName: string): string {
-    switch (templateName) {
-        case 'resume':
-            return resumeTemplate;
-        default:
-            throw new Error(`Unknown template: ${templateName}`);
-    }
-}
-
 export function projectsAndOssToLatex(content: ContentByType) {
     const projectsContent = projectsToLatex(
         content[ContentTypeEnum.enum.project],

@@ -1,19 +1,14 @@
 // profiles.ts
+//
+// Pure schema + parsing for resume profiles. No build-time I/O lives here, so this is
+// safe to import from anywhere (site or tests). The webpack-loaded `profiles` value is
+// produced in content-io.ts via parseProfiles(); the fs-based test adapter calls the
+// same parseProfiles() on YAML it read itself.
 import { z } from "zod/v4";
 import {Dimension, DimensionScores, dimensionScoresSchema, maxScore} from "@/app/lib/content/scoring";
 
 // Special profile name for custom weight combinations
 export const CUSTOM_PROFILE_NAME = "Utility Player";
-
-// load exactly /public/content/profiles.yaml (or .yml)
-const profilesModule = (require as any).context(
-    "@/public/content",
-    false,
-    /^\.\/profiles\.ya?ml$/
-);
-
-const raw = profilesModule("./profiles.yaml");
-const rawProfiles = (raw.default ?? raw) as unknown;
 
 // default: max score across all dims
 const maxedScores: DimensionScores = dimensionScoresSchema.parse(
@@ -29,4 +24,6 @@ const profileSchema = z.object({
 export const profilesSchema = z.array(profileSchema);
 export type Profile = z.infer<typeof profileSchema>;
 
-export const profiles = profilesSchema.parse(rawProfiles);
+export function parseProfiles(raw: unknown): Profile[] {
+    return profilesSchema.parse(raw);
+}

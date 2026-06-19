@@ -5,7 +5,8 @@ import {RadialSelector} from "@/components/ui/radial";
 import React, {useState, useRef, useEffect} from "react";
 import PDFComponent from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
-import {profiles, Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
+import {profiles} from '@/app/lib/content/content-io';
+import {Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
 
 type Mode = 'intro' | 'interactive';
 
