@@ -1,6 +1,6 @@
 'use client'
 
-import { profiles } from "../lib/content/profiles";
+import { profiles } from "../lib/content/content-io";
 import {
     Select,
     SelectContent,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import {Dimension, dimensionLabels} from "@/app/lib/content/scoring";
 
+// TODO: remove, this is dead code now
 export default function ProfileSelector() {
     return (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">

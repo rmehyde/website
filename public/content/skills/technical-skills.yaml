@@ -117,10 +117,10 @@
     backend: 2
 
 - contentType: technical-skill
-  title: "D3, JavaScript"
+  title: "JavaScript, D3"
   summary: "Pragmatic frontend development and data visualization"
   detail: "Data visualization with D3.js and modern JavaScript for interactive web applications"
   scores:
     frontend: 5
-    data-analytics: 4
+    data-analytics: 5
     solutions: 2

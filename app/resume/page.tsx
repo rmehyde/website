@@ -12,6 +12,9 @@ type Mode = 'intro' | 'interactive';
 
 const DEFAULT_PROFILE_NAME = "ML Platform Engineer";
 
+// TODO: consider auto-trimming to a single page? Like best shot, but if the generated PDF is two pages we check how
+//  many lines over it is an trim? Or just trim by 1 line until it's a single page?
+
 // Helper function to find matching profile for given weights
 const findMatchingProfile = (weights: Record<string, number>) => {
     return profiles.find(profile => {

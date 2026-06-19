@@ -44,25 +44,29 @@ export function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): s
 }
 
 export function baseContentToLatex(
-    projects: BaseContent[],
+    contentList: BaseContent[],
     verbosity: Verbosity,
     includeLinks: boolean = true,
 ): string {
     switch (verbosity) {
         case Verbosity.Concise:
-            return projects.map(project => {
-                return `\\textbf{${escapeLatex(project.title)}}: ${escapeLatex(project.summary)}` +
-                    (includeLinks ? " " + linksToLatex(project.links, verbosity) : "")
+            return (contentList.length > 0 ? `\\bulletspace\n` : "") +
+                contentList.map(item => {
+                // ":~" ties the first word of the summary to the title with a non-breaking space,
+                // so the title can never sit alone with its description orphaned to the next line
+                return `\\textbf{${escapeLatex(item.title)}}:~${escapeLatex(item.summary)}` +
+                    // tie the link superscript to the last word with a non-breaking space (~),
+                    // so the link never wraps onto its own line — it moves with the word or not at all
+                    (includeLinks ? "~" + linksToLatex(item.links, verbosity) : "")
             }).join(`\\bulletspace\n`)
         case Verbosity.Verbose:
-            return projects.map(project => {
+            return contentList.map(item => {
                 return dedent(String.raw`
-                    \section*{${escapeLatex(project.title)}}
-                    ${escapeLatex(project.detail)}`
+                    \section*{${escapeLatex(item.title)}}
+                    ${escapeLatex(item.detail)}`
                     + (includeLinks ? String.raw`
-                    
                     \noindent
-                    ${linksToLatex(project.links, verbosity)}`
+                    ${linksToLatex(item.links, verbosity)}`
                         : "")
                 );
             }).join("\n");
@@ -94,7 +98,10 @@ function isoDateToString(isoDate: string): string {
 
 
 function jobDutyToLatex(duty: Duty): string {
-    const lines = [`  \\item ${escapeLatex(duty.summary)} ` + linksToLatex(duty.links, Verbosity.Concise)]
+    // tie the link superscript to the last word with a non-breaking space (~) so it never
+    // orphans onto its own line; drop the separator entirely when there are no links
+    const links = linksToLatex(duty.links, Verbosity.Concise)
+    const lines = [`  \\item ${escapeLatex(duty.summary)}` + (links ? "~" + links : "")]
     if (duty.subduties.length > 0) {
         lines.push("\\begin{itemize}")
         // @ts-ignore
@@ -141,7 +148,7 @@ export function projectsAndOssToLatex(content: ContentByType) {
             `)
         : ""
     console.log(projectsContent, ossContent)
-    return ossContent + maybeSeparator + projectsContent;
+    return projectsContent + maybeSeparator + ossContent;
 }
 
 export function educationToLatex(education: Education[]): string {
@@ -158,7 +165,27 @@ export function softSkillsToLatex(softSkills: SoftSkill[]): string {
     ).join("\n");
 }
 
-export function technicalSkillsToLatex(technicalSkills: TechnicalSkill[]): string {
-    const skillItems = technicalSkills.map(skill => escapeLatex(skill.title));
-    return "\\tb~" + skillItems.map(s => s.replace(" ", "~")).join(" \\tb~") + " \\tb~(\\&~more)";
+// approximate printed-width budget for the inline technical-skills line, in characters.
+//   each item costs 3 (leading space + bullet + space) plus its visible text length.
+//   the list arrives relevance-sorted, so the budget trims the least-relevant tail. Tune to fit two lines.
+export const SKILLS_WIDTH_BUDGET = 195
+
+// always present — the wink. its width is reserved up front so it never tips the line over.
+const MORE_SUFFIX = " \\tb~(\\&~more)";
+const MORE_COST = 3 + "(& more)".length; // same 3-per-item convention + its visible text
+
+export function technicalSkillsToLatex(
+    technicalSkills: TechnicalSkill[],
+    widthBudget: number = SKILLS_WIDTH_BUDGET
+): string {
+    const shown: string[] = [];
+    let used = MORE_COST; // reserve the always-on "& more" before fitting any skills
+    for (const skill of technicalSkills) {
+        const cost = 3 + skill.title.length; // space + bullet + space, then the visible text
+        if (shown.length > 0 && used + cost > widthBudget) break;
+        shown.push(escapeLatex(skill.title));
+        used += cost;
+    }
+    const body = shown.map(s => s.replace(" ", "~")).join(" \\tb~");
+    return "\\tb~" + body + MORE_SUFFIX;
 }

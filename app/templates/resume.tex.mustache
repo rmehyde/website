@@ -3,8 +3,8 @@
 
 % setup document class and margins
 \documentclass[11pt]{article}
-% TODO: wtf my right margin is tiny tho??
 \usepackage[margin=0.75in]{geometry}
+\raggedright
 %\usepackage{parskip}
 
 % CharisSIL font
@@ -61,11 +61,10 @@ label={\tb}
     \endgroup
 }
 
-% TODO: find a better arrow font
-% arrows since I don't like the ones in the default font
-%\newcommand{\rightarr}{{{\fontfamily{cmr}\selectfont →}}}
-\newcommand{\rightarr}{→}
-\newcommand{\tb}{{{\fontfamily{cmr}\selectfont\LARGE\textbullet}}}
+% special glyphs since I don't like the ones in the text font
+\newfontfamily\glyphfont{TeX Gyre Pagella}
+\newcommand{\rightarr}{{\glyphfont →}}
+\newcommand{\tb}{{\glyphfont\large\raisebox{-0.07ex}{•}}}
 \newcommand{\bulletspace}{\space\tb\allowbreak\space}
 
 
@@ -76,9 +75,6 @@ label={\tb}
 \pagestyle{fancy}
 
 \begin{document}
-% sloppy can be used to fix spacing quite nicely
-%%  however one way it achieves this is through ruthless hyp-henation, in the middle of words
-% \sloppy
 
 % header: name and contact info
 % no indentation on this line; create a full-width box
@@ -109,7 +105,6 @@ label={\tb}
 
 <%#projectsOssContent%>
 \section*{\textsc{Projects \& Open-Source Contributions}}
-<!--TODO: each item with links should probably get its own line, e.g. on Devops Eng you get just the link on the next line :( -->
 <%{projectsOssContent}%>
 <%/projectsOssContent%>
 
