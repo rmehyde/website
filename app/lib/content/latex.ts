@@ -50,7 +50,7 @@ export function baseContentToLatex(
 ): string {
     switch (verbosity) {
         case Verbosity.Concise:
-            return (contentList.length > 0 ? `\\bulletspace\n` : "") +
+            return (contentList.length > 0 ? `\\leadbullet\n` : "") +
                 contentList.map(item => {
                 // ":~" ties the first word of the summary to the title with a non-breaking space,
                 // so the title can never sit alone with its description orphaned to the next line

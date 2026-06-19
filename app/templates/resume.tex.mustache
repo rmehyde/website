@@ -77,7 +77,12 @@ before=\raggedright  % bullets always ragged; headers stay justified so their \h
 \newfontfamily\glyphfont{TeX Gyre Pagella}
 \newcommand{\rightarr}{{\glyphfont →}}
 \newcommand{\tb}{{\glyphfont\large\raisebox{-0.07ex}{•}}}
-\newcommand{\bulletspace}{\space\tb\allowbreak\space}
+% separator between inline items: breakable space, bullet, then a non-breaking space, so a
+% line can break only BEFORE the bullet — the bullet always rolls to the next line with its item
+\newcommand{\bulletspace}{\space\tb~}
+% leading bullet for the first item: no leading space, so it sits flush whether it starts a
+% fresh paragraph (Projects) or follows \noindent (OSS) — fixes the inconsistent first-item gap
+\newcommand{\leadbullet}{\tb~}
 
 
 % headers and footers
