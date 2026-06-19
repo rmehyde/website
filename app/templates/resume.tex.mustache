@@ -4,7 +4,18 @@
 % setup document class and margins
 \documentclass[11pt]{article}
 \usepackage[margin=0.75in]{geometry}
-\raggedright
+
+% alignment is declared per-section (no global package). bullets are ragged via the
+% itemize setup below; flowing sections wrap their body in {\raggedright ...\par} or
+% {\justify ...\par}. \raggedright is built in; define its justified counterpart:
+\newcommand{\justify}{\leftskip=0pt \rightskip=0pt \parfillskip=0pt plus 1fil\relax \tolerance=9999 \emergencystretch=3em\relax}
+
+% hyphenation: discourage breaks slightly, and never hyphenate Capitalized words,
+% which covers CamelCase brand names (PyTorch, ClickHouse, Kubernetes, ...).
+% Add exact exceptions to \hyphenation{} for any that slip through.
+\hyphenpenalty=200
+\uchyph=0
+\hyphenation{PyTorch TensorFlow ClickHouse Kubernetes SwiftLaTeX Buildkite}
 %\usepackage{parskip}
 
 % CharisSIL font
@@ -24,7 +35,8 @@
 % \pagestyle{empty}
 \setlist[itemize]{noitemsep, topsep=0pt, leftmargin=*,
 % label={\LARGE\textbullet}
-label={\tb}
+label={\tb},
+before=\raggedright  % bullets always ragged; headers stay justified so their \hfill works
 }
 
 % links
@@ -105,12 +117,18 @@ label={\tb}
 
 <%#projectsOssContent%>
 \section*{\textsc{Projects \& Open-Source Contributions}}
+% justify this section explicitly; \par must be inside the group so the paragraph
+% is broken while still in justified mode
+{\justify
 <%{projectsOssContent}%>
+\par}
 <%/projectsOssContent%>
 
 <%#educationContent%>
 \section*{\textsc{Education}}
+{\raggedright
 <%{educationContent}%>
+\par}
 <%/educationContent%>
 
 <%#softSkillsContent%>
@@ -122,7 +140,9 @@ label={\tb}
 
 <%#technicalSkillsContent%>
 \section*{\textsc{Technical Skills}}
+{\raggedright
 <%{technicalSkillsContent}%>
+\par}
 <%/technicalSkillsContent%>
 
 \end{document}
