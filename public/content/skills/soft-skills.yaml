@@ -41,7 +41,7 @@
   scores:
     leadership: 3
     devops-infra: 2
-    solution: 2
+    solutions: 2
     libs-tooling: 2
     data-analytics: 2
     backend: 2

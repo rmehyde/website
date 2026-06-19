@@ -1,13 +1,13 @@
 - name: ML Platform Engineer
   scores:
-    libs-tooling: 5
+    libs-tooling: 4
     science: 2
-    ml: 5
+    ml: 4
     data-analytics: 2
     leadership: 2
     solutions: 1
-    devops-infra: 4
-    backend: 4
+    devops-infra: 3
+    backend: 3
     frontend: 1
     data-eng: 3
 - name: Applied ML Engineer

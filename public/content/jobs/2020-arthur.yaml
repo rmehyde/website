@@ -65,9 +65,12 @@ duties:
       Designed and implemented scalable internal ML platform for models dynamically trained and deployed over 
       arbitrary customer datasets across tabular, text, and image data.
     scores:
+#      TODO: needs libs-tooling probably, and maybe infra?
       ml: 5
       data-eng: 4
       backend: 3
+      devops-infra: 2
+      libs-tooling: 2
       science: 2
       leadership: 2
   - title: Dynamic Infrastructure Provisioning
