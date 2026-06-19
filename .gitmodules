@@ -1,0 +1,3 @@
+[submodule "vendor/SwiftLaTeX"]
+	path = vendor/SwiftLaTeX
+	url = git@github.com:rmehyde/SwiftLaTeX.git
