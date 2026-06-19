@@ -6,11 +6,12 @@ import {ContactInfo} from "@/app/contact/contactContext";
 import {ContentTypeEnum} from "@/app/lib/content/schema";
 
 export function generateResumeLatex(
-    weights: DimensionScores, 
-    contact: ContactInfo, 
-    budget: number = 50
+    weights: DimensionScores,
+    contact: ContactInfo,
+    // rendered bullet-lines available for the jobs section — THE one-page calibration knob
+    lineBudget: number = 14
 ): string {
-    const allContent = getFilteredAndSortedContent(weights, budget, {
+    const allContent = getFilteredAndSortedContent(weights, lineBudget, {
         'soft-skill': -5,      // Never filter soft skills (minimal threshold)
         'technical-skill': -4  // Almost never filter technical skills (one step up from never)
     })
