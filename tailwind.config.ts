@@ -103,7 +103,8 @@ const config: Config = {
         ':root': extractColorVars(theme('colors')),
       });
     },
-      require("tailwindcss-animate")
+      require("tailwindcss-animate"),
+      require("@tailwindcss/container-queries")
 ],
 }
 export default config

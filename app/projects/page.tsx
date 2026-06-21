@@ -21,8 +21,12 @@ export default function DynamicProjects() {
         <div>
             {/* TODO: this needs some better spacing as it looks fucky with the project
             spacing */}
-            {/* TODO: 'lg' isn't quite right here, we need to dial in the perfect breakpoint */}
-            <div className="flex flex-col justify-evenly lg:flex-row mb-16">
+            {/* Fit-or-stack: prompt / graph / prompt sit in a ROW when the container is wide
+                enough for all three, otherwise they STACK — all at once, never a partial wrap.
+                Container-driven (reacts to this section's width, not the viewport). Tune the
+                @[..] threshold below to the row's natural width. */}
+            <div className="@container">
+            <div className="flex flex-col justify-evenly @[70rem]:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
                 {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
                 <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
@@ -44,6 +48,7 @@ export default function DynamicProjects() {
                 <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
                     do you want to see?
                 </div>
+            </div>
             </div>
             {/* content cards re-sort based on those weights */}
             {}
