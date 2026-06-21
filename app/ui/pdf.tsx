@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/collapsible"
 import {Download, AlertCircle, RefreshCw, ChevronDownIcon} from "lucide-react";
 
-const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=fitH"
+const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
 
 import { DvipdfmxEngine } from "@/app/lib/swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "@/app/lib/swiftlatex/XeTeXEngine";
@@ -160,7 +160,7 @@ export default function PDFComponent({onWeightsComplete}: {
 
     return (
         <div>
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-8">
                 {(renderState !== 'idle') ? (
                     <Button disabled>
                         <Spinner/>
@@ -195,13 +195,20 @@ export default function PDFComponent({onWeightsComplete}: {
                             </AlertDescription>
                         </Alert>
                     </div>
-                ) : pdfUrl ? (
-                    <object data={pdfUrl + PDF_FRAGMENTS}
-                            type='application/pdf'
-                            width='100%' height='1000px'>
-                    </object>
                 ) : (
-                    <div className="w-full h-[1000px] bg-gray-300"></div>
+                    <div className="w-full aspect-[8.5/11]">
+                        {/* aspect box = US Letter (8.5x11): the whole page shows with no internal
+                            scroll, and height tracks width. Single-page only — a 2nd page would
+                            reintroduce internal scroll. */}
+                        {pdfUrl ? (
+                            <object data={pdfUrl + PDF_FRAGMENTS}
+                                    type='application/pdf'
+                                    className="block h-full w-full">
+                            </object>
+                        ) : (
+                            <div className="h-full w-full bg-gray-300"></div>
+                        )}
+                    </div>
                 )}
 
                 {renderState !== 'idle' && !error && (

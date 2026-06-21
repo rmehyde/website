@@ -24,46 +24,18 @@ type RadialSelectorProps = {
     labelTextClass?: string;
     minRadiusRatio?: number;
     labelDistance?: number;
-    labelSpace?: number;
+    // label text room beyond plotRadius, per axis — side labels need more X than top/bottom need Y
+    labelSpaceX?: number;
+    labelSpaceY?: number;
+    // transparent breathing room at the box edge, per axis. Keeps neighbors from colliding
+    // when flex space-between hits 0, without the justify-evenly distortion a margin would cause.
+    gutterX?: number;
+    gutterY?: number;
     // Transition props
     transitionDuration?: number; // if provided, enables smooth transitions
     onTransitionStart?: () => void;
     onTransitionEnd?: () => void;
 };
-
-function splitLines(text: string, maxLen: number): string[] {
-    // split by words, including symbol-only words with the next (e.g. "& Thing" is a single element)
-    const raw = text.split(" ");
-    const words: string[] = [];
-    for (let i = 0; i < raw.length; i++) {
-        if (/^[^A-Za-z0-9]+$/.test(raw[i]) && i + 1 < raw.length) {
-            // symbol-only token → merge with next
-            words.push(raw[i] + " " + raw[i + 1]);
-            i++;
-        } else {
-            words.push(raw[i]);
-        }
-    }
-
-    // split into array of lines
-    const result: string[] = [];
-    let curLine = "";
-    let lineLen = 0;
-    for (const word of words) {
-        lineLen += word.length + 1;
-        if (lineLen <= maxLen) {
-            curLine += curLine.length > 0 ? " " + word : word
-        } else {
-            result.push(curLine)
-            curLine = word;
-            lineLen = word.length + 1;
-        }
-    }
-    result.push(curLine);
-
-    return result;
-}
-
 
 export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   dimensionLabels,
@@ -75,8 +47,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   labelTextClass = "text-sm",
                                                                   minRadiusRatio = 0.1,
                                                                   labelDistance = 20,
-    // TODO: consider replacing labelSpace with bbox-based dynamic rerender
-                                                                  labelSpace = 110,
+    // wide-but-short box: side labels need the X room, top/bottom labels barely need Y
+                                                                  labelSpaceX = 120,
+                                                                  labelSpaceY = 50,
+                                                                  gutterX = 20,
+                                                                  gutterY = 14,
                                                                   transitionDuration,
                                                                   onTransitionStart,
                                                                   onTransitionEnd,
@@ -150,15 +125,14 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     }, [values, transitionDuration, startTransition, displayValues]);
 
     const dimensions = Object.keys(dimensionLabels);
-    const dimensionLabelLines: Record<string, string[]> = Object.fromEntries(
-        Object.entries(dimensionLabels).map(
-            ([key, label]) => [key, splitLines(label, 20)]
-        )
-    );
-    // total svg size includes extra space for labels
-    const total = (plotRadius + labelSpace) * 2;
-    const cx = total / 2;
-    const cy = total / 2;
+    // box = plot + label room + gutter, sized per axis so it isn't forced square.
+    // labels are bounded to the plot+label region (the gutter stays empty) — see the cap below.
+    // NOTE: only width is capped; labelSpaceY must be chosen to fit the tallest top/bottom label.
+    const usableHalfWidth = plotRadius + labelSpaceX;
+    const width = (usableHalfWidth + gutterX) * 2;
+    const height = (plotRadius + labelSpaceY + gutterY) * 2;
+    const cx = width / 2;
+    const cy = height / 2;
     const innerR = plotRadius * minRadiusRatio;
     const handleR = 6
 
@@ -228,12 +202,12 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     return (
         <div
             className="relative"
-            style={{width: total, height: total}}
+            style={{width, height}}
         >
             <svg
                 ref={svgRef}
-                width={total}
-                height={total}
+                width={width}
+                height={height}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
@@ -308,14 +282,23 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                     );
                 })}
             </svg>
-            {/* plot labels */}
+            {/* plot labels — HTML overlays positioned in the SVG's coordinate space */}
             {dimensions.map((dim, i) => {
-                // compute the same label anchor point you used before
                 const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                const lx = cx + Math.cos(angle) * (plotRadius + labelDistance * 0.8);
-                const ly = cy + Math.sin(angle) * (plotRadius + labelDistance * 0.8);
-                const tx = -50 + 50 * Math.cos(angle);
-                const ty = -50 + 50 * Math.sin(angle);
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+                const anchorRadius = plotRadius + labelDistance * 0.8;
+                const lx = cx + cos * anchorRadius;
+                const ly = cy + sin * anchorRadius;
+                // translate each label outward by a fraction of its own size
+                const tx = -50 + 50 * cos;
+                const ty = -50 + 50 * sin;
+
+                // Cap label width to the room between its anchor and the label region's
+                // edge (gutter excluded), so a long label wraps (via CSS) instead of
+                // spilling. After the translate the far edge sits at lx + (0.5 + 0.5·|cos|)·W;
+                // bounding that within the label region [gutterX, width − gutterX] gives:
+                const maxLabelWidth = (2 * usableHalfWidth - 2 * Math.abs(cos) * anchorRadius) / (1 + Math.abs(cos));
 
                 return (
                     <Label
@@ -325,17 +308,13 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                             left: `${lx}px`,
                             top: `${ly}px`,
                             transform: `translate(${tx}%, ${ty}%)`,
+                            maxWidth: `${maxLabelWidth}px`,
                             textAlign: "center",
-                            whiteSpace: "nowrap",  // let <br/> drive line breaks
+                            overflowWrap: "break-word",
                         }}
                         className={labelTextClass + " font-medium"}
                     >
-                        {dimensionLabelLines[dim].map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {line}
-                                {idx < dimensionLabelLines[dim].length - 1 && <br/>}
-                            </React.Fragment>
-                        ))}
+                        {dimensionLabels[dim]}
                     </Label>
                 );
             })}

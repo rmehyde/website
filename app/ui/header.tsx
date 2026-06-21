@@ -9,7 +9,7 @@ export function NavigationHeader() {
     if (pathname === '/') return null
 
     return (
-        <header className="flex flex-wrap justify-between items-center pa-4 pb-12 md:py-6">
+        <header className="flex flex-wrap justify-between items-center pb-12 md:pt-6">
             <Link href="/" className="invisible md:visible md:text-2xl">Reese Hyde</Link>
             {/* TODO: this is a "line break only on small screens" as an alternative to hiding the header as above*/}
             {/*<span className="block w-full md:hidden" aria-hidden />*/}

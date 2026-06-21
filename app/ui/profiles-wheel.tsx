@@ -13,6 +13,7 @@ import {
 import {Dimension, dimensionLabels} from "@/app/lib/content/scoring";
 import { useState, useEffect, useRef, useMemo } from "react";
 import {ArrowRight} from "lucide-react";
+import {cn} from "@/components/lib/utils";
 
 type Mode = 'intro' | 'interactive';
 
@@ -35,6 +36,7 @@ interface ProfileSelectorProps {
     previewChangeOffsetMillis: number;
     onUserIntent: (reason: 'user') => void;
     onIntroComplete: () => void;
+    className?: string;  // merged onto the root; tailwind-merge lets it override the defaults
 }
 
 export default function ProfileSelector({
@@ -48,6 +50,7 @@ export default function ProfileSelector({
     previewChangeOffsetMillis,
     onUserIntent,
     onIntroComplete,
+    className = "",
 }: ProfileSelectorProps) {
     const [isAnimating, setIsAnimating] = useState(false);
     // TODO: there's some weird empty state: initial page load shows first element with no top margin which is wrong
@@ -245,7 +248,7 @@ export default function ProfileSelector({
     const article = articleFor(displayProfile);
 
     return (
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <div className={cn("flex flex-col items-start gap-3 sm:flex-row sm:items-center", className)}>
             {/* "Reese is a" is fixed; the "n" always reserves its width (visibility, not display) and only
                 shows when needed — so the wheel never shifts and just the "n" fades in/out. */}
             <div className="text-2xl whitespace-nowrap" aria-label={`Reese is ${article}`}>

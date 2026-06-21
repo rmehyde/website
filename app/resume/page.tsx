@@ -211,8 +211,12 @@ export default function DynamicResume() {
 
     return (
         <div>
-            {/*<div className="flex flex-col justify-center md:pl-8">*/}
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            {/* Content-driven layout: flex-wrap keeps the selector + graph side-by-side while
+                they fit on one line and stacks them automatically when they don't — no JS, no
+                breakpoint. flex-1 on the graph wrapper eats the row's free space, so justify-center
+                is a no-op when side-by-side (selector stays left, graph centers in the leftover);
+                once they wrap, each item is alone on its line and justify-center centers it. */}
+            <div className="flex flex-wrap items-center justify-center gap-6 pb-8">
                 <ProfileSelector
                     mode={mode}
                     selectedProfile={selectedProfile}
@@ -224,19 +228,22 @@ export default function DynamicResume() {
                     previewChangeOffsetMillis={-25}
                     onUserIntent={exitIntro}
                     onIntroComplete={() => exitIntro('auto')}
+                    className="pt-4"
                 />
-                {/* TODO: fix scroll issue on mobile */}
-                {/* radial selector drives the weights */}
-                <RadialSelector
-                    dimensionLabels={dimensionLabels}
-                    values={mode === 'intro' ? previewWeights : values}
-                    levels={maxScore}
-                    max={maxScore}
-                    onChange={handleWeightsChange}
-                    onComplete={handleWeightsComplete}
-                    plotRadius={100}  // TODO: should be 75 on mobile
-                    transitionDuration={mode === 'intro' && !prefersReducedMotion ? 50 : undefined}
-                />
+                <div className="flex-1 flex justify-center">
+                    {/* TODO: fix scroll issue on mobile */}
+                    {/* radial selector drives the weights */}
+                    <RadialSelector
+                        dimensionLabels={dimensionLabels}
+                        values={mode === 'intro' ? previewWeights : values}
+                        levels={maxScore}
+                        max={maxScore}
+                        onChange={handleWeightsChange}
+                        onComplete={handleWeightsComplete}
+                        plotRadius={100}  // TODO: should be 75 on mobile
+                        transitionDuration={mode === 'intro' && !prefersReducedMotion ? 50 : undefined}
+                    />
+                </div>
             </div>
             {/* TODO: probably this padding should be global as well */}
             <div className="pb-8">
@@ -246,6 +253,7 @@ export default function DynamicResume() {
                     />
                 )}
             </div>
+            <div className="h-16"></div>
         </div>
     )
 }
