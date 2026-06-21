@@ -141,6 +141,9 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const cy = plotSize / 2;
     const innerR = plotRadius * minRadiusRatio;
     const handleR = 6
+    // extra radius beyond the visible dot for an easier (esp. touch) grab target — tune up as needed
+    const handleHitExtra = 2;
+    const handleHitR = handleR + handleHitExtra;
 
     // Use displayValues for rendering (either current values or transitioning values)
     const dataPoints = dimensions.map((dim, i) => {
@@ -275,17 +278,27 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                     const hx = cx + ux * r;
                     const hy = cy + uy * r;
                     return (
-                        <circle
-                            key={dim}
-                            cx={hx}
-                            cy={hy}
-                            r={handleR}
-                            fill="hsl(var(--primary))"
-                            stroke="hsl(var(--primary-foreground))"
-                            strokeWidth={2}
-                            onPointerDown={onHandleDown(dim)}
-                            style={{cursor: "pointer"}}
-                        />
+                        <g key={dim}>
+                            {/* invisible enlarged hit target — transparent fill is still hit-testable */}
+                            <circle
+                                cx={hx}
+                                cy={hy}
+                                r={handleHitR}
+                                fill="transparent"
+                                onPointerDown={onHandleDown(dim)}
+                                style={{cursor: "pointer"}}
+                            />
+                            {/* visible dot — drawn on top, ignores pointers so the hit target catches them */}
+                            <circle
+                                cx={hx}
+                                cy={hy}
+                                r={handleR}
+                                fill="hsl(var(--primary))"
+                                stroke="hsl(var(--primary-foreground))"
+                                strokeWidth={2}
+                                style={{pointerEvents: "none"}}
+                            />
+                        </g>
                     );
                 })}
             </svg>
