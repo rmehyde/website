@@ -240,7 +240,6 @@ export default function DynamicResume() {
                         max={maxScore}
                         onChange={handleWeightsChange}
                         onComplete={handleWeightsComplete}
-                        plotRadius={100}  // TODO: should be 75 on mobile
                         transitionDuration={mode === 'intro' && !prefersReducedMotion ? 50 : undefined}
                     />
                 </div>

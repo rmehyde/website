@@ -12,6 +12,8 @@ import { easeCubicOut } from "d3-ease";
 import React, {useState, useRef, useEffect, useCallback} from "react";
 import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
+import {scale} from "@/app/lib/typography";
+import {useBreakpointUp} from "@/app/lib/tailwind/responsive";
 
 type RadialSelectorProps = {
     dimensionLabels: Record<string, string>;
@@ -20,17 +22,8 @@ type RadialSelectorProps = {
     levels: number; // number of concentric integer steps
     onChange: (newValues: Record<string, number>) => void;
     onComplete?: (finalValues: Record<string, number>) => void;
-    plotRadius?: number;
     labelTextClass?: string;
     minRadiusRatio?: number;
-    labelDistance?: number;
-    // label text room beyond plotRadius, per axis — side labels need more X than top/bottom need Y
-    labelSpaceX?: number;
-    labelSpaceY?: number;
-    // transparent breathing room at the box edge, per axis. Keeps neighbors from colliding
-    // when flex space-between hits 0, without the justify-evenly distortion a margin would cause.
-    gutterX?: number;
-    gutterY?: number;
     // Transition props
     transitionDuration?: number; // if provided, enables smooth transitions
     onTransitionStart?: () => void;
@@ -43,15 +36,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                                   max,
                                                                   onChange,
                                                                   onComplete,
-                                                                  plotRadius = 150,
-                                                                  labelTextClass = "text-sm",
+                                                                  labelTextClass = scale.label,
                                                                   minRadiusRatio = 0.1,
-                                                                  labelDistance = 20,
-    // wide-but-short box: side labels need the X room, top/bottom labels barely need Y
-                                                                  labelSpaceX = 120,
-                                                                  labelSpaceY = 50,
-                                                                  gutterX = 20,
-                                                                  gutterY = 14,
                                                                   transitionDuration,
                                                                   onTransitionStart,
                                                                   onTransitionEnd,
@@ -125,14 +111,34 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     }, [values, transitionDuration, startTransition, displayValues]);
 
     const dimensions = Object.keys(dimensionLabels);
+
+    // Component owns its sizing: two discrete sizes switched at the `md` breakpoint.
+    // The whole geometry scales together (plot radius + label room + gutters) so the small
+    // size actually fits a phone — not just the plot radius. Desktop = original tuned values,
+    // mobile = half. Label *text* scales separately via labelTextClass (the type scale).
+    const isMdUp = useBreakpointUp("md");
+    const plotRadius = isMdUp ? 100 : 70;
+    const labelSpaceX = 120;
+    const labelSpaceY = 50;
+    const labelDistance = 20;
+    const gutterX = 20;
+    const gutterY = 14;
+
     // box = plot + label room + gutter, sized per axis so it isn't forced square.
     // labels are bounded to the plot+label region (the gutter stays empty) — see the cap below.
     // NOTE: only width is capped; labelSpaceY must be chosen to fit the tallest top/bottom label.
     const usableHalfWidth = plotRadius + labelSpaceX;
+    // `width` is the FULL box (plot + label room). The container requests it as a definite
+    // width (so it WON'T collapse as a flex item — the SVG + labels are absolute, so there's no
+    // in-flow content to give it size) but caps at max-width:100%, so it still shrinks when an
+    // ancestor is narrower: the label room gives way (labels wrap) while the plot stays put.
+    // `height` is fixed (vertical isn't viewport-constrained). The plot SVG is a fixed square,
+    // centered; its coords are relative to plotSize, while labels anchor to the container.
     const width = (usableHalfWidth + gutterX) * 2;
     const height = (plotRadius + labelSpaceY + gutterY) * 2;
-    const cx = width / 2;
-    const cy = height / 2;
+    const plotSize = (plotRadius + 8) * 2;
+    const cx = plotSize / 2;
+    const cy = plotSize / 2;
     const innerR = plotRadius * minRadiusRatio;
     const handleR = 6
 
@@ -201,13 +207,14 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     // @ts-ignore
     return (
         <div
-            className="relative"
-            style={{width, height}}
+            className="relative mx-auto"
+            style={{width, maxWidth: "100%", height}}
         >
             <svg
                 ref={svgRef}
-                width={width}
-                height={height}
+                width={plotSize}
+                height={plotSize}
+                className="touch-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerLeave={onPointerUp}
@@ -288,27 +295,26 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 const cos = Math.cos(angle);
                 const sin = Math.sin(angle);
                 const anchorRadius = plotRadius + labelDistance * 0.8;
-                const lx = cx + cos * anchorRadius;
-                const ly = cy + sin * anchorRadius;
                 // translate each label outward by a fraction of its own size
                 const tx = -50 + 50 * cos;
                 const ty = -50 + 50 * sin;
 
-                // Cap label width to the room between its anchor and the label region's
-                // edge (gutter excluded), so a long label wraps (via CSS) instead of
-                // spilling. After the translate the far edge sits at lx + (0.5 + 0.5·|cos|)·W;
-                // bounding that within the label region [gutterX, width − gutterX] gives:
-                const maxLabelWidth = (2 * usableHalfWidth - 2 * Math.abs(cos) * anchorRadius) / (1 + Math.abs(cos));
+                // Cap label width to the room left between its anchor and the container edge,
+                // as a calc() on the LIVE container width (100%): when the container shrinks
+                // below `width`, the cap shrinks and the label wraps instead of spilling.
+                // At full width this reduces to the old fixed-px cap.
+                const horizontalReserve = 2 * gutterX + 2 * Math.abs(cos) * anchorRadius;
+                const widthDivisor = 1 + Math.abs(cos);
 
                 return (
                     <Label
                         key={dim}
                         style={{
                             position: "absolute",
-                            left: `${lx}px`,
-                            top: `${ly}px`,
+                            left: `calc(50% + ${(cos * anchorRadius).toFixed(2)}px)`,
+                            top: `${(height / 2 + sin * anchorRadius).toFixed(2)}px`,
                             transform: `translate(${tx}%, ${ty}%)`,
-                            maxWidth: `${maxLabelWidth}px`,
+                            maxWidth: `calc((100% - ${horizontalReserve.toFixed(2)}px) / ${widthDivisor.toFixed(4)})`,
                             textAlign: "center",
                             overflowWrap: "break-word",
                         }}

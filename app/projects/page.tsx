@@ -4,14 +4,11 @@ import ContentCards from "@/app/ui/cards/contentCards";
 import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
-import {useBreakpointUp} from "@/app/lib/tailwind/responsive";
 import {scale} from "@/app/lib/typography";
 
 
 
 export default function DynamicProjects() {
-    const isMdUp = useBreakpointUp("md")
-
     // initialize weights to maxScore for each dimension
     const [values, setValues] = useState<Record<string,number>>(
         Dimension.options.reduce(
@@ -32,16 +29,13 @@ export default function DynamicProjects() {
                     What kind of projects
                 </div>
                 {/* radial selector drives the weights */}
-                <div className="self-center">
+                <div className="self-center max-w-full">
                     <RadialSelector
                         dimensionLabels={dimensionLabels}
                         values={values}
                         levels={maxScore}
                         max={maxScore}
                         onChange={setValues}
-                        plotRadius={isMdUp ? 100 : 75}
-                        labelDistance={isMdUp ? 25 :  20}
-                        labelTextClass={scale.label}
                     />
                 </div>
                 {/* TODO: the right side of the graph pushes up against this text
