@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="125" height="200.0" viewBox="0 0 125 200.0">
+  <g fill="none"
+     stroke="#000000"
+     stroke-width="20.0"
+     stroke-linecap="butt"
+     stroke-linejoin="round">
+    <line x1="10.0" y1="190.0" x2="10.0" y2="30.0" />
+    <line x1="30.0" y1="10.0" x2="90.0" y2="10.0" stroke="#245dc1" />
+    <line x1="115.0" y1="35.0" x2="115.0" y2="70.0" />
+    <line x1="115.0" y1="120.0" x2="115.0" y2="190.0" />
+    <line x1="10.0" y1="100.0" x2="95.0" y2="100.0" />
+    <path d="M 10.0 30.0 A 20.0 20.0 0 0 1 30.0 10.0" stroke="#245dc1" />
+    <path d="M 90.0 10.0 A 25.0 25.0 0 0 1 115.0 35.0" stroke="#245dc1" />
+    <path d="M 85.0 100.0 A 30.0 30.0 0 0 0 115.0 70.0" />
+    <path d="M 95.0 100.0 A 20.0 20.0 0 0 1 115.0 120.0" />
+  </g>
+</svg>
