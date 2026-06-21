@@ -2,6 +2,7 @@ import React from 'react'
 // import { DynamicIcon } from "lucide-react/dynamic";
 import {Content} from './schema'
 import {H1, Link} from "@/app/ui/cards/markdown-elements"; // wherever your Content type lives
+import {scale} from "@/app/lib/typography";
 
 
 export function generateContentElements(
@@ -22,7 +23,7 @@ export function generateContentElements(
             >
                 {title}
             </H1>
-            <div className="text-xl">
+            <div className={scale.body}>
                 <p>{detail.trim()}</p>
 
                 {links && links.length > 0 && (

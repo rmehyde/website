@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { cn } from "@/components/lib/utils";
+import { scale } from "@/app/lib/typography";
 
 type H1Props = {
     children: ReactNode;
@@ -8,7 +10,7 @@ type H1Props = {
 
 export function H1({ children, className = "", prefix }: H1Props): React.JSX.Element {
     return (
-        <h1 className={`text-2xl font-medium pb-2 ${className}`.trim()}>
+        <h1 className={cn(scale.lead, "font-medium pb-2", className)}>
             {prefix}
             {children}
         </h1>

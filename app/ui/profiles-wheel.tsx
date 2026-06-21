@@ -14,6 +14,7 @@ import {Dimension, dimensionLabels} from "@/app/lib/content/scoring";
 import { useState, useEffect, useRef, useMemo } from "react";
 import {ArrowRight} from "lucide-react";
 import {cn} from "@/components/lib/utils";
+import {scale} from "@/app/lib/typography";
 
 type Mode = 'intro' | 'interactive';
 
@@ -251,15 +252,15 @@ export default function ProfileSelector({
         <div className={cn("flex flex-col items-start gap-3 sm:flex-row sm:items-center", className)}>
             {/* "Reese is a" is fixed; the "n" always reserves its width (visibility, not display) and only
                 shows when needed — so the wheel never shifts and just the "n" fades in/out. */}
-            <div className="text-2xl whitespace-nowrap" aria-label={`Reese is ${article}`}>
+            <div className={cn(scale.lead, "whitespace-nowrap")} aria-label={`Reese is ${article}`}>
                 Reese is a<span aria-hidden="true" className={article === 'an' ? '' : 'invisible'}>n</span>
             </div>
-            <div className="relative w-72">
+            <div className="relative w-60 md:w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
-                        className={`w-full text-xl gap-1 py-0 overflow-hidden ${
+                        className={cn(scale.body, `w-full gap-1 py-0 overflow-hidden ${
                             selectedProfile === CUSTOM_PROFILE_NAME && !isAnimating ? 'text-muted-foreground' : ''
-                        }`}
+                        }`)}
                         onPointerDown={handleUserIntent}
                         onKeyDown={handleUserIntent}
                         aria-label={`Current profile: ${selectedProfile}`}
@@ -296,7 +297,7 @@ export default function ProfileSelector({
 
                     <SelectContent>
                         {profiles.filter(p => p.name !== CUSTOM_PROFILE_NAME).map((p) => (
-                            <SelectItem key={p.name} value={p.name} className="text-xl">
+                            <SelectItem key={p.name} value={p.name} className={scale.body}>
                                 {p.name}
                             </SelectItem>
                         ))}
@@ -306,7 +307,7 @@ export default function ProfileSelector({
                             <SelectItem
                                 key={CUSTOM_PROFILE_NAME}
                                 value={CUSTOM_PROFILE_NAME}
-                                className="text-xl"
+                                className={scale.body}
                                 disabled
                             >
                                 {CUSTOM_PROFILE_NAME}

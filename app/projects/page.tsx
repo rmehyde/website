@@ -5,6 +5,7 @@ import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
 import {useBreakpointUp} from "@/app/lib/tailwind/responsive";
+import {scale} from "@/app/lib/typography";
 
 
 
@@ -27,7 +28,7 @@ export default function DynamicProjects() {
             <div className="flex flex-col justify-evenly lg:flex-row mb-16">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
                 {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
-                <div className="flex items-center justify-center text-3xl text-center whitespace-nowrap">
+                <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
                     What kind of projects
                 </div>
                 {/* radial selector drives the weights */}
@@ -40,13 +41,13 @@ export default function DynamicProjects() {
                         onChange={setValues}
                         plotRadius={isMdUp ? 100 : 75}
                         labelDistance={isMdUp ? 25 :  20}
-                        labelTextClass={isMdUp ? "text-sm" : "text-xs"}
+                        labelTextClass={scale.label}
                     />
                 </div>
                 {/* TODO: the right side of the graph pushes up against this text
                         when the page is pretty narrow but not quite vertical
                 */}
-                <div className="flex items-center justify-center text-3xl text-center whitespace-nowrap">
+                <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
                     do you want to see?
                 </div>
             </div>
