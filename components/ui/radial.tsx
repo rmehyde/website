@@ -121,6 +121,9 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const labelSpaceX = 120;
     const labelSpaceY = 50;
     const labelDistance = 20;
+    // extra vertical-only gap between the plot and the top/bottom labels (side labels unaffected,
+    // since they have no vertical offset; diagonals get a proportional share via their sin).
+    const labelGapY = 12;
     const gutterX = 20;
     const gutterY = 14;
 
@@ -135,7 +138,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     // `height` is fixed (vertical isn't viewport-constrained). The plot SVG is a fixed square,
     // centered; its coords are relative to plotSize, while labels anchor to the container.
     const width = (usableHalfWidth + gutterX) * 2;
-    const height = (plotRadius + labelSpaceY + gutterY) * 2;
+    const height = (plotRadius + labelSpaceY + gutterY + labelGapY) * 2;
     const plotSize = (plotRadius + 8) * 2;
     const cx = plotSize / 2;
     const cy = plotSize / 2;
@@ -303,11 +306,16 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 })}
             </svg>
             {/* plot labels — HTML overlays positioned in the SVG's coordinate space */}
+            {/* TODO: need to rethink this... it's tricky because what I'd really like is to absolutely position these
+                 labels as we do here, but have the browser wrap them within our box. however those seem in conflict.
+                 Also need to shuffle them around a little to avoid collisions.*/}
             {dimensions.map((dim, i) => {
                 const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
                 const cos = Math.cos(angle);
                 const sin = Math.sin(angle);
                 const anchorRadius = plotRadius + labelDistance * 0.8;
+                // vertical anchor pushes top/bottom labels a touch further out for breathing room
+                const anchorRadiusY = anchorRadius + labelGapY;
                 // translate each label outward by a fraction of its own size
                 const tx = -50 + 50 * cos;
                 const ty = -50 + 50 * sin;
@@ -325,7 +333,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                         style={{
                             position: "absolute",
                             left: `calc(50% + ${(cos * anchorRadius).toFixed(2)}px)`,
-                            top: `${(height / 2 + sin * anchorRadius).toFixed(2)}px`,
+                            // TODO: probably the solution here is to trade maxWidth for setting 'right'
+                            top: `${(height / 2 + sin * anchorRadiusY).toFixed(2)}px`,
                             transform: `translate(${tx}%, ${ty}%)`,
                             maxWidth: `calc((100% - ${horizontalReserve.toFixed(2)}px) / ${widthDivisor.toFixed(4)})`,
                             textAlign: "center",

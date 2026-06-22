@@ -18,7 +18,7 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
             const allContent = getFilteredAndSortedContent(loadAllContent(), weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
-                <div key={c.title} className="w-full p-5 lg:w-[32rem]">
+                <div key={c.title}>
                     {generateContentElements(c)}
                 </div>
             ))
@@ -35,8 +35,11 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
         return <p>Loading content…</p>
     }
 
+    // Fill the available width: 1 column on mobile, 2 flexible (1fr) columns at lg+ that stretch
+    // to the page margins. Cards carry no fixed width — the grid sizes them, and the page's
+    // max-w-7xl caps overall width. Consistent gap at every size.
     return (
-        <div className="grid grid-cols-1 justify-items-center lg:grid-cols-[repeat(2,32rem)] lg:justify-center lg:justify-items-stretch xl:gap-20">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {cards}
         </div>
     )

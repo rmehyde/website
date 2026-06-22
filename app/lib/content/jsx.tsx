@@ -13,13 +13,10 @@ export function generateContentElements(
             <H1
                 className="m-0 pb-0 inline-flex items-center gap-2"
                 prefix={null}
-                /*
-                TODO: restore this, just skipped for load times
-
-                prefix={
-                    icon ? <DynamicIcon name={icon as any}/> : null
-                }
-                */
+                /* TODO: RESTORE*/
+                // prefix={
+                //     icon ? <DynamicIcon name={icon as any}/> : null
+                // }
             >
                 {title}
             </H1>

@@ -26,7 +26,7 @@ export default function DynamicProjects() {
                 Container-driven (reacts to this section's width, not the viewport). Tune the
                 @[..] threshold below to the row's natural width. */}
             <div className="@container">
-            <div className="flex flex-col justify-evenly @[70rem]:flex-row mb-16">
+            <div className="flex flex-col justify-evenly @[68rem]:flex-row md:mb-12 md:mt-6">
             {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
                 {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
                 <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>

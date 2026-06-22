@@ -17,8 +17,9 @@
  */
 export const scale = {
     splash: "text-4xl sm:text-6xl lg:text-8xl",
-    headline: "text-xl md:text-3xl",
-    lead: "text-lg md:text-2xl",
-    body: "text-base md:text-xl",
+    headline: "text-xl md:text-2xl lg:text-3xl",
+    lead: "text-lg md:text-xl lg:text-2xl",
+    nav: "text-sm sm:text-lg md:text-xl lg:text-2xl",
+    body: "text-base md:text-lg lg:text-xl",
     label: "text-xs md:text-sm",
 } as const;

@@ -20,7 +20,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
             <body>
-                <div className="min-h-screen max-w-7xl m-auto px-4 md:px-14">
+                <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-8">
                     <header>
                         <NavigationHeader/>
                     </header>
