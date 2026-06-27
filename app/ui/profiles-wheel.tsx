@@ -249,7 +249,7 @@ export default function ProfileSelector({
     const article = articleFor(displayProfile);
 
     return (
-        <div className={cn("flex flex-col items-start gap-3 sm:flex-row sm:items-center", className)}>
+        <div className={cn("flex flex-col items-start w-fit gap-x-3 gap-y-1 xs:flex-row xs:items-center", className)}>
             {/* "Reese is a" is fixed; the "n" always reserves its width (visibility, not display) and only
                 shows when needed — so the wheel never shifts and just the "n" fades in/out. */}
             <div className={cn(scale.lead, "whitespace-nowrap")} aria-label={`Reese is ${article}`}>

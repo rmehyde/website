@@ -123,7 +123,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const handleHitR = 12;          // generous touch target; scales with the plot
 
     // Label placement, in screen px, applied around the live plot via calc().
-    const labelRoomX = 120;         // horizontal text room reserved each side
+    const labelRoomX = 144;         // horizontal text room reserved each side (wide enough for "Machine Learning" on one line)
     const labelRoomY = 56;          // vertical text room reserved top and bottom
     const edgeThreshold = 0.5;      // |cos| at or below this marks a top/bottom pole; the rest are side-anchored
 
