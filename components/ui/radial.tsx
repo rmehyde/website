@@ -13,7 +13,6 @@ import React, {useState, useRef, useEffect, useCallback} from "react";
 import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {scale} from "@/app/lib/typography";
-import {useBreakpointUp} from "@/app/lib/tailwind/responsive";
 
 type RadialSelectorProps = {
     dimensionLabels: Record<string, string>;
@@ -44,11 +43,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                                               }) => {
     const [activeDim, setActiveDim] = useState<string | null>(null);
     const svgRef = useRef<SVGSVGElement>(null);
-    
+
     // Transition state management
     const [displayValues, setDisplayValues] = useState<Record<string, number>>(values);
     const transitionRef = useRef<any>(null);
-    
+
     // Transition animation function using D3
     const startTransition = useCallback((fromValues: Record<string, number>, toValues: Record<string, number>) => {
         if (!transitionDuration || transitionDuration <= 0) {
@@ -56,32 +55,32 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             setDisplayValues(toValues);
             return;
         }
-        
+
         // Cancel any existing transition by setting a flag
         if (transitionRef.current) {
             transitionRef.current.cancelled = true;
         }
-        
+
         onTransitionStart?.();
-        
+
         // Create interpolator for the values object
         const valuesInterpolator = interpolate(fromValues, toValues);
-        
+
         // Create transition state object
         const transitionState = { cancelled: false };
         transitionRef.current = transitionState;
-        
+
         // Create D3 transition
         const t = transition()
             .duration(transitionDuration)
             .ease(easeCubicOut);
-            
+
         // Apply the transition
         t.tween('values', () => {
             return (progress: number) => {
                 // Check if this transition was cancelled
                 if (transitionState.cancelled) return;
-                
+
                 setDisplayValues(valuesInterpolator(progress));
             };
         }).on('end', () => {
@@ -92,7 +91,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             }
         });
     }, [transitionDuration, onTransitionStart, onTransitionEnd]);
-    
+
     // Cancel any active transition
     const cancelTransition = useCallback(() => {
         if (transitionRef.current) {
@@ -100,7 +99,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             transitionRef.current = null;
         }
     }, []);
-    
+
     // Detect when values prop changes and start transition
     useEffect(() => {
         if (transitionDuration && transitionDuration > 0) {
@@ -112,56 +111,34 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
 
     const dimensions = Object.keys(dimensionLabels);
 
-    // Component owns its sizing: two discrete sizes switched at the `md` breakpoint.
-    // The whole geometry scales together (plot radius + label room + gutters) so the small
-    // size actually fits a phone — not just the plot radius. Desktop = original tuned values,
-    // mobile = half. Label *text* scales separately via labelTextClass (the type scale).
-    const isMdUp = useBreakpointUp("md");
-    const plotRadius = isMdUp ? 100 : 70;
-    const labelSpaceX = 120;
-    const labelSpaceY = 50;
-    const labelDistance = 20;
-    // extra vertical-only gap between the plot and the top/bottom labels (side labels unaffected,
-    // since they have no vertical offset; diagonals get a proportional share via their sin).
-    const labelGapY = 12;
-    const gutterX = 20;
-    const gutterY = 14;
+    // Plot geometry lives in fixed SVG user units and scales to `--plot-r` screen
+    // pixels via the viewBox, so the size is CSS-driven (no layout JS, no hydration jump).
+    const PR = 100;                 // plot radius (user units)
+    const PAD = 8;                  // room so handles/strokes aren't clipped
+    const VB = (PR + PAD) * 2;      // viewBox edge
+    const cx = VB / 2;
+    const cy = VB / 2;
+    const innerR = PR * minRadiusRatio;
+    const handleR = 6;
+    const handleHitR = 12;          // generous touch target; scales with the plot
 
-    // box = plot + label room + gutter, sized per axis so it isn't forced square.
-    // labels are bounded to the plot+label region (the gutter stays empty) — see the cap below.
-    // NOTE: only width is capped; labelSpaceY must be chosen to fit the tallest top/bottom label.
-    const usableHalfWidth = plotRadius + labelSpaceX;
-    // `width` is the FULL box (plot + label room). The container requests it as a definite
-    // width (so it WON'T collapse as a flex item — the SVG + labels are absolute, so there's no
-    // in-flow content to give it size) but caps at max-width:100%, so it still shrinks when an
-    // ancestor is narrower: the label room gives way (labels wrap) while the plot stays put.
-    // `height` is fixed (vertical isn't viewport-constrained). The plot SVG is a fixed square,
-    // centered; its coords are relative to plotSize, while labels anchor to the container.
-    const width = (usableHalfWidth + gutterX) * 2;
-    const height = (plotRadius + labelSpaceY + gutterY + labelGapY) * 2;
-    const plotSize = (plotRadius + 8) * 2;
-    const cx = plotSize / 2;
-    const cy = plotSize / 2;
-    const innerR = plotRadius * minRadiusRatio;
-    const handleR = 6
-    // extra radius beyond the visible dot for an easier (esp. touch) grab target — tune up as needed
-    const handleHitExtra = 2;
-    const handleHitR = handleR + handleHitExtra;
+    // Label placement, in screen px, applied around the live plot via calc().
+    const labelRoomX = 120;         // horizontal text room reserved each side
+    const labelRoomY = 56;          // vertical text room reserved top and bottom
+    const edgeThreshold = 0.5;      // |cos| at or below this marks a top/bottom pole; the rest are side-anchored
 
     // Use displayValues for rendering (either current values or transitioning values)
     const dataPoints = dimensions.map((dim, i) => {
         const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
         const v = Math.max(0, Math.min(displayValues[dim] ?? 0, max));
-        const radius = innerR + (plotRadius - innerR) * (v / max);
+        const radius = innerR + (PR - innerR) * (v / max);
         return {angle, radius};
     });
 
     const radialLineGen = lineRadial<{ angle: number; radius: number }>()
         .angle(d => d.angle + Math.PI / 2)
         .radius(d => d.radius)
-        // .curve(curveLinearClosed);
         .curve(curveCardinalClosed.tension(0.5));
-    // .curve(curveCatmullRomClosed.alpha(0.1));
 
     // pointer down begins drag
     const onHandleDown = (dim: string) => (e: React.PointerEvent) => {
@@ -169,7 +146,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         cancelTransition();
         // Snap displayValues to current values prop immediately
         setDisplayValues(values);
-        
+
         e.currentTarget.setPointerCapture(e.pointerId);
         setActiveDim(dim);
     };
@@ -191,10 +168,10 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         const dy = loc.y - cy;
         // project pointer onto axis
         const proj = dx * ux + dy * uy;
-        // clamp projection to [innerR, plotRadius]
-        const clamped = Math.min(Math.max(proj, innerR), plotRadius);
+        // clamp projection to [innerR, PR]
+        const clamped = Math.min(Math.max(proj, innerR), PR);
         // map to integer value in [0, max]
-        const raw = ((clamped - innerR) / (plotRadius - innerR)) * max;
+        const raw = ((clamped - innerR) / (PR - innerR)) * max;
         const newVal = Math.round(raw);
         onChange({...values, [activeDim]: newVal});
     };
@@ -209,17 +186,19 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         }
     };
 
-    // @ts-ignore
-    // @ts-ignore
     return (
         <div
-            className="relative mx-auto"
-            style={{width, maxWidth: "100%", height}}
+            className="relative mx-auto [--plot-r:72px] [--label-gap:14px] md:[--plot-r:100px] md:[--label-gap:19px]"
+            style={{
+                width: `calc(2 * var(--plot-r) + ${2 * labelRoomX}px)`,
+                maxWidth: "100%",
+                height: `calc(2 * var(--plot-r) + ${2 * labelRoomY}px)`,
+            }}
         >
             <svg
                 ref={svgRef}
-                width={plotSize}
-                height={plotSize}
+                viewBox={`0 0 ${VB} ${VB}`}
+                style={{ width: `calc(var(--plot-r) * ${VB / PR})`, height: `calc(var(--plot-r) * ${VB / PR})` }}
                 className="touch-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
@@ -228,8 +207,8 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 {/* axes */}
                 {dimensions.map((dim, i) => {
                     const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
-                    const x2 = cx + Math.cos(angle) * plotRadius;
-                    const y2 = cy + Math.sin(angle) * plotRadius;
+                    const x2 = cx + Math.cos(angle) * PR;
+                    const y2 = cy + Math.sin(angle) * PR;
                     return (
                         <line
                             key={dim}
@@ -239,6 +218,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                             y2={y2}
                             stroke="hsl(var(--muted-foreground))"
                             strokeWidth={1}
+                            vectorEffect="non-scaling-stroke"
                         />
                     );
                 })}
@@ -251,10 +231,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                             key={lvl}
                             cx={cx}
                             cy={cy}
-                            r={innerR + (plotRadius - innerR) * t}
+                            r={innerR + (PR - innerR) * t}
                             fill="none"
                             stroke="hsl(var(--muted-foreground))"
                             strokeWidth={0.5}
+                            vectorEffect="non-scaling-stroke"
                         />
                     );
                 })}
@@ -268,6 +249,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                         strokeWidth={2}
                         strokeLinejoin="round"
                         strokeLinecap="round"
+                        vectorEffect="non-scaling-stroke"
                     />
                 </g>
 
@@ -275,7 +257,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                 {dimensions.map((dim, i) => {
                     const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
                     const v = Math.max(0, Math.min(displayValues[dim] ?? 0, max));
-                    const r = innerR + (plotRadius - innerR) * (v / max);
+                    const r = innerR + (PR - innerR) * (v / max);
                     const ux = Math.cos(angle);
                     const uy = Math.sin(angle);
                     const hx = cx + ux * r;
@@ -299,46 +281,52 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
                                 fill="hsl(var(--primary))"
                                 stroke="hsl(var(--primary-foreground))"
                                 strokeWidth={2}
+                                vectorEffect="non-scaling-stroke"
                                 style={{pointerEvents: "none"}}
                             />
                         </g>
                     );
                 })}
             </svg>
-            {/* plot labels — HTML overlays positioned in the SVG's coordinate space */}
-            {/* TODO: need to rethink this... it's tricky because what I'd really like is to absolutely position these
-                 labels as we do here, but have the browser wrap them within our box. however those seem in conflict.
-                 Also need to shuffle them around a little to avoid collisions.*/}
+
+            {/* Labels: the top/bottom poles center above/below their dot; every other label
+                is welded by its near horizontal edge and vertically centered on the dot, so
+                text radiates outward and a wrapped label grows in place. */}
             {dimensions.map((dim, i) => {
                 const angle = (i / dimensions.length) * 2 * Math.PI - Math.PI / 2;
                 const cos = Math.cos(angle);
                 const sin = Math.sin(angle);
-                const anchorRadius = plotRadius + labelDistance * 0.8;
-                // vertical anchor pushes top/bottom labels a touch further out for breathing room
-                const anchorRadiusY = anchorRadius + labelGapY;
-                // translate each label outward by a fraction of its own size
-                const tx = -50 + 50 * cos;
-                const ty = -50 + 50 * sin;
+                const isPole = Math.abs(cos) <= edgeThreshold;
 
-                // Cap label width to the room left between its anchor and the container edge,
-                // as a calc() on the LIVE container width (100%): when the container shrinks
-                // below `width`, the cap shrinks and the label wraps instead of spilling.
-                // At full width this reduces to the old fixed-px cap.
-                const horizontalReserve = 2 * gutterX + 2 * Math.abs(cos) * anchorRadius;
-                const widthDivisor = 1 + Math.abs(cos);
+                // tx/ty weld a box edge to the anchor; gapX/gapY nudge it off the dot by a
+                // multiple of --label-gap. Poles weld a horizontal edge and center; others weld
+                // a side and ride their axis vertically (gapY ∝ sin), so flankers sit off-level.
+                const tx = isPole ? -50 : cos > 0 ? 0 : -100;
+                const ty = isPole ? (sin < 0 ? -100 : 0) : -50;
+                const gapX = isPole ? 0 : cos > 0 ? 1 : -1;
+                const gapY = sin;
+                const textAlign = isPole ? "center" : cos > 0 ? "left" : "right";
+
+                const left = `calc(50% + (${cos.toFixed(4)} * var(--plot-r)) + (${gapX} * var(--label-gap)))`;
+                const top = `calc(50% + (${sin.toFixed(4)} * var(--plot-r)) + (${gapY.toFixed(4)} * var(--label-gap)))`;
+
+                // Cap width to the live room between the anchor and the container edge so a
+                // long label wraps instead of spilling; poles get the full width.
+                const maxWidth = isPole
+                    ? "100%"
+                    : `calc(50% - var(--label-gap) - (${Math.abs(cos).toFixed(4)} * var(--plot-r)))`;
 
                 return (
                     <Label
                         key={dim}
                         style={{
                             position: "absolute",
-                            left: `calc(50% + ${(cos * anchorRadius).toFixed(2)}px)`,
-                            // TODO: probably the solution here is to trade maxWidth for setting 'right'
-                            top: `${(height / 2 + sin * anchorRadiusY).toFixed(2)}px`,
+                            left,
+                            top,
                             transform: `translate(${tx}%, ${ty}%)`,
-                            maxWidth: `calc((100% - ${horizontalReserve.toFixed(2)}px) / ${widthDivisor.toFixed(4)})`,
-                            textAlign: "center",
-                            overflowWrap: "break-word",
+                            maxWidth,
+                            textAlign,
+                            overflowWrap: "normal",
                         }}
                         className={labelTextClass + " font-medium"}
                     >
