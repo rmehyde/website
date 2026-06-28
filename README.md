@@ -1,26 +1,17 @@
-# Reese M.E. Hyde's Personal Site
+# Reese Hyde's Personal Site
 
-As a software engineer I obviously overengineered this baby, as is a rite of passage for personal sites.
-The site used to exist with its current content and design as manually-written HTML+CSS. That was great, the code 
+As a software engineer I obviously overengineered this thing, as is a rite of passage for personal sites.
+It used to be a list of projects captured as manually-written HTML+CSS. That was great, the code 
 was totally readable and the complexity of the implementation nicely matched the actual project.
 
-It's now constructed in the following way:
-- Statically built NextJS site
-- Single page with a list of my projects
-- Each Project is defined as a file in `<project>.mdx`
-- These MDX files get built into [MDXCard components](app/ui/cards/contentCards.tsx) and rendered on the page
-
-Updating content is now _slightly_ easier because I can just plop it in a new Markdown file without touching code. But 
-I did this mostly to learn about Next, TypeScript, React, and modern frontend development in general. I do have some 
-aspirations for some slick dynamic content, but who knows what the future holds.
+Now it's a statically built NextJS site and every snippet of content fits into a schema with a title and short version 
+and long version and list of links and a score along ten dimensions and there's a spider graph so you can decide how 
+much of each dimension you want to see and the content also includes my whole job history which a WASM-compiled TeX 
+engine will build for you into a dynamic resume. It's a bit silly, and you can read more about it on [the About page](https://rmehyde.com/about).
 
 ## Building
-- `npm install`
-- `npm run build`
+- `pnpm install`
+- `pnpm run build`
 
 Output will be in `out/` which can be served statically. Note that it must be hosted on a proper webserver, 
 e.g. `cd out; python3 -m http.server 3000`
-
-## Dynamic Content Context
-
-TODO
