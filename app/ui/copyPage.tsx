@@ -1,0 +1,21 @@
+import React from "react";
+import {cn} from "@/components/lib/utils";
+import {scale} from "@/app/lib/typography";
+
+export function CopyPageBody({children, className}: {children: React.ReactNode; className?: string}) {
+    return (
+        <div className={cn("flex flex-col items-center gap-20 pt-8 md:pt-24", className)}>
+            {React.Children.map(children, (child) => (
+                <div className="w-full max-w-2xl">{child}</div>
+            ))}
+        </div>
+    );
+}
+
+export function CopyPageContent({children, className}: {children: React.ReactNode; className?: string}) {
+    return (
+        <div className={cn(scale.feature, "space-y-4", className)}>
+            {children}
+        </div>
+    );
+}

@@ -258,7 +258,7 @@ export default function ProfileSelector({
             <div className="relative w-60 md:w-72">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
-                        className={cn(scale.body, `w-full gap-1 py-0 overflow-hidden ${
+                        className={cn(scale.feature, `w-full gap-1 py-0 overflow-hidden ${
                             selectedProfile === CUSTOM_PROFILE_NAME && !isAnimating ? 'text-muted-foreground' : ''
                         }`)}
                         onPointerDown={handleUserIntent}
@@ -297,7 +297,7 @@ export default function ProfileSelector({
 
                     <SelectContent>
                         {profiles.filter(p => p.name !== CUSTOM_PROFILE_NAME).map((p) => (
-                            <SelectItem key={p.name} value={p.name} className={scale.body}>
+                            <SelectItem key={p.name} value={p.name} className={scale.feature}>
                                 {p.name}
                             </SelectItem>
                         ))}
@@ -307,7 +307,7 @@ export default function ProfileSelector({
                             <SelectItem
                                 key={CUSTOM_PROFILE_NAME}
                                 value={CUSTOM_PROFILE_NAME}
-                                className={scale.body}
+                                className={scale.feature}
                                 disabled
                             >
                                 {CUSTOM_PROFILE_NAME}

@@ -1,40 +1,51 @@
 
-[DONE] - projects page restrict dimensions
-[DONE] - layout
-- contact lock/info/etc
-	- cleanup buttons
-	- write contact page
-	- update email, remove mailto:
-
-- when you click to select a profile/role it snaps to the new value, should transition like the scroller
 - new pages content
-- label renames (devops + data analytics)
-- footer (copyright + links)
 - projects cleanup
     - change website link to about page
     - nicer traffic race screens page
-- icon
 - finish resume
 	- profile seniority
 	- profiles
 	- new bullets (microservices, deploy, etc)
 	- pass of all profiles content + 1page
 
+
+- layout tweaks
+    - fix main page spacing
+        - lower text only fits to hero text width on wider screens
+    - more margin when compressed!
+    - more space before links on project cards
+
+- icon
+- html page title
+- https links
+
 - impl quality pass/cleanup
+    - structure: lib/component/package/etc
 	- ts-ignore
 	- console.log()s
 	- drop old pages
 	- drop dead libs/plumbing (JSX/MD etc)
 	- what needs to get bundled vs not, be in public vs not, etc.
-- public folder listing
+- update readme
+- public folder listing (index so you can see it)
 - ship :)
 	- license
 - tracking?
 
 
+[DONE] - footer (copyright + links)
+[DONE] - projects page restrict dimensions
+[DONE] - layout
+[DONE] - when you click to select a profile/role it snaps to the new value, should transition like the scroller
+[DONE] - contact lock/info/etc
+	[DONE] - cleanup contact buttons
+	[DONE] - write contact page
+	[DONE] - update email, remove mailto:
+
+
 
 LAYOUT
-- more space before links on project cards
 
 [DONE] - perfect chart labels
 [DONE] - spacing around wheel on projects page

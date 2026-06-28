@@ -7,6 +7,7 @@ import PDFComponent from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
 import {profiles} from '@/app/lib/content/content-io';
 import {Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
+import {preserveContactParams} from '@/app/contact/contactContext';
 
 type Mode = 'intro' | 'interactive';
 
@@ -81,10 +82,13 @@ export default function DynamicResume() {
         
         const timeoutId = setTimeout(() => {
             const params = dimensionScoresToParams(committedWeights as DimensionScores);
-            const newUrl = params.toString() 
+            // Keep any ?email/?phone overrides — they live in the same query string and would
+            // otherwise be dropped by this weights-only rebuild.
+            preserveContactParams(new URLSearchParams(window.location.search), params);
+            const newUrl = params.toString()
                 ? `${window.location.pathname}?${params.toString()}`
                 : window.location.pathname;
-                
+
             window.history.replaceState({}, '', newUrl);
         }, 500); // 500ms debounce
         
@@ -215,7 +219,7 @@ export default function DynamicResume() {
                 centered pair while they fit on one line, and stacks them (each centered) when they
                 don't — no JS, no breakpoint. The graph wrapper shrinks to its content so the whole
                 pair stays centered; making it flex-1 would pin the selector to the left edge. */}
-            <div className="flex flex-wrap items-center justify-center md:gap-10 pb-8">
+            <div className="flex flex-wrap items-center justify-center md:gap-10 pb-12">
                 <ProfileSelector
                     mode={mode}
                     selectedProfile={selectedProfile}
@@ -242,8 +246,7 @@ export default function DynamicResume() {
                     />
                 </div>
             </div>
-            {/* TODO: probably this padding should be global as well */}
-            <div className="pb-8">
+            <div>
                 {mode === 'interactive' && (
                     <PDFComponent
                         onWeightsComplete={handlePDFReady}

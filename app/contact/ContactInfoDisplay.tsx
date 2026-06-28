@@ -1,6 +1,9 @@
 "use client";
 
+import clsx from "clsx";
+
 import {useContactStore} from "@/app/contact/contactContext";
+import {scale} from "@/app/lib/typography";
 
 // Reads the global contact store and renders email/phone, masked or revealed
 // depending on unlock state. Used on the Contact page; intentionally NOT shown
@@ -11,10 +14,12 @@ export function ContactInfoDisplay({className}: {className?: string}) {
     return (
         <div className={className}>
             <div>
-                <span className="font-medium">Email:</span> {contact.email}
+                <div className={clsx(scale.body, "text-muted-foreground")}>Email</div>
+                <div className={scale.feature}>{contact.email}</div>
             </div>
             <div>
-                <span className="font-medium">Phone:</span> {contact.phone}
+                <div className={clsx(scale.body, "text-muted-foreground")}>Phone</div>
+                <div className={scale.feature}>{contact.phone}</div>
             </div>
         </div>
     );

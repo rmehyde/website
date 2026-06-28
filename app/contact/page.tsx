@@ -1,30 +1,52 @@
 "use client";
 
+import clsx from "clsx";
+import {ChevronDown} from "lucide-react";
+
 import {useContactStore} from "@/app/contact/contactContext";
 import {ContactInfoDisplay} from "./ContactInfoDisplay";
 import {UnlockForm} from "./UnlockForm";
+import {ContactIntro, REVEAL_TEXT} from "./content";
+import {scale} from "@/app/lib/typography";
 
 // shadcn/ui components:
-import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
+import {Collapsible, CollapsibleTrigger, CollapsibleContent} from "@/components/ui/collapsible";
+import {CopyPageBody, CopyPageContent} from "@/app/ui/copyPage";
+import {Separator} from "@/components/ui/separator";
 
-// Inline presentation of the unlock unit: contact info, then (while locked) the
-// passphrase form right below it — no Dialog. The Resume page renders the same
-// UnlockForm inside a modal instead. Layout here is placeholder; appearance changes
-// to follow.
 export default function ContactPage() {
     const locked = useContactStore((state) => state.locked);
 
     return (
-        <div className="flex justify-center p-8">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Contact Info</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <ContactInfoDisplay className="space-y-2"/>
-                    {locked && <UnlockForm/>}
-                </CardContent>
-            </Card>
-        </div>
+        <CopyPageBody className={"gap-14"}>
+            <CopyPageContent>
+                <ContactIntro/>
+            </CopyPageContent>
+
+            <Separator/>
+
+            {locked ? (
+                <Collapsible>
+                    <CollapsibleTrigger
+                        className={clsx(
+                            scale.feature,
+                            "group inline-flex items-center gap-2 font-medium",
+                            "cursor-pointer underline-offset-4 transition hover:underline",
+                        )}
+                    >
+                        {REVEAL_TEXT}
+                        <ChevronDown
+                            className="h-5 w-5 transition-transform group-data-[state=open]:rotate-180"
+                            aria-hidden="true"
+                        />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-6">
+                        <UnlockForm/>
+                    </CollapsibleContent>
+                </Collapsible>
+            ) : (
+                <ContactInfoDisplay className="space-y-4"/>
+            )}
+        </CopyPageBody>
     );
 }

@@ -20,7 +20,7 @@ export function generateContentElements(
             >
                 {title}
             </H1>
-            <div className={scale.body}>
+            <div className={scale.feature}>
                 <p>{detail.trim()}</p>
 
                 {links && links.length > 0 && (

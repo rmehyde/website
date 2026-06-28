@@ -56,6 +56,32 @@ export const useContactStore = create<ContactStore>()((set) => ({
     },
 }));
 
+// Query-param keys that override contact info on the résumé. Centralized so the override
+// reader and the URL-preserver below stay in sync (and so adding a key is a one-line change).
+export const CONTACT_PARAM_KEYS = ['email', 'phone'] as const;
+
+// Optional ?email= / ?phone= query overrides, read by the résumé PDF. They let us export a
+// resume with REAL (un-obfuscated) contact info for ATS parsing via a crafted URL, without
+// unlocking. Each field overrides independently; absent fields fall through to the store.
+// Note: URL-encode values — a literal "+" in a query string decodes to a space (use %2B).
+export function contactOverrideFromParams(params: URLSearchParams): Partial<ContactInfo> {
+    const override: Partial<ContactInfo> = {};
+    for (const key of CONTACT_PARAM_KEYS) {
+        const val = params.get(key)?.trim();
+        if (val) override[key] = val;
+    }
+    return override;
+}
+
+// Carry contact override params from one query string into another. The résumé rebuilds its
+// URL from the graph weights on every change; without this, that rewrite would drop ?email/?phone.
+export function preserveContactParams(from: URLSearchParams, into: URLSearchParams): void {
+    for (const key of CONTACT_PARAM_KEYS) {
+        const val = from.get(key);
+        if (val !== null) into.set(key, val);
+    }
+}
+
 // Hydrate once on the client. The store starts masked/locked (matching SSR), then flips to
 // unlocked if a valid cached key is present — so the unlock survives reloads without a prompt.
 if (typeof window !== 'undefined') {

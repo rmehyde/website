@@ -1,8 +1,8 @@
 'use client';
 
-import React, {useState, useRef, useCallback, useEffect} from 'react';
+import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {useContactStore} from "@/app/contact/contactContext";
+import {useContactStore, contactOverrideFromParams} from "@/app/contact/contactContext";
 import {generateResumeLatex} from "@/app/lib/content/resume";
 import {Button} from "@/components/ui/button";
 import {Spinner} from "@/components/ui/spinner";
@@ -20,6 +20,7 @@ const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
 
 import { DvipdfmxEngine } from "@/app/lib/swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "@/app/lib/swiftlatex/XeTeXEngine";
+import {REVEAL_TEXT} from "@/app/contact/content";
 
 let xetexEngine: XeTeXEngine, dviEngine: DvipdfmxEngine;
 
@@ -52,8 +53,21 @@ interface PdfError {
 export default function PDFComponent({onWeightsComplete}: {
     onWeightsComplete?: (callback: (weights: DimensionScores) => void) => void;
 }) {
-    const contact = useContactStore((state) => state.contact);
-    const locked = contact.email.includes("*");
+    const storeContact = useContactStore((state) => state.contact);
+    const locked = useContactStore((state) => state.locked);
+    // Optional ?email=/?phone= URL overrides let us export a real-contact résumé for ATS without
+    // unlocking. Read once from the URL, then merged over the (possibly masked) store values so
+    // each field overrides independently and absent ones fall through to the store.
+    const contactOverride = useMemo(
+        () => (typeof window !== 'undefined'
+            ? contactOverrideFromParams(new URLSearchParams(window.location.search))
+            : {}),
+        [],
+    );
+    const contact = useMemo(() => ({
+        email: contactOverride.email ?? storeContact.email,
+        phone: contactOverride.phone ?? storeContact.phone,
+    }), [storeContact, contactOverride]);
     // Always-current contact for renderPDF to read. Keeping it out of renderPDF's deps means
     // renderPDF stays stable, so the (single) trigger the parent captured never goes stale after
     // an unlock — every render path picks up the latest email/phone.
@@ -188,44 +202,46 @@ export default function PDFComponent({onWeightsComplete}: {
 
     return (
         <div>
-            <div className="flex justify-center mb-8">
-                {(renderState !== 'idle') ? (
-                    <Button disabled>
-                        <Spinner/>
-                        Generating PDF...
-                    </Button>
-                ) : error ? (
-                    <Button onClick={() => setError(null)} variant="outline">
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        {/* TODO: state issue. Fail -> Try Again. Does nothing, you get "Download Resume" button */}
-                        Try Again
-                    </Button>
-                ) : (
+            {(renderState === 'idle' && !error) ? (
+                <div className="flex flex-wrap items-center justify-center gap-12 mb-8">
+                    {locked && (
+                        <Dialog open={unlockOpen} onOpenChange={setUnlockOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">
+                                    <Lock className="mr-2 h-4 w-4"/>
+                                    {REVEAL_TEXT}
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[400px]">
+                                <DialogHeader>
+                                    <DialogTitle>{REVEAL_TEXT}</DialogTitle>
+                                </DialogHeader>
+                                <UnlockForm onSuccess={() => setUnlockOpen(false)}/>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+
                     <Button asChild>
                         <a href={pdfUrl} download={`reesehyde-resume.pdf`}>
                             <Download className="mr-2 h-4 w-4" />
                             Download Resume
                         </a>
                     </Button>
-                )}
-            </div>
-
-            {locked && (
+                </div>
+            ) : (
                 <div className="flex justify-center mb-8">
-                    <Dialog open={unlockOpen} onOpenChange={setUnlockOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                <Lock className="mr-2 h-4 w-4"/>
-                                Unhide Contact Details
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[400px]">
-                            <DialogHeader>
-                                <DialogTitle>Unlock Contact Info</DialogTitle>
-                            </DialogHeader>
-                            <UnlockForm onSuccess={() => setUnlockOpen(false)}/>
-                        </DialogContent>
-                    </Dialog>
+                    {renderState !== 'idle' ? (
+                        <Button disabled>
+                            <Spinner/>
+                            Generating PDF...
+                        </Button>
+                    ) : (
+                        <Button onClick={() => setError(null)} variant="outline">
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            {/* TODO: state issue. Fail -> Try Again. Does nothing, you get "Download Resume" button */}
+                            Try Again
+                        </Button>
+                    )}
                 </div>
             )}
 

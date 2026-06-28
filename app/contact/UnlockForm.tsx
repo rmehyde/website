@@ -8,6 +8,8 @@ import {useContactStore} from "@/app/contact/contactContext";
 // shadcn/ui components:
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import {scale} from "@/app/lib/typography";
+import {cn} from "@/components/lib/utils";
 
 export interface UnlockFormProps {
     // Called after a passphrase successfully decrypts the contact info. The modal
@@ -47,12 +49,13 @@ export function UnlockForm({onSuccess, className}: UnlockFormProps) {
     return (
         <div className={clsx(isShaking && "animate-shake", className)}>
             <div className="space-y-4">
-                {/* TODO: placeholder copy — real wording + passphrase hint come in a later pass. */}
-                <p className="text-sm text-muted-foreground">
-                    My email and phone are hidden. Enter the passphrase to reveal them.
-                </p>
+                <div className={cn(scale.body, "text-muted-foreground")}>
+                    <span className="font-semibold">Hint: </span>
+                    What's in the car?
+                </div>
                 <form onSubmit={handleDecrypt} className="space-y-4">
                     <Input
+                        className={scale.body}
                         type="text"
                         placeholder="Enter passphrase"
                         ref={passwordRef}

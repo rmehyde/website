@@ -1,24 +1,27 @@
 ## About Reese
 
-Reese Matthew Earle Hyde is a Machine Learning Engineer by trade, but loves all flavors of software and many things far 
+Reese M.E. Hyde is a Machine Learning Engineer by trade, but loves all flavors of software and many things far 
 beyond it. He strives to understand how things work, and the way things might be made to work. His interests include 
-economics, finance, physics, neuroscience, cognitive science, philosophy of mind, ecology, cooking, hiking, and much 
-more.
+economics, finance, physics, neuroscience, cognitive science, ecology, cooking, hiking, and much more.
 
 Reese was born and raised in Austin, Texas and is now primarily based in Brooklyn, New York.
 
 ## About This Site
 
-This website is as much a fun exercise as it is a portfolio. It's implemented as a _static site_, which means that it's 
-just a pile of files that your device downloads and runs itself. Of course, the functionality of the site is dynamic: 
-you can interact with the dimensions and profiles to see different projects or resumes.
+This website is as much a fun exercise as it is a portfolio.
 
-On the Resume page, your browser is actually generating dynamic resume markup based on your selections, and then running 
+
+
+It's implemented as a _static site_, which means that it's 
+just a pile of files that your device downloads and runs itself. Of course, the functionality of the site is dynamic: 
+you can interact with the dimensions in the plot to see different projects or resumes.
+
+On the Resume page, your browser is actually generating dynamic markup based on your selections, and then running 
 a [typesetting engine](https://en.wikipedia.org/wiki/XeTeX) which was compiled into a [web-focused binary 
 format](https://en.wikipedia.org/wiki/WebAssembly) to render it into a PDF. I cannot stress enough that this is an 
 objectively poor technical approach to such a feature: generating a dynamic PDF is exactly the kind of thing that 
 should be done by a server, not your browser. But if your device can do the computation itself, then I don't have to 
-pay for a server to do it, and there's less that can go wrong and bring down the site. Those advantages really do make 
+pay for a server to do it, and there's less that can go wrong to bring down the site. Those advantages really do make 
 for a fun technical constraint.
 
 The other thing about static sites, though, is that they're inherently open. In order for your browser to do all the 
