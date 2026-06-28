@@ -9,7 +9,7 @@ links:
     target: https://rmehyde.com/assets/trafficrace.apk
   - tag: screenshots
     detail: Check out some screenshots
-    target: https://rmehyde.com/trafficracescreens.html
+    target: https://rmehyde.com/projects/trafficrace
 scores:
   frontend: 5
   backend: 2
