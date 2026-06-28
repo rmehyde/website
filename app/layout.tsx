@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {Roboto} from 'next/font/google';
 import './globals.css'
 import {NavigationHeader} from "@/app/ui/header";
+import {SiteFooter} from "@/app/ui/footer";
 
 export const metadata: Metadata = {
     title: 'Reese M.E. Hyde',
@@ -20,13 +21,14 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
             <body>
-                <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-8">
+                <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-8 flex flex-col">
                     <header>
                         <NavigationHeader/>
                     </header>
-                    <main>
+                    <main className="grow">
                         {children}
                     </main>
+                    <SiteFooter/>
                 </div>
             </body>
         </html>
