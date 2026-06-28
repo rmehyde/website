@@ -4,7 +4,6 @@ import {useState, useRef} from "react";
 import clsx from "clsx";
 
 import {useContactStore} from "@/app/contact/contactContext";
-import {decryptContactInfo} from "@/app/contact/decrypt";
 
 // shadcn/ui components:
 import {Input} from "@/components/ui/input";
@@ -23,7 +22,7 @@ export interface UnlockFormProps {
 // job. Decryption (decrypt.ts) and global state (contactContext.tsx) are the shared
 // atoms it composes; the only seam between presentations is the onSuccess callback.
 export function UnlockForm({onSuccess, className}: UnlockFormProps) {
-    const setContact = useContactStore((state) => state.setContact);
+    const unlock = useContactStore((state) => state.unlock);
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isShaking, setIsShaking] = useState(false);
@@ -35,11 +34,9 @@ export function UnlockForm({onSuccess, className}: UnlockFormProps) {
         setError("");
 
         const rawPwd = passwordRef.current?.value.toLowerCase().replace(/\W/g, '') || "";
-        try {
-            const decrypted = await decryptContactInfo(rawPwd);
-            setContact(decrypted);
+        if (await unlock(rawPwd)) {
             onSuccess?.();
-        } catch {
+        } else {
             setError("Incorrect passphrase, please try again.");
             // trigger shake:
             setIsShaking(true);

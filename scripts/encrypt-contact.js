@@ -73,11 +73,17 @@ function askPassword(promptText) {
         rl.close();
 
         // derive a 32-byte key from password using PBKDF2
-        const salt = crypto.randomBytes(16); // 16-byte salt
+        // Fixed salt (not random): the derived key must be STABLE across re-encryptions
+        // so the browser can cache it and decrypt future blobs without re-prompting for the
+        // passphrase. The salt is already public — it ships embedded in every blob — so
+        // pinning it here leaks nothing; the passphrase remains the only secret.
+        const salt = Buffer.from("404cd6202cef97ebff9fb54b3930797f", "hex"); // 16-byte salt
         const key = crypto.pbkdf2Sync(password, salt, 500_000, 32, "sha256");
 
         // encrypt the JSON payload with AES-256-GCM
         const payload = JSON.stringify({ email, phone });
+        // IV MUST stay random per run. The salt above is fixed, so the key is now long-lived;
+        // reusing an IV under a fixed key breaks AES-GCM (auth-key recovery / forgery).
         const iv = crypto.randomBytes(12); // 12-byte IV for GCM
 
         const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);

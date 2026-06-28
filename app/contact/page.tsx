@@ -12,8 +12,7 @@ import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
 // UnlockForm inside a modal instead. Layout here is placeholder; appearance changes
 // to follow.
 export default function ContactPage() {
-    const contact = useContactStore((state) => state.contact);
-    const locked = contact.email.includes("*");
+    const locked = useContactStore((state) => state.locked);
 
     return (
         <div className="flex justify-center p-8">
