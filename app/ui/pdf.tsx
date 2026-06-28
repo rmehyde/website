@@ -12,7 +12,9 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import {Download, AlertCircle, RefreshCw, ChevronDownIcon} from "lucide-react";
+import {Download, AlertCircle, RefreshCw, ChevronDownIcon, Lock} from "lucide-react";
+import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {UnlockForm} from "@/app/contact/UnlockForm";
 
 const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
 
@@ -51,15 +53,25 @@ export default function PDFComponent({onWeightsComplete}: {
     onWeightsComplete?: (callback: (weights: DimensionScores) => void) => void;
 }) {
     const contact = useContactStore((state) => state.contact);
+    const locked = contact.email.includes("*");
+    // Always-current contact for renderPDF to read. Keeping it out of renderPDF's deps means
+    // renderPDF stays stable, so the (single) trigger the parent captured never goes stale after
+    // an unlock — every render path picks up the latest email/phone.
+    const contactRef = useRef(contact);
+    contactRef.current = contact;
     const [renderState, setRenderState] = useState<RenderState>('idle');
     const [pdfUrl, setPdfUrl] = useState("");
     const [error, setError] = useState<PdfError | null>(null);
+    const [unlockOpen, setUnlockOpen] = useState(false);
     const pendingWeightsRef = useRef<DimensionScores | null>(null);
+    // Weights of the most recent render, so a contact change (unlock) can re-render with them.
+    const lastWeightsRef = useRef<DimensionScores | null>(null);
 
     const renderPDF = useCallback(async (weightsToRender: DimensionScores) => {
         setRenderState('rendering');
         setError(null);
         pendingWeightsRef.current = null;
+        lastWeightsRef.current = weightsToRender;
 
         try {
             // Engine initialization
@@ -76,7 +88,7 @@ export default function PDFComponent({onWeightsComplete}: {
             // LaTeX generation
             let latex: string;
             try {
-                latex = generateResumeLatex(weightsToRender, contact);
+                latex = generateResumeLatex(weightsToRender, contactRef.current);
                 console.log("LaTeX generated", latex);
             } catch (e) {
                 throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) };
@@ -129,7 +141,7 @@ export default function PDFComponent({onWeightsComplete}: {
                 setRenderState('idle');
             }
         }
-    }, [contact]);
+    }, []);
 
     const triggerRender = useCallback((weightsToRender: DimensionScores) => {
         if (renderState === 'idle') {
@@ -149,6 +161,22 @@ export default function PDFComponent({onWeightsComplete}: {
             hasRegisteredRef.current = true;
         }
     }, [onWeightsComplete]);
+
+    // Re-render when the contact info actually changes (passphrase unlock) — the weights are
+    // unchanged, so the weight-driven render path won't fire on its own. We compare against the
+    // PREVIOUS contact value rather than using a one-shot "did mount" flag: React StrictMode
+    // double-invokes mount effects in dev, and a one-shot flag would let the second invoke sneak
+    // past and launch a second concurrent compile ("Engine is still spinning"). A value compare is
+    // idempotent — it fires at most once per genuine change. Keyed on `contact` only; including
+    // triggerRender would re-fire on every renderState change.
+    const prevContactRef = useRef(contact);
+    useEffect(() => {
+        if (prevContactRef.current === contact) return;
+        prevContactRef.current = contact;
+        if (lastWeightsRef.current) {
+            triggerRender(lastWeightsRef.current);
+        }
+    }, [contact]);
 
     const stageLabels: Record<PdfError['stage'], string> = {
         'init': 'Engine Initialization',
@@ -181,6 +209,27 @@ export default function PDFComponent({onWeightsComplete}: {
                     </Button>
                 )}
             </div>
+
+            {/* Inline unlock affordance: same UnlockForm as the Contact page, wrapped in a modal.
+                Shown only while contact info is masked. Placeholder placement/copy — UX to follow. */}
+            {locked && (
+                <div className="flex justify-center mb-8">
+                    <Dialog open={unlockOpen} onOpenChange={setUnlockOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                                <Lock className="mr-2 h-4 w-4"/>
+                                Contact details are hidden — unlock
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[400px]">
+                            <DialogHeader>
+                                <DialogTitle>Unlock Contact Info</DialogTitle>
+                            </DialogHeader>
+                            <UnlockForm onSuccess={() => setUnlockOpen(false)}/>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            )}
 
             <div className="relative">
                 {error ? (

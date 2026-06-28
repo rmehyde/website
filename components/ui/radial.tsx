@@ -120,7 +120,7 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const cy = VB / 2;
     const innerR = PR * minRadiusRatio;
     const handleR = 6;
-    const handleHitR = 12;          // generous touch target; scales with the plot
+    const handleHitR = 8;          // generous touch target; scales with the plot
 
     // Label placement, in screen px, applied around the live plot via calc().
     const labelRoomX = 144;         // horizontal text room reserved each side (wide enough for "Machine Learning" on one line)

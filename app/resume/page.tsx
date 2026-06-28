@@ -211,12 +211,11 @@ export default function DynamicResume() {
 
     return (
         <div>
-            {/* Content-driven layout: flex-wrap keeps the selector + graph side-by-side while
-                they fit on one line and stacks them automatically when they don't — no JS, no
-                breakpoint. flex-1 on the graph wrapper eats the row's free space, so justify-center
-                is a no-op when side-by-side (selector stays left, graph centers in the leftover);
-                once they wrap, each item is alone on its line and justify-center centers it. */}
-            <div className="flex flex-wrap items-center justify-center gap-6 pb-8">
+            {/* Content-driven layout: flex-wrap keeps the selector + graph side-by-side as a
+                centered pair while they fit on one line, and stacks them (each centered) when they
+                don't — no JS, no breakpoint. The graph wrapper shrinks to its content so the whole
+                pair stays centered; making it flex-1 would pin the selector to the left edge. */}
+            <div className="flex flex-wrap items-center justify-center md:gap-10 pb-8">
                 <ProfileSelector
                     mode={mode}
                     selectedProfile={selectedProfile}
@@ -230,8 +229,7 @@ export default function DynamicResume() {
                     onIntroComplete={() => exitIntro('auto')}
                     className="pt-4"
                 />
-                <div className="flex-1 flex justify-center">
-                    {/* TODO: fix scroll issue on mobile */}
+                <div className="flex justify-center">
                     {/* radial selector drives the weights */}
                     <RadialSelector
                         dimensionLabels={dimensionLabels}
