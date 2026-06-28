@@ -2,10 +2,7 @@
 import {usePathname} from 'next/navigation'
 import {scale} from "@/app/lib/typography";
 import {cn} from "@/components/lib/utils";
-
-// GitHub inferred from your repo links. LinkedIn is a placeholder — swap in your real profile URL.
-const GITHUB_URL = "https://github.com/rmehyde"
-const LINKEDIN_URL = "https://www.linkedin.com/in/reese-h-835b28175/"
+import {GITHUB_URL, LINKEDIN_URL} from "@/app/contact/content";
 
 // Brand glyphs are inlined (not bundled as files) so they inherit the surrounding
 // text color via fill="currentColor" — same pattern as the lucide icons elsewhere.

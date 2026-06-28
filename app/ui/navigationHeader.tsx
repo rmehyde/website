@@ -12,7 +12,7 @@ export function NavigationHeader() {
     if (pathname === '/') return null
 
     return (
-        <header className="flex flex-wrap items-center justify-between pt-4 pb-8 md:pt-6 md:pb-12">
+        <header className="flex flex-wrap items-center justify-between">
             {/* Home link: House icon below sm (no room for the name), the full name at sm+. */}
             <Link href="/" aria-label="Home" className={cn(scale.nav, "inline-flex items-center")}>
                 <House className="h-4 w-4 sm:hidden" aria-hidden="true"/>

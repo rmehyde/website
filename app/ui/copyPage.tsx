@@ -4,7 +4,7 @@ import {scale} from "@/app/lib/typography";
 
 export function CopyPageBody({children, className}: {children: React.ReactNode; className?: string}) {
     return (
-        <div className={cn("flex flex-col items-center gap-8 pt-8 md:pt-24", className)}>
+        <div className={cn("flex flex-col items-center gap-8", className)}>
             {React.Children.map(children, (child) => (
                 <div className="w-full max-w-2xl">{child}</div>
             ))}

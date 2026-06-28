@@ -26,16 +26,9 @@ export default function DynamicProjects() {
 
     return (
         <div>
-            {/* TODO: this needs some better spacing as it looks fucky with the project
-            spacing */}
-            {/* Fit-or-stack: prompt / graph / prompt sit in a ROW when the container is wide
-                enough for all three, otherwise they STACK — all at once, never a partial wrap.
-                Container-driven (reacts to this section's width, not the viewport). Tune the
-                @[..] threshold below to the row's natural width. */}
+            {/* fit or stack: all three side by side or all three vertical" */}
             <div className="@container">
-            <div className="flex flex-col mb-12 mt-4 gap-3 md:gap-7 md:mt-6 md:mb-16 justify-evenly @[68rem]:flex-row @[68rem]:gap-0">
-            {/*<div className="flex flex-col gap-24 justify-center md:flex-row">*/}
-                {/* TODO: when page is narrow this can look weird with projects on next line we get some dont dead open inside*/}
+            <div className="flex flex-col mb-12 gap-3 md:gap-7 md:mb-16 justify-evenly @[68rem]:flex-row @[68rem]:gap-0">
                 <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
                     What kind of projects
                 </div>
@@ -49,9 +42,6 @@ export default function DynamicProjects() {
                         onChange={setValues}
                     />
                 </div>
-                {/* TODO: the right side of the graph pushes up against this text
-                        when the page is pretty narrow but not quite vertical
-                */}
                 <div className={`flex items-center justify-center ${scale.headline} text-center whitespace-nowrap`}>
                     do you want to see?
                 </div>
