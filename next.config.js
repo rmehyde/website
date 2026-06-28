@@ -2,9 +2,6 @@
 const nextConfig = {
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
     output: 'standalone',
-    typescript: {
-        ignoreBuildErrors: true,
-    },
 
     webpack(config, { isServer }) {
         config.resolve.fallback = {
