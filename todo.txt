@@ -1,10 +1,6 @@
 
-- projects cleanup
-    [DONE] - change website link to about page
-    - nicer traffic race screens page
 - finish resume
 	- profile seniority
-	- profiles
 	- new bullets (microservices, deploy, etc)
 	- pass of all profiles content + 1page
 
@@ -23,6 +19,9 @@
     - ensure /spend gets shipped too
 
 
+[DONE] - projects cleanup
+    [DONE] - change website link to about page
+    [DONE] - nicer traffic race screens page
 [DONE] - update readme
 [DONE] - html page title
 [DONE] - https links
