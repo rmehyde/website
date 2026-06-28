@@ -13,17 +13,20 @@ import {scale} from "@/app/lib/typography";
 import {Collapsible, CollapsibleTrigger, CollapsibleContent} from "@/components/ui/collapsible";
 import {CopyPageBody, CopyPageContent} from "@/app/ui/copyPage";
 import {Separator} from "@/components/ui/separator";
+import {cn} from "@/components/lib/utils";
+import {H1} from "@/app/ui/sectionHeaders";
 
 export default function ContactPage() {
     const locked = useContactStore((state) => state.locked);
 
     return (
-        <CopyPageBody className={"gap-14"}>
+        <CopyPageBody>
+            <H1>Contact</H1>
             <CopyPageContent>
                 <ContactIntro/>
             </CopyPageContent>
 
-            <Separator/>
+            <Separator className={"my-6"}/>
 
             {locked ? (
                 <Collapsible>

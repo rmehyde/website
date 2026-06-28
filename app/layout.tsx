@@ -1,7 +1,7 @@
 import type {Metadata} from 'next'
 import {Roboto} from 'next/font/google';
 import './globals.css'
-import {NavigationHeader} from "@/app/ui/header";
+import {NavigationHeader} from "@/app/ui/navigationHeader";
 import {SiteFooter} from "@/app/ui/footer";
 
 export const metadata: Metadata = {
