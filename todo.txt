@@ -1,6 +1,6 @@
 
 - projects cleanup
-    - change website link to about page
+    [DONE] - change website link to about page
     - nicer traffic race screens page
 - finish resume
 	- profile seniority
@@ -8,12 +8,6 @@
 	- new bullets (microservices, deploy, etc)
 	- pass of all profiles content + 1page
 
-
-- layout tweaks
-    - fix main page spacing
-        - lower text only fits to hero text width on wider screens
-    - more margin when compressed!
-    - more space before links on project cards
 
 - icon
 
@@ -24,12 +18,9 @@
 	- drop old pages
 	- drop dead libs/plumbing (JSX/MD etc)
 	- what needs to get bundled vs not, be in public vs not, etc.
-- license
 - public folder listing (index so you can see it)
 - ship :)
     - ensure /spend gets shipped too
-
-- tracking?
 
 
 [DONE] - update readme
@@ -48,6 +39,11 @@
 
 
 LAYOUT
+
+
+[DONE] - fix main page spacing: lower text only fits to hero text width on wider screens
+[DONE] - more margin when compressed!
+[DONE] - more space before links on project cards
 
 [DONE] - perfect chart labels
 [DONE] - spacing around wheel on projects page

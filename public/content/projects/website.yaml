@@ -6,12 +6,13 @@ detail:
   Portfolio website. You're probably here now! You better believe that it's delightfully overengineered, check
   out the repo for details.
 links:
+  - tag: about
+    detail: Read about it
+    target: https://rmehyde.com/about
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/website
-  - tag: site
-    detail: Visit the site
-    target: https://rmehyde.com/
+
 scores:
   frontend: 5
   libs-tooling: 2

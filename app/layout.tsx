@@ -5,7 +5,7 @@ import {NavigationHeader} from "@/app/ui/navigationHeader";
 import {SiteFooter} from "@/app/ui/footer";
 
 export const metadata: Metadata = {
-    title: 'Reese M.E. Hyde',
+    title: 'Reese Hyde',
     description: "Reese Hyde's portfolio website",
 }
 
@@ -21,7 +21,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className={`${roboto.variable} font-sans`}>
             <body>
-                <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-8 flex flex-col">
+                <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-12 flex flex-col">
                     <header className="pt-4 pb-8 md:pt-6 md:pb-20">
                         <NavigationHeader/>
                     </header>

@@ -36,8 +36,7 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
     }
 
     // Fill the available width: 1 column on mobile, 2 flexible (1fr) columns at lg+ that stretch
-    // to the page margins. Cards carry no fixed width — the grid sizes them, and the page's
-    // max-w-7xl caps overall width. Consistent gap at every size.
+    // to the page margins.
     return (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {cards}

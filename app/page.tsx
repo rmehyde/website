@@ -18,7 +18,7 @@ import {scale} from "@/app/lib/typography";
 export default async function Home() {
     return (
         <div className="min-h-screen flex flex-col justify-center sm:pl-8">
-            <div className="max-w-xl">
+            <div className="max-w-md md:max-w-xl">
                 <div className={scale.splash}>
                     {"Hi, I'm Reese."}
                 </div>

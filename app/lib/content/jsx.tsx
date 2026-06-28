@@ -24,7 +24,7 @@ export function generateContentElements(
                 <p>{detail.trim()}</p>
 
                 {links && links.length > 0 && (
-                    <p>
+                    <p className="mt-1.5">
                         {links.map((link, i) => {
                             const label =
                                 i === 0
