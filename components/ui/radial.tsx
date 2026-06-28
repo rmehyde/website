@@ -8,7 +8,7 @@ import {
 } from "d3-shape";
 import { transition } from "d3-transition";
 import { interpolate } from "d3-interpolate";
-import { easeCubicOut } from "d3-ease";
+import { easeCubicOut, easeCubicInOut, easeSinInOut, easeQuadInOut } from "d3-ease";
 import React, {useState, useRef, useEffect, useCallback} from "react";
 import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
@@ -44,55 +44,34 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
     const [activeDim, setActiveDim] = useState<string | null>(null);
     const svgRef = useRef<SVGSVGElement>(null);
 
-    // Transition state management
+    // displayValues is what actually gets drawn. It tracks the `values` prop, but the tracking is
+    // animated: when the target changes we ease displayValues toward it frame by frame.
     const [displayValues, setDisplayValues] = useState<Record<string, number>>(values);
-    const transitionRef = useRef<any>(null);
 
-    // Transition animation function using D3
-    const startTransition = useCallback((fromValues: Record<string, number>, toValues: Record<string, number>) => {
-        if (!transitionDuration || transitionDuration <= 0) {
-            // No transition - set immediately
-            setDisplayValues(toValues);
-            return;
-        }
+    // Live mirrors of state the transition effect needs to READ but must not DEPEND on:
+    //  • displayValues is rewritten every animation frame by the running tween. If the effect
+    //    depended on it, each frame would re-run the effect and restart the transition — a fresh
+    //    50ms ease from the current point every ~16ms, which never actually completes (and so
+    //    onTransitionEnd never fires). Reading the position from a ref lets one transition run
+    //    start-to-finish.
+    //  • activeDim says a handle is mid-drag. Reading it from a ref (not a dep) means releasing a
+    //    handle doesn't re-run the effect, so a finished drag never kicks off a stray settle.
+    const displayValuesRef = useRef(displayValues);
+    displayValuesRef.current = displayValues;
+    const activeDimRef = useRef(activeDim);
+    activeDimRef.current = activeDim;
 
-        // Cancel any existing transition by setting a flag
-        if (transitionRef.current) {
-            transitionRef.current.cancelled = true;
-        }
+    // Latest transition callbacks, read via ref so startTransition stays referentially stable even
+    // when a parent passes fresh inline handlers each render.
+    const onTransitionStartRef = useRef(onTransitionStart);
+    onTransitionStartRef.current = onTransitionStart;
+    const onTransitionEndRef = useRef(onTransitionEnd);
+    onTransitionEndRef.current = onTransitionEnd;
 
-        onTransitionStart?.();
+    const transitionRef = useRef<{ cancelled: boolean } | null>(null);
 
-        // Create interpolator for the values object
-        const valuesInterpolator = interpolate(fromValues, toValues);
-
-        // Create transition state object
-        const transitionState = { cancelled: false };
-        transitionRef.current = transitionState;
-
-        // Create D3 transition
-        const t = transition()
-            .duration(transitionDuration)
-            .ease(easeCubicOut);
-
-        // Apply the transition
-        t.tween('values', () => {
-            return (progress: number) => {
-                // Check if this transition was cancelled
-                if (transitionState.cancelled) return;
-
-                setDisplayValues(valuesInterpolator(progress));
-            };
-        }).on('end', () => {
-            if (!transitionState.cancelled) {
-                transitionRef.current = null;
-                setDisplayValues(toValues); // Ensure exact final values
-                onTransitionEnd?.();
-            }
-        });
-    }, [transitionDuration, onTransitionStart, onTransitionEnd]);
-
-    // Cancel any active transition
+    // Stop any in-flight transition. Its tween/end callbacks captured this same object, so flipping
+    // `cancelled` makes them no-op on their next frame.
     const cancelTransition = useCallback(() => {
         if (transitionRef.current) {
             transitionRef.current.cancelled = true;
@@ -100,14 +79,57 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         }
     }, []);
 
-    // Detect when values prop changes and start transition
+    // Animate displayValues from a start point to a target with a single D3 transition.
+    const startTransition = useCallback((fromValues: Record<string, number>, toValues: Record<string, number>) => {
+        cancelTransition();
+
+        // Identity transition: nothing to animate (mount, or a target equal to where we already
+        // sit), so just stay put — no tween, no start/end events for a move that isn't happening.
+        if (Object.keys(toValues).every(k => fromValues[k] === toValues[k])) return;
+
+        onTransitionStartRef.current?.();
+        const valuesInterpolator = interpolate(fromValues, toValues);
+        const run = transitionRef.current = { cancelled: false };
+
+        // TEMP DIAGNOSTIC — how many frames actually render per transition, and the eased
+        // progress + wall-clock at each tick. Remove once we've characterized the snap.
+        const t0 = performance.now();
+        let ticks = 0;
+
+        transition()
+            .duration(transitionDuration!)
+            .ease(easeQuadInOut)
+            .tween('values', () => (progress: number) => {
+                if (run.cancelled) return;
+                ticks++;
+                console.log(`[radial] tick ${ticks}  t=${progress.toFixed(3)}  +${(performance.now() - t0).toFixed(0)}ms`);
+                // d3's object interpolator mutates and returns ONE shared object every tick, so
+                // passing it straight to setState is reference-equal → React bails → no repaint
+                // until `end` (which passes a different ref) snaps to the target. Spread to a fresh
+                // object each frame so every tick actually renders.
+                setDisplayValues({...valuesInterpolator(progress)});
+            })
+            .on('end', () => {
+                if (run.cancelled) return;
+                console.log(`[radial] END  ${ticks} ticks  ${(performance.now() - t0).toFixed(0)}ms  dur=${transitionDuration}`);
+                transitionRef.current = null;
+                setDisplayValues(toValues); // land exactly on target
+                onTransitionEndRef.current?.();
+            });
+    }, [transitionDuration, cancelTransition]);
+
+    // Reconcile displayValues toward the `values` prop whenever the TARGET (or the duration)
+    // changes — once per real change, not once per frame. Animate when a duration is set and no
+    // handle is being dragged; otherwise jump (1:1 pointer tracking during a drag, or instant when
+    // transitions are disabled). Releasing a handle changes neither dep, so it triggers nothing.
     useEffect(() => {
-        if (transitionDuration && transitionDuration > 0) {
-            startTransition(displayValues, values);
+        if (transitionDuration && transitionDuration > 0 && !activeDimRef.current) {
+            startTransition(displayValuesRef.current, values);
         } else {
+            cancelTransition();
             setDisplayValues(values);
         }
-    }, [values, transitionDuration, startTransition, displayValues]);
+    }, [values, transitionDuration, startTransition, cancelTransition]);
 
     const dimensions = Object.keys(dimensionLabels);
 

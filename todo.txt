@@ -10,6 +10,9 @@
 - new pages content
 - label renames (devops + data analytics)
 - footer (copyright + links)
+- projects cleanup
+    - change website link to about page
+    - nicer traffic race screens page
 - icon
 - finish resume
 	- profile seniority

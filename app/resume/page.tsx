@@ -238,7 +238,7 @@ export default function DynamicResume() {
                         max={maxScore}
                         onChange={handleWeightsChange}
                         onComplete={handleWeightsComplete}
-                        transitionDuration={mode === 'intro' && !prefersReducedMotion ? 50 : undefined}
+                        transitionDuration={prefersReducedMotion ? undefined : 120}
                     />
                 </div>
             </div>

@@ -210,15 +210,13 @@ export default function PDFComponent({onWeightsComplete}: {
                 )}
             </div>
 
-            {/* Inline unlock affordance: same UnlockForm as the Contact page, wrapped in a modal.
-                Shown only while contact info is masked. Placeholder placement/copy — UX to follow. */}
             {locked && (
                 <div className="flex justify-center mb-8">
                     <Dialog open={unlockOpen} onOpenChange={setUnlockOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                                 <Lock className="mr-2 h-4 w-4"/>
-                                Contact details are hidden — unlock
+                                Unhide Contact Details
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[400px]">
