@@ -22,10 +22,8 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <html lang="en" className={`${roboto.variable} font-sans`}>
             <body>
                 <div className="min-h-screen max-w-7xl m-auto px-4 sm:px-12 flex flex-col">
-                    <header className="pt-4 pb-8 md:pt-6 md:pb-20">
-                        <NavigationHeader/>
-                    </header>
-                    <main className="grow">
+                    <NavigationHeader/>
+                    <main className="grow flex flex-col">
                         {children}
                     </main>
                     <SiteFooter/>
