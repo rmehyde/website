@@ -6,12 +6,10 @@ detail: A Google Cardboard mobile VR game in which players on a local network ra
 links:
   - tag: apk
     detail: Download the Android APK
-    # TODO: make secure once working
-    target: http://rmehyde.com/assets/trafficrace.apk
+    target: https://rmehyde.com/assets/trafficrace.apk
   - tag: screenshots
     detail: Check out some screenshots
-    # TODO: make secure once working
-    target: http://rmehyde.com/trafficracescreens.html
+    target: https://rmehyde.com/trafficracescreens.html
 scores:
   frontend: 5
   backend: 2

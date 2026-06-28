@@ -11,8 +11,7 @@ links:
     target: https://github.com/rmehyde/website
   - tag: site
     detail: Visit the site
-    # TODO: make secure once working
-    target: http://rmehyde.com/
+    target: https://rmehyde.com/
 scores:
   frontend: 5
   libs-tooling: 2
