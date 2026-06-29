@@ -5,6 +5,7 @@
 	- pass of all profiles content + 1page
 
 - icon
+    - make cap media-dynamic too
 
 - work through code todos
 - maybe tune number of profile wheel passes
