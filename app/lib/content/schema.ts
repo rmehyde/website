@@ -64,15 +64,19 @@ export const TechnicalSkillSchema = BaseContentSchema.extend({
 });
 export type TechnicalSkill = z.infer<typeof TechnicalSkillSchema>;
 
+export type Duty = BaseContent & {
+    contentType: "duty";
+    subduties: Duty[];
+};
+
 export const DutySchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.duty),
     // TODO: add a projects matcher/exclusion
     //   I think this means excluding things from being listed in both Projects and Duties? wrote it awhile ago
-    get subduties() {
+    get subduties(): z.ZodDefault<z.ZodArray<z.ZodType<Duty>>> {
         return z.array(DutySchema).default([])
     }
 });
-export type Duty = z.infer<typeof DutySchema>;
 
 export const JobSchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.job),

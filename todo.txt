@@ -8,7 +8,11 @@
     - make cap media-dynamic too
 
 - work through code todos
-- maybe tune number of profile wheel passes
+
+- tweaks
+    - maybe tune number of profile wheel passes
+    - lil more spacing between links on homepage
+    - animations run as we hit it on profile scroll, needs to be a lil earlier
 
 - impl quality pass/cleanup
     - structure: lib/component/package/etc

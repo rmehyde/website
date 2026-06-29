@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-    output: 'standalone',
+    output: 'export',
 
     webpack(config, { isServer }) {
         config.resolve.fallback = {
