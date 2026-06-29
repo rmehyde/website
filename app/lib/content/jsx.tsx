@@ -1,6 +1,6 @@
 import React from 'react'
 import { DynamicIcon } from "lucide-react/dynamic";
-import {Content} from './schema'
+import {Content, Link as LinkData} from './schema'
 import {H1, Link} from "@/app/ui/cards/markdown-elements";
 import {scale} from "@/app/lib/typography";
 
@@ -23,7 +23,7 @@ export function generateContentElements(
 
                 {links && links.length > 0 && (
                     <p className="mt-1.5">
-                        {links.map((link, i) => {
+                        {links.map((link: LinkData, i: number) => {
                             const label =
                                 i === 0
                                     ? link.detail
