@@ -102,7 +102,6 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             .tween('values', () => (progress: number) => {
                 if (run.cancelled) return;
                 ticks++;
-                console.log(`[radial] tick ${ticks}  t=${progress.toFixed(3)}  +${(performance.now() - t0).toFixed(0)}ms`);
                 // d3's object interpolator mutates and returns ONE shared object every tick, so
                 // passing it straight to setState is reference-equal → React bails → no repaint
                 // until `end` (which passes a different ref) snaps to the target. Spread to a fresh
@@ -111,7 +110,6 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
             })
             .on('end', () => {
                 if (run.cancelled) return;
-                console.log(`[radial] END  ${ticks} ticks  ${(performance.now() - t0).toFixed(0)}ms  dur=${transitionDuration}`);
                 transitionRef.current = null;
                 setDisplayValues(toValues); // land exactly on target
                 onTransitionEndRef.current?.();

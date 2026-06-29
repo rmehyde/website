@@ -97,7 +97,6 @@ export default function DynamicResume() {
 
     // Exit intro mode and transition to interactive
     const exitIntro = (reason: 'auto' | 'user') => {
-        console.log(`Exiting intro mode: ${reason}`);
         setMode('interactive');
         setPreviewProfile(selectedProfile);
         setPreviewWeights(committedWeights);

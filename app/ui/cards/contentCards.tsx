@@ -22,7 +22,6 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
                     {generateContentElements(c)}
                 </div>
             ))
-            console.log(items)
             if (!cancelled) setCards(items)
         }
 

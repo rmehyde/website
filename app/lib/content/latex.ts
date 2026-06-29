@@ -22,7 +22,6 @@ export function escapeLatex(str: string): string {
 
 export function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): string {
     if (links === undefined || links.length === 0) {
-        console.log("no links", links)
         return ""
     }
     switch (verbosity) {
@@ -146,7 +145,6 @@ export function projectsAndOssToLatex(content: ContentByType) {
             \par\noindent
             `)
         : ""
-    console.log(projectsContent, ossContent)
     return projectsContent + maybeSeparator + ossContent;
 }
 

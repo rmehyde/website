@@ -162,7 +162,6 @@ export default function ProfileSelector({
                     offset: totalDuration > 0 ? cumulativeTime / totalDuration : 0
                 }));
                 for (const rt of rockTimings) {
-                    console.log("rt ", rt);
                     keyframes.push({
                         transform: `translateY(-${(lastStepIndex + rt.travelDistanceInRows) * rowSizePx}px)`,
                         offset: totalDuration > 0 ? rt.cumulativeTime / totalDuration : 0
@@ -187,10 +186,6 @@ export default function ProfileSelector({
             setCenteringOffset(centeringOffsetPx);
             
             const animationData = generateAnimationData(elementHeight + gapHeight);
-            
-            console.log('Starting animation with keyframes:', animationData.keyframes);
-            console.log('Total duration:', animationData.totalDuration);
-            console.log("Animation data: ", animationData);
             
             // Set up discrete preview profile updates
             const timeouts: NodeJS.Timeout[] = [];
@@ -220,7 +215,6 @@ export default function ProfileSelector({
             animation.onfinish = () => {
                 setIsAnimating(false);
                 onIntroComplete();
-                console.log(`Intro complete, selected: ${selectedProfile}`);
             };
             
             return () => {
@@ -235,7 +229,6 @@ export default function ProfileSelector({
 
     const handleSelectChange = (value: string) => {
         onProfileChange(value);
-        console.log(`Selected: ${value}`);
     };
     
     const handleUserIntent = () => {

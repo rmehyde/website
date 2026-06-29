@@ -9,11 +9,13 @@
 
 - impl quality pass/cleanup
     - structure: lib/component/package/etc
-	- ts-ignore
-	- console.log()s
-	- drop old pages
-	- drop dead libs/plumbing (JSX/MD etc)
+        - file naming
 	- what needs to get bundled vs not, be in public vs not, etc.
+	[DONE] - console.log()s
+	[DONE] - ts-ignore
+	[DONE] - drop old pages
+	[DONE] - drop dead libs/plumbing (JSX/MD etc)
+
 - public folder listing (index so you can see it)
 - ship :)
     - ensure /spend gets shipped too

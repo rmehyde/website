@@ -26,7 +26,6 @@ let xetexEngine: XeTeXEngine, dviEngine: DvipdfmxEngine;
 
 export const initializeLatexEngines = async () => {
     try {
-        console.log("Initializing latex engines...");
         if (!xetexEngine) {
             xetexEngine = new XeTeXEngine();
             await xetexEngine.loadEngine("/lib/swiftlatex/swiftlatexxetex.js");
@@ -35,7 +34,6 @@ export const initializeLatexEngines = async () => {
             dviEngine = new DvipdfmxEngine();
             await dviEngine.loadEngine("/lib/swiftlatex/swiftlatexdvipdfm.js");
         }
-        console.log("Engines loaded");
     } catch (e) {
         console.error("Engine initialization failed:", e);
         throw e;
@@ -103,7 +101,6 @@ export default function PDFComponent({onWeightsComplete}: {
             let latex: string;
             try {
                 latex = generateResumeLatex(weightsToRender, contactRef.current);
-                console.log("LaTeX generated", latex);
             } catch (e) {
                 throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) };
             }
