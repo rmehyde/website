@@ -96,7 +96,7 @@ export default function DynamicResume() {
     }, [committedWeights, mode]);
 
     // Exit intro mode and transition to interactive
-    const exitIntro = (reason: 'auto' | 'user') => {
+    const exitIntro = (_reason: 'auto' | 'user') => {
         setMode('interactive');
         setPreviewProfile(selectedProfile);
         setPreviewWeights(committedWeights);

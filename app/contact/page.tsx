@@ -13,7 +13,6 @@ import {scale} from "@/app/lib/typography";
 import {Collapsible, CollapsibleTrigger, CollapsibleContent} from "@/components/ui/collapsible";
 import {CopyPageBody, CopyPageContent} from "@/app/ui/copyPage";
 import {Separator} from "@/components/ui/separator";
-import {cn} from "@/components/lib/utils";
 import {H1} from "@/app/ui/sectionHeaders";
 
 export default function ContactPage() {

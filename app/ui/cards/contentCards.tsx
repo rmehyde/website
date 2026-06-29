@@ -6,7 +6,6 @@ import {generateContentElements} from "@/app/lib/content/jsx";
 import {getFilteredAndSortedContent, groupContentByType} from "@/app/lib/content/load";
 import {loadAllContent} from "@/app/lib/content/content-io";
 import {ContentTypeEnum} from "@/app/lib/content/schema";
-import {Card} from "@/components/ui/card";
 
 export default function ContentCards({ weights }: { weights: DimensionScores }) {
     const [cards, setCards] = useState<React.JSX.Element[] | null>(null)

@@ -1,7 +1,5 @@
 "use client"
 import {usePathname} from 'next/navigation'
-import {scale} from "@/app/lib/typography";
-import {cn} from "@/components/lib/utils";
 import {GITHUB_URL, LINKEDIN_URL} from "@/app/contact/content";
 
 // Brand glyphs are inlined (not bundled as files) so they inherit the surrounding

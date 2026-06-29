@@ -1,16 +1,11 @@
 import {
     lineRadial,
-    curveLinear,
-    curveLinearClosed,
     curveCardinalClosed,
-    curveCatmullRomClosed,
-    curveBundle,
 } from "d3-shape";
 import { transition } from "d3-transition";
 import { interpolate } from "d3-interpolate";
-import { easeCubicOut, easeCubicInOut, easeSinInOut, easeQuadInOut } from "d3-ease";
+import { easeQuadInOut } from "d3-ease";
 import React, {useState, useRef, useEffect, useCallback} from "react";
-import {Card} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {scale} from "@/app/lib/typography";
 
@@ -91,17 +86,11 @@ export const RadialSelector: React.FC<RadialSelectorProps> = ({
         const valuesInterpolator = interpolate(fromValues, toValues);
         const run = transitionRef.current = { cancelled: false };
 
-        // TEMP DIAGNOSTIC — how many frames actually render per transition, and the eased
-        // progress + wall-clock at each tick. Remove once we've characterized the snap.
-        const t0 = performance.now();
-        let ticks = 0;
-
         transition()
             .duration(transitionDuration!)
             .ease(easeQuadInOut)
             .tween('values', () => (progress: number) => {
                 if (run.cancelled) return;
-                ticks++;
                 // d3's object interpolator mutates and returns ONE shared object every tick, so
                 // passing it straight to setState is reference-equal → React bails → no repaint
                 // until `end` (which passes a different ref) snaps to the target. Spread to a fresh

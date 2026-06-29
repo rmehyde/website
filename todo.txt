@@ -4,13 +4,16 @@
 	- new bullets (microservices, deploy, etc)
 	- pass of all profiles content + 1page
 
-
 - icon
+
+- work through code todos
+- maybe tune number of profile wheel passes
 
 - impl quality pass/cleanup
     - structure: lib/component/package/etc
         - file naming
 	- what needs to get bundled vs not, be in public vs not, etc.
+	[DONE] - unused imports
 	[DONE] - console.log()s
 	[DONE] - ts-ignore
 	[DONE] - drop old pages

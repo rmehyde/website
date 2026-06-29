@@ -10,9 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {Dimension, dimensionLabels} from "@/app/lib/content/scoring";
 import { useState, useEffect, useRef, useMemo } from "react";
-import {ArrowRight} from "lucide-react";
 import {cn} from "@/components/lib/utils";
 import {scale} from "@/app/lib/typography";
 

@@ -1,5 +1,4 @@
 import {z} from "zod/v4";
-import type {Content} from "./schema";
 
 export const maxScore = 5
 

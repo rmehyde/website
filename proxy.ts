@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function proxy(_request: NextRequest) {
     const res = NextResponse.next();
 
     res.headers.set("Cross-Origin-Opener-Policy", "same-origin");

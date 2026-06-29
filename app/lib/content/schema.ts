@@ -1,4 +1,3 @@
-import {parse as parseYaml} from "yaml";
 import {z} from "zod/v4";
 import {dimensionScoresSchema} from "@/app/lib/content/scoring";
 

@@ -15,8 +15,7 @@ const eslintConfig = [
   // We turn those specific rules off rather than refactor working, deliberate code; the
   // classic rules-of-hooks and exhaustive-deps stay on.
   ...nextCoreWebVitals.map((c) => {
-    if (!c.rules) return c;
-    const rules = { ...c.rules };
+    const rules = { ...(c.rules || {}) };
     let changed = false;
     if ("react/no-unescaped-entities" in rules) {
       // Allow apostrophes/quotes in prose; still forbid bare > and } (prior override).
@@ -28,6 +27,15 @@ const eslintConfig = [
         rules[r] = "off";
         changed = true;
       }
+    }
+    // Flag unused vars/imports (warn). Added to the object that owns the
+    // @typescript-eslint plugin so the rule's plugin stays in scope; `_`-prefix opts out.
+    if (c.plugins && c.plugins["@typescript-eslint"]) {
+      rules["@typescript-eslint/no-unused-vars"] = [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
+      ];
+      changed = true;
     }
     return changed ? { ...c, rules } : c;
   }),
