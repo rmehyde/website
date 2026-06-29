@@ -200,7 +200,7 @@ export default function PDFComponent({onWeightsComplete}: {
     return (
         <div>
             {(renderState === 'idle' && !error) ? (
-                <div className="flex flex-wrap items-center justify-center gap-12 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-8">
                     {locked && (
                         <Dialog open={unlockOpen} onOpenChange={setUnlockOpen}>
                             <DialogTrigger asChild>

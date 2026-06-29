@@ -1,7 +1,7 @@
 import React from 'react'
-// import { DynamicIcon } from "lucide-react/dynamic";
+import { DynamicIcon } from "lucide-react/dynamic";
 import {Content} from './schema'
-import {H1, Link} from "@/app/ui/cards/markdown-elements"; // wherever your Content type lives
+import {H1, Link} from "@/app/ui/cards/markdown-elements";
 import {scale} from "@/app/lib/typography";
 
 
@@ -12,11 +12,9 @@ export function generateContentElements(
         <>
             <H1
                 className="m-0 pb-0 inline-flex items-center gap-2"
-                prefix={null}
-                /* TODO: RESTORE*/
-                // prefix={
-                //     icon ? <DynamicIcon name={icon as any}/> : null
-                // }
+                prefix={
+                    icon ? <DynamicIcon name={icon as any}/> : null
+                }
             >
                 {title}
             </H1>

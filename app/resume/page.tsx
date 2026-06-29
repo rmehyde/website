@@ -214,10 +214,7 @@ export default function DynamicResume() {
 
     return (
         <div>
-            {/* Content-driven layout: flex-wrap keeps the selector + graph side-by-side as a
-                centered pair while they fit on one line, and stacks them (each centered) when they
-                don't — no JS, no breakpoint. The graph wrapper shrinks to its content so the whole
-                pair stays centered; making it flex-1 would pin the selector to the left edge. */}
+            {/* fit-or-stack via flex-wrap */}
             <div className="flex flex-wrap items-center justify-center md:gap-10 pb-12">
                 <ProfileSelector
                     mode={mode}

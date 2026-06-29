@@ -23,7 +23,7 @@ export function ContactIntro() {
                 >
                     on LinkedIn
                 </a>{" "}
-                I'll be happy to share it. Or if you have the passphrase, you can reveal it below.
+                I'll be happy to share it there. Or if you have the passphrase, you can reveal it below.
             </p>
             <p>
                 If you're thinking of reaching out about a role, the{" "}

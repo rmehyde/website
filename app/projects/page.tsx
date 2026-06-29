@@ -6,10 +6,6 @@ import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";
 import {scale} from "@/app/lib/typography";
 
-// The Projects graph intentionally exposes a subset of the résumé's dimensions —
-// Leadership and Solutions & Integration aren't useful filters for project cards.
-// Hidden dimensions never appear in the graph or in `values`; dimensionScoresSchema
-// defaults them to 0 on parse, so everything downstream is identical to the full set.
 const PROJECT_HIDDEN_DIMENSIONS: Dimension[] = ["leadership", "solutions"];
 const projectDimensionLabels = Object.fromEntries(
     Object.entries(dimensionLabels).filter(([dim]) => !PROJECT_HIDDEN_DIMENSIONS.includes(dim as Dimension))
@@ -48,10 +44,7 @@ export default function DynamicProjects() {
             </div>
             </div>
             {/* content cards re-sort based on those weights */}
-            {}
             <ContentCards weights={dimensionScoresSchema.parse(values)} />
-            {/* TODO: use a global footer */}
-            <div className="h-20"/>
         </div>
     )
 }
