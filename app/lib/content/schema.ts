@@ -1,5 +1,5 @@
 import {parse as parseYaml} from "yaml";
-import {z, ZodArray, ZodTypeAny} from "zod/v4";
+import {z} from "zod/v4";
 import {dimensionScoresSchema} from "@/app/lib/content/scoring";
 
 
@@ -69,8 +69,7 @@ export const DutySchema = BaseContentSchema.extend({
     contentType: z.literal(ContentTypeEnum.enum.duty),
     // TODO: add a projects matcher/exclusion
     //   I think this means excluding things from being listed in both Projects and Duties? wrote it awhile ago
-    get subduties(): ZodArray<ZodTypeAny>{
-        // @ts-ignore
+    get subduties() {
         return z.array(DutySchema).default([])
     }
 });

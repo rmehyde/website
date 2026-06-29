@@ -104,7 +104,6 @@ function jobDutyToLatex(duty: Duty): string {
     const lines = [`  \\item ${escapeLatex(duty.summary)}` + (links ? "~" + links : "")]
     if (duty.subduties.length > 0) {
         lines.push("\\begin{itemize}")
-        // @ts-ignore
         lines.push(...duty.subduties.map(jobDutyToLatex));
         lines.push("\\end{itemize}")
     }
