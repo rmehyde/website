@@ -17,10 +17,10 @@
 - redeploy spend explorer on subdomain (spend.rmehyde.com)
 
 - impl quality pass/cleanup
-    [DONE] - structure: lib/component/package/etc
-        [DONE] - file naming
 	- what needs to get bundled vs not, be in public vs not, etc.
-	- properly vendor TexLive-Ondemand lib
+	[DONE] - structure: lib/component/package/etc
+            [DONE] - file naming
+	[DONE] - properly vendor/copy TexLive-Ondemand lib and emscripten
 	[DONE] - unused imports
 	[DONE] - console.log()s
 	[DONE] - ts-ignore
