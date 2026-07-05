@@ -14,10 +14,11 @@
     - lil more spacing between links on homepage
     - animations run as we hit it on profile scroll, needs to be a lil earlier
 
+- redeploy spend explorer on subdomain (spend.rmehyde.com)
 
 - impl quality pass/cleanup
-    - structure: lib/component/package/etc
-        - file naming
+    [DONE] - structure: lib/component/package/etc
+        [DONE] - file naming
 	- what needs to get bundled vs not, be in public vs not, etc.
 	- properly vendor TexLive-Ondemand lib
 	[DONE] - unused imports
