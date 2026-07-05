@@ -13,7 +13,7 @@ import { parseProfiles, Profile } from "@/app/lib/content/profiles";
 import { Content } from "@/app/lib/content/schema";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CONTENT_DIR = join(ROOT, "public", "content");
+const CONTENT_DIR = join(ROOT, "content");
 const TEMPLATE_PATH = join(ROOT, "app", "templates", "resume.tex.mustache");
 const PROFILES_PATH = join(CONTENT_DIR, "profiles.yaml");
 

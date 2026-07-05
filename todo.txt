@@ -14,10 +14,15 @@
     - lil more spacing between links on homepage
     - animations run as we hit it on profile scroll, needs to be a lil earlier
 
-- redeploy spend explorer on subdomain (spend.rmehyde.com)
 
-- impl quality pass/cleanup
-	- what needs to get bundled vs not, be in public vs not, etc.
+- ship :)
+    - ensure /spend gets shipped too
+        - redeploy spend explorer on subdomain (spend.rmehyde.com)
+
+
+[WONT] - public folder listing (index so you can see it)
+[DONE] - impl quality pass/cleanup
+	[DONE] - what needs to get bundled vs not, be in public vs not, etc.
 	[DONE] - structure: lib/component/package/etc
             [DONE] - file naming
 	[DONE] - properly vendor/copy TexLive-Ondemand lib and emscripten
@@ -26,13 +31,6 @@
 	[DONE] - ts-ignore
 	[DONE] - drop old pages
 	[DONE] - drop dead libs/plumbing (JSX/MD etc)
-
-- public folder listing (index so you can see it)
-- ship :)
-    - ensure /spend gets shipped too
-
-
-
 [DONE] - projects cleanup
     [DONE] - change website link to about page
     [DONE] - nicer traffic race screens page

@@ -15,7 +15,7 @@ import resumeTemplate from "@/app/templates/resume.tex.mustache";
 // load all .yaml/.yml content files (excluding the root profiles.yaml) as validated Content
 export function loadAllContent(): Content[] {
     const contentModules = (require as any).context(
-        '@/public/content',
+        '@/content',
         true,
         /\.\/.+\/.+\.(?:ya?ml)$/
     )
@@ -29,10 +29,10 @@ export function getResumeTemplate(): string {
     return resumeTemplate
 }
 
-// load exactly /public/content/profiles.yaml (or .yml)
+// load exactly /content/profiles.yaml (or .yml)
 function loadRawProfiles(): unknown {
     const profilesModule = (require as any).context(
-        "@/public/content",
+        "@/content",
         false,
         /^\.\/profiles\.ya?ml$/
     )
