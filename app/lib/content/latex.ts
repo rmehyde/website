@@ -91,8 +91,10 @@ export function projectsToLatex(
 
 function isoDateToString(isoDate: string): string {
     const [year, month] = isoDate.split("-").map(Number);
-    const monthName = new Date(0, month - 1).toLocaleString("en", { month: "short" });
-    return `${monthName}. ${year}`;
+    const monthNameShort = new Date(0, month - 1).toLocaleString("en", { month: "short" });
+    const monthNameLong = new Date(0, month - 1).toLocaleString("en", { month: "long" });
+    const monthName = monthNameShort + (monthNameShort == monthNameLong ? "" : ".")
+    return `${monthName} ${year}`;
 }
 
 
@@ -114,8 +116,7 @@ export function jobToLatex(job: Job): string {
     const titleString = rolesString + ", " + job.company;
     const startString = isoDateToString(job.start);
     const endString = job.end ? isoDateToString(job.end) : "Present";
-    // TODO: space before em dash is larger than after
-    const locTimeString = `${job.location} \\textemdash~ {${startString}}\\textendash{${endString}}`;
+    const locTimeString = `${job.location}~~\\textemdash~~{${startString}}\\textendash{${endString}}`;
     // TODO: larger font, spacing
     const header = `\\textbf{${titleString} \\hfill ${locTimeString}}`
     const items = job.duties.map(jobDutyToLatex).join('\n');
@@ -136,12 +137,11 @@ export function projectsAndOssToLatex(content: ContentByType) {
         true
     );
     const maybeSeparator = (projectsContent.length > 0 && ossContent.length > 0)
-        // TODO: the second vspace isn't doing anything?
         ? dedent(String.raw`
-            \vspace{-.5em}
+            \vspace{-.25em}
             \par\noindent
             \makebox[\linewidth][c]{\rule{0.25\linewidth}{0.75pt}}
-            \vspace{-1.25em}
+            \vspace{-1em}
             \par\noindent
             `)
         : ""

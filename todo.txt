@@ -5,7 +5,7 @@
 	- pass of all profiles content + 1page
 
 - icon
-    - make cap media-dynamic too
+    - make logo cap media-dynamic too
 
 - work through code todos
 
@@ -14,10 +14,12 @@
     - lil more spacing between links on homepage
     - animations run as we hit it on profile scroll, needs to be a lil earlier
 
+
 - impl quality pass/cleanup
     - structure: lib/component/package/etc
         - file naming
 	- what needs to get bundled vs not, be in public vs not, etc.
+	- properly vendor TexLive-Ondemand lib
 	[DONE] - unused imports
 	[DONE] - console.log()s
 	[DONE] - ts-ignore
@@ -27,6 +29,7 @@
 - public folder listing (index so you can see it)
 - ship :)
     - ensure /spend gets shipped too
+
 
 
 [DONE] - projects cleanup
@@ -44,6 +47,9 @@
 	[DONE] - cleanup contact buttons
 	[DONE] - write contact page
 	[DONE] - update email, remove mailto:
+[DONE] - optimize size
+    [DONE] - remove redundant .fmt file
+    [WONT] - maybe move apk and/or subwaymap elsewhere
 
 
 
