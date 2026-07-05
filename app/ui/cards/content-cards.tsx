@@ -17,7 +17,8 @@ export default function ContentCards({ weights }: { weights: DimensionScores }) 
         let cancelled = false
 
         function load() {
-            const allContent = getFilteredAndSortedContent(loadAllContent(), weights)
+            const projects = loadAllContent().filter(c => c.contentType === ContentTypeEnum.enum.project)
+            const allContent = getFilteredAndSortedContent(projects, weights)
             const content = groupContentByType(allContent)[ContentTypeEnum.enum.project];
             const items = content.map(c => (
                 <div key={c.title}>

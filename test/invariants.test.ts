@@ -19,7 +19,7 @@ const VALID_DIMS = new Set<string>(Dimension.options);
 const RESUME_LINE_BUDGET = 14;
 const CONTACT = { email: "you@example.com", phone: "+1 (555) 555-5555" };
 
-const CONTENT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "content");
+const CONTENT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "content");
 
 // recursively collect every `scores` object found in a parsed YAML tree
 function collectScoresKeys(node: unknown, keys: Set<string>): void {

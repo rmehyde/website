@@ -15,10 +15,10 @@ scores:
   libs-tooling: 3
   ml: 3
   data-eng: 1
-# TODO: need exclusion with project so that only one shows up?
 duties:
   - title: Novel RiCSR SpMV CUDA Algorithm
     contentType: duty
+    excludeProject: RiCSR SpMV
     summary: Created novel CUDA algorithm for optimizing sparse matrix-vector multiplication across multiple GPUs
     detail:
       A research project exploring sparse matrix-vector multiplication using the novel Ribboned Compressed Sparse Row 

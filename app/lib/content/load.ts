@@ -1,5 +1,5 @@
 import {DimensionScores, scoreContentAbsolute, scoreContentComposite, scoreContentCosine} from "@/app/lib/content/scoring";
-import {ContentSchema, Content, ContentByType, ContentTypeEnum, Job, Duty} from "@/app/lib/content/schema";
+import {ContentSchema, Content, ContentByType, ContentTypeEnum, Job, Duty, Project} from "@/app/lib/content/schema";
 
 // parse one loaded module's contents (single object or array) into validated Content.
 //   shared by every content adapter (webpack require.context, fs-based tests) so the
@@ -227,11 +227,20 @@ export function selectJobDuties(
     return { jobs: selectedJobs, trace }
 }
 
+// extract project names to exclude because they're already covered by job duties
+function dutyExcludeRefs(duties: Duty[]): string[] {
+    return duties.flatMap(duty => [
+        ...(duty.excludeProject ? [duty.excludeProject] : []),
+        ...dutyExcludeRefs((duty.subduties ?? []) as Duty[]),
+    ])
+}
+
 export function getFilteredAndSortedContent(
     allContent: Content[],
     weights: DimensionScores,
     lineBudget?: number,
-    thresholdOverrides: Record<string, number> = {}
+    thresholdOverrides: Record<string, number> = {},
+    excludeCoveredProjects: boolean = true
 ): Content[] {
     const jobs = allContent.filter((c): c is Job => c.contentType === ContentTypeEnum.enum.job)
     const nonJobs = allContent.filter(c => c.contentType !== ContentTypeEnum.enum.job)
@@ -244,7 +253,31 @@ export function getFilteredAndSortedContent(
         ? selectJobDuties(jobs, weights, lineBudget).jobs
         : jobs.map(job => withSortedDuties(job, weights))
 
-    return [...selectedJobs, ...sortedNonJobs]
+    // exclude project covered by duties, unless caller asked us to skip it
+    if (!excludeCoveredProjects) {
+        return [...selectedJobs, ...sortedNonJobs]
+    }
+
+    // confirm all set excludeProject fields map to a valid project name
+    const projectTitles = new Set(
+        allContent
+            .filter((c): c is Project => c.contentType === ContentTypeEnum.enum.project)
+            .map(p => p.title)
+    )
+    for (const ref of dutyExcludeRefs(jobs.flatMap(job => job.duties as Duty[]))) {
+        if (!projectTitles.has(ref)) {
+            throw new Error(
+                `duty excludeProject "${ref}" does not match any project title`
+            )
+        }
+    }
+
+    const covered = new Set(dutyExcludeRefs(selectedJobs.flatMap(job => job.duties as Duty[])))
+    const dedupedNonJobs = sortedNonJobs.filter(
+        c => !(c.contentType === ContentTypeEnum.enum.project && covered.has(c.title))
+    )
+
+    return [...selectedJobs, ...dedupedNonJobs]
 }
 
 export function groupContentByType(content: Content[]): ContentByType {
