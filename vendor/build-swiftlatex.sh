@@ -25,8 +25,20 @@ PUBLIC_FILES=(
   "xetex.wasm/swiftlatexxetex.wasm"
 )
 
-# load emscripten env
-source "$HOME/Projects/emsdk/emsdk_env.sh"
+# Load a pinned emscripten toolchain from the vendored emsdk submodule (vendor/emsdk).
+# The emsdk repo is just installer scripts; `emsdk install` downloads the actual toolchain
+# into vendor/emsdk (gitignored by emsdk), so it's fetched once per machine, not committed.
+# Pin the version deliberately: emsdk's "latest" has since moved to 6.x, but the committed
+# engines were built with 4.0.21 — building against a newer emscripten can change the WASM.
+EMSDK_VERSION="4.0.21"
+EMSDK_DIR="$SCRIPT_DIR/emsdk"
+if [[ ! -x "$EMSDK_DIR/emsdk" ]]; then
+  echo "error: vendored emsdk missing — run: git submodule update --init vendor/emsdk" >&2
+  exit 1
+fi
+"$EMSDK_DIR/emsdk" install "$EMSDK_VERSION"
+"$EMSDK_DIR/emsdk" activate "$EMSDK_VERSION"
+source "$EMSDK_DIR/emsdk_env.sh"
 
 cd "$SCRIPT_DIR/SwiftLaTeX"
 
