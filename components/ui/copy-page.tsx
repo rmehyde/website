@@ -20,7 +20,7 @@ export function CopyPageContent({children, className}: {children: React.ReactNod
     );
 }
 
-export function ExternalLink({href, text}: {href: string, text: string}) {
+export function TextLink({href, text}: {href: string, text: string}) {
     return (
         <a href={href} target="_blank" rel="noopener noreferrer" className="underline">{text}</a>
     )

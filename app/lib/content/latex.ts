@@ -1,6 +1,8 @@
 import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project, Education, SoftSkill, TechnicalSkill} from "@/app/lib/content/schema";
 import dedent from "dedent";
 
+const SITE_URL = "https://rmehyde.com";
+
 export enum Verbosity {
     Concise = "Concise",
     Verbose = "Verbose",
@@ -32,11 +34,12 @@ export function linksToLatex(links: Link[] | undefined, verbosity: Verbosity): s
             return `\\textsuperscript{${hyperlinks}}`
         case Verbosity.Verbose:
             return links.map((link, i) => {
+                const href = link.target.startsWith('/') ? SITE_URL + link.target : link.target;
                     const label =
                         i === 0
                             ? link.detail
                             : link.detail.charAt(0).toLowerCase() + link.detail.slice(1)
-                    return `\\uhref{${escapeLatex(link.target)}}{${escapeLatex(label)}}`
+                    return `\\uhref{${escapeLatex(href)}}{${escapeLatex(label)}}`
                 }
             ).join(" or ")
     }

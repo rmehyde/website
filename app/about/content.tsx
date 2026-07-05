@@ -1,5 +1,5 @@
 import {H2} from "@/components/ui/section-headers";
-import {CopyPageContent, ExternalLink} from "@/components/ui/copy-page";
+import {CopyPageContent, TextLink} from "@/components/ui/copy-page";
 
 export function AboutReese() {
     return (
@@ -29,12 +29,12 @@ export function AboutSite() {
                 filters and sorts what you see.
             </p>
             <p>
-                But it's implemented as a <ExternalLink href="https://en.wikipedia.org/wiki/Static_web_page" text="static site"/>,
+                But it's implemented as a <TextLink href="https://en.wikipedia.org/wiki/Static_web_page" text="static site"/>,
                 which means that it's just a pile of files your device downloads and runs itself: on the Resume page,
                 it's your browser that's actually generating dynamic markup based on your selections, and then running a{" "}
-                <ExternalLink href="https://en.wikipedia.org/wiki/XeTeX" text="typesetting engine"/>{" "}
+                <TextLink href="https://en.wikipedia.org/wiki/XeTeX" text="typesetting engine"/>{" "}
                 which was compiled into a{" "}
-                <ExternalLink href="https://en.wikipedia.org/wiki/WebAssembly" text="web-compatible binary format"/>{" "}
+                <TextLink href="https://en.wikipedia.org/wiki/WebAssembly" text="web-compatible binary format"/>{" "}
                 to render it into a PDF.
                 I cannot stress enough that this is an objectively poor technical approach
                 to such a feature — generating a dynamic PDF is exactly the kind of thing that should be done by a
@@ -54,8 +54,8 @@ export function AboutSite() {
             </p>
             <p>
                 The format on your device is friendlier to machines than humans, though. If you're curious for a look
-                yourself, you can see all the{" "} <ExternalLink href="https://github.com/rmehyde/website" text="code"/>{" "}
-                and{" "} <ExternalLink href="TODO" text="content"/>{" "}
+                yourself, you can see all the{" "} <TextLink href="https://github.com/rmehyde/website" text="code"/>{" "}
+                and{" "} <TextLink href="TODO" text="content"/>{" "}
                 {/* TODO: replace "TODO" with the real content repo/path URL */}
                 for the site on GitHub.
             </p>

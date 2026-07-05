@@ -1,11 +1,11 @@
 import {H1} from "@/components/ui/section-headers";
-import {CopyPageContent, ExternalLink} from "@/components/ui/copy-page";
+import {CopyPageContent, TextLink} from "@/components/ui/copy-page";
 import {scale} from "@/app/lib/typography";
 
 // Static screenshots gallery for the Traffic Race VR project. This page is the
 // destination of the project card's "screenshots" link; it isn't part of the
 // dynamic content system, so the captions live here rather than in the YAML.
-const APK_URL = "https://rmehyde.com/assets/trafficrace.apk";
+const APK_URL = "/assets/trafficrace.apk";
 
 // Pre-shrunk WebP (originals were ~2360px PNGs, ~1.5 MB total). width/height are the
 // intrinsic dims so the browser reserves the right box and doesn't shift on load.
@@ -25,7 +25,7 @@ export default function TrafficRaceScreens() {
                     <p>
                         A Google Cardboard mobile VR game in which players on a local network race each
                         other across a highway. You can{" "}
-                        <ExternalLink href={APK_URL} text="download the Android APK"/> to try it, or take
+                        <TextLink href={APK_URL} text="download the Android APK"/> to try it, or take
                         a look at a few screenshots below.
                     </p>
                 </CopyPageContent>

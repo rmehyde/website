@@ -6,7 +6,7 @@ detail: A privacy-conscious web app for visualizing spend data from Amex® trans
 links:
   - tag: app
     detail: View the App
-    target: https://rmehyde.com/spend
+    target: https://spend.rmehyde.com/
 scores:
   frontend: 5
   data-analytics: 5

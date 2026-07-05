@@ -65,8 +65,9 @@ duties:
     scores:
       libs-tooling: 5
       ml: 4
+      data-eng: 3
       science: 2
-      data-eng: 2
+      backend: 1
       data-analytics: 1
   - title: Offline Risk Management Platform
     contentType: duty
@@ -75,7 +76,7 @@ duties:
       into an extensible platform for arbitrary risk actions: granular suspensions, device blocks, and reverts of false positives"
     scores:
       libs-tooling: 5
-      ml: 3
+      ml: 2
       backend: 2
       data-eng: 2
       leadership: 2

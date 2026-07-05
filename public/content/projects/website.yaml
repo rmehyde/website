@@ -8,7 +8,7 @@ detail:
 links:
   - tag: about
     detail: Read about it
-    target: https://rmehyde.com/about
+    target: /about
   - tag: repo
     detail: Source on GitHub
     target: https://github.com/rmehyde/website
