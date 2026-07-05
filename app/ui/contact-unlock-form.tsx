@@ -3,7 +3,7 @@
 import {useState, useRef} from "react";
 import clsx from "clsx";
 
-import {useContactStore} from "@/app/contact/contactContext";
+import {useContactStore} from "@/app/lib/contact/contact-store";
 
 // shadcn/ui components:
 import {Input} from "@/components/ui/input";
@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button";
 import {scale} from "@/app/lib/typography";
 import {cn} from "@/components/lib/utils";
 
-export interface UnlockFormProps {
+export interface ContactUnlockFormProps {
     // Called after a passphrase successfully decrypts the contact info. The modal
     // presentation (Resume) uses this to close itself; the inline presentation
     // (Contact) can ignore it and let the global store update flip the display.
@@ -21,9 +21,9 @@ export interface UnlockFormProps {
 
 // Container-agnostic unlock unit: blurb + passphrase input + decrypt glue. Knows
 // nothing about whether it's rendered inline or inside a Dialog — that's the caller's
-// job. Decryption (decrypt.ts) and global state (contactContext.tsx) are the shared
+// job. Decryption (decrypt.ts) and global state (contact-context.tsx) are the shared
 // atoms it composes; the only seam between presentations is the onSuccess callback.
-export function UnlockForm({onSuccess, className}: UnlockFormProps) {
+export function ContactUnlockForm({onSuccess, className}: ContactUnlockFormProps) {
     const unlock = useContactStore((state) => state.unlock);
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");

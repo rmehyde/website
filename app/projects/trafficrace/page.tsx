@@ -1,5 +1,5 @@
-import {H1} from "@/app/ui/sectionHeaders";
-import {CopyPageContent, ExternalLink} from "@/app/ui/copyPage";
+import {H1} from "@/components/ui/section-headers";
+import {CopyPageContent, ExternalLink} from "@/components/ui/copy-page";
 import {scale} from "@/app/lib/typography";
 
 // Static screenshots gallery for the Traffic Race VR project. This page is the

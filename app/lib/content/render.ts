@@ -2,7 +2,7 @@ import {DimensionScores} from "@/app/lib/content/scoring";
 import {getFilteredAndSortedContent, groupContentByType, sortJobsByDate} from "@/app/lib/content/load";
 import {jobToLatex, projectsAndOssToLatex, educationToLatex, softSkillsToLatex, technicalSkillsToLatex} from "@/app/lib/content/latex";
 import mustache from "mustache";
-import {ContactInfo} from "@/app/contact/contactContext";
+import {ContactInfo} from "@/app/lib/contact/contact-store";
 import {Content, ContentTypeEnum} from "@/app/lib/content/schema";
 
 // thresholds keep skills from being filtered out by the relevance gate

@@ -2,7 +2,7 @@
 
 import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {useContactStore, contactOverrideFromParams} from "@/app/contact/contactContext";
+import {useContactStore, contactOverrideFromParams} from "@/app/lib/contact/contact-store";
 import {generateResumeLatex} from "@/app/lib/content/resume";
 import {Button} from "@/components/ui/button";
 import {Spinner} from "@/components/ui/spinner";
@@ -14,14 +14,15 @@ import {
 } from "@/components/ui/collapsible"
 import {Download, AlertCircle, RefreshCw, ChevronDownIcon, Lock} from "lucide-react";
 import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import {UnlockForm} from "@/app/contact/UnlockForm";
+import {ContactUnlockForm} from "@/app/ui/contact-unlock-form";
 
 const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
 
 import { DvipdfmxEngine } from "@/app/lib/swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "@/app/lib/swiftlatex/XeTeXEngine";
-import { prewarmEngines } from "@/app/lib/swiftlatexPrewarm";
-import {REVEAL_TEXT} from "@/app/contact/content";
+import { prewarmEngines } from "@/app/lib/swiftlatex-prewarm";
+
+import {REVEAL_TEXT} from "@/app/lib/contact/contact-constants";
 
 let xetexEngine: XeTeXEngine, dviEngine: DvipdfmxEngine;
 
@@ -222,7 +223,7 @@ export default function PDFComponent({onWeightsComplete}: {
                                 <DialogHeader>
                                     <DialogTitle>{REVEAL_TEXT}</DialogTitle>
                                 </DialogHeader>
-                                <UnlockForm onSuccess={() => setUnlockOpen(false)}/>
+                                <ContactUnlockForm onSuccess={() => setUnlockOpen(false)}/>
                             </DialogContent>
                         </Dialog>
                     )}

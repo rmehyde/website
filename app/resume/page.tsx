@@ -1,13 +1,13 @@
 'use client'
 
 import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxScore, dimensionScoresToParams, dimensionScoresFromParams} from '@/app/lib/content/scoring';
-import {RadialSelector} from "@/components/ui/radial";
+import {RadialSelector} from "@/app/ui/radial";
 import React, {useState, useRef, useEffect} from "react";
 import PDFComponent, { warmEngines } from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
 import {profiles} from '@/app/lib/content/content-io';
 import {Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
-import {preserveContactParams} from '@/app/contact/contactContext';
+import {preserveContactParams} from '@/app/lib/contact/contact-store';
 
 type Mode = 'intro' | 'interactive';
 

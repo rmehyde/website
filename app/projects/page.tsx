@@ -1,6 +1,6 @@
 'use client'
 
-import ContentCards from "@/app/ui/cards/contentCards";
+import ContentCards from "@/app/ui/cards/content-cards";
 import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState} from "react";

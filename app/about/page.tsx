@@ -1,6 +1,6 @@
 "use client";
 
-import {CopyPageBody} from "@/app/ui/copyPage";
+import {CopyPageBody} from "@/components/ui/copy-page";
 import {AboutReese, AboutSite, Acknowledgements} from "@/app/about/content";
 
 export default function AboutPage() {

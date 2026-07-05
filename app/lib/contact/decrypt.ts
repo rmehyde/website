@@ -1,5 +1,5 @@
 import {encryptedContactData} from "./encrypted";
-import type {ContactInfo} from "./contactContext";
+import type {ContactInfo} from "./contact-store";
 
 const PBKDF2_ITERATIONS = 500_000;
 

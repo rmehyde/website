@@ -1,5 +1,5 @@
-import {H2} from "@/app/ui/sectionHeaders";
-import {CopyPageContent, ExternalLink} from "@/app/ui/copyPage";
+import {H2} from "@/components/ui/section-headers";
+import {CopyPageContent, ExternalLink} from "@/components/ui/copy-page";
 
 export function AboutReese() {
     return (

@@ -1,6 +1,6 @@
 "use client"
 import {usePathname} from 'next/navigation'
-import {GITHUB_URL, LINKEDIN_URL} from "@/app/contact/content";
+import {GITHUB_URL, LINKEDIN_URL} from "@/app/lib/contact/contact-constants";
 
 // Brand glyphs are inlined (not bundled as files) so they inherit the surrounding
 // text color via fill="currentColor" — same pattern as the lucide icons elsewhere.

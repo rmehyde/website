@@ -2,12 +2,9 @@
 
 import clsx from "clsx";
 
-import {useContactStore} from "@/app/contact/contactContext";
+import {useContactStore} from "@/app/lib/contact/contact-store";
 import {scale} from "@/app/lib/typography";
 
-// Reads the global contact store and renders email/phone, masked or revealed
-// depending on unlock state. Used on the Contact page; intentionally NOT shown
-// inside the Resume modal, where the PDF itself is the display.
 export function ContactInfoDisplay({className}: {className?: string}) {
     const contact = useContactStore((state) => state.contact);
 
