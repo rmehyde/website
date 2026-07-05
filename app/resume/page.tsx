@@ -3,7 +3,7 @@
 import {Dimension, dimensionLabels, DimensionScores, dimensionScoresSchema, maxScore, dimensionScoresToParams, dimensionScoresFromParams} from '@/app/lib/content/scoring';
 import {RadialSelector} from "@/components/ui/radial";
 import React, {useState, useRef, useEffect} from "react";
-import PDFComponent from "@/app/ui/pdf";
+import PDFComponent, { warmEngines } from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
 import {profiles} from '@/app/lib/content/content-io';
 import {Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
@@ -75,7 +75,11 @@ export default function DynamicResume() {
 
     const triggerRenderRef = useRef<((weights: DimensionScores) => void) | null>(null);
     const previousWeightsRef = useRef<DimensionScores | null>(null);
-    
+
+    // Warm the LaTeX engines (worker init + cache prewarm) as soon as the page loads, so
+    // warming overlaps the intro animation and the first render doens't need network
+    useEffect(() => { void warmEngines().catch(() => {}); }, []);
+
     // Update URL when weights change (debounced to avoid excessive updates)
     useEffect(() => {
         if (typeof window === 'undefined' || mode === 'intro') return;

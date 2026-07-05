@@ -36,8 +36,11 @@ make
 
 # Transpile TypeScript files
 echo "Transpiling TypeScript files..."
-"$SCRIPT_DIR/../node_modules/.bin/tsc" dvipdfm.wasm/DvipdfmxEngine.tsx --outDir dvipdfm.wasm --target es2020 --module es2020 --skipLibCheck --moduleResolution node
-"$SCRIPT_DIR/../node_modules/.bin/tsc" xetex.wasm/XeTeXEngine.tsx --outDir xetex.wasm --target es2020 --module es2020 --skipLibCheck --moduleResolution node
+# --ignoreConfig: the per-engine tsconfig.json trips TS5112 ("won't be loaded if files
+# are specified on commandline") on TS 5.6+, which silently blocks emit and leaves stale
+# .js. --lib replaces the DOM types that tsconfig used to provide.
+"$SCRIPT_DIR/../node_modules/.bin/tsc" dvipdfm.wasm/DvipdfmxEngine.tsx --ignoreConfig --outDir dvipdfm.wasm --target es2020 --module es2020 --lib dom,es2020 --skipLibCheck
+"$SCRIPT_DIR/../node_modules/.bin/tsc" xetex.wasm/XeTeXEngine.tsx --ignoreConfig --outDir xetex.wasm --target es2020 --module es2020 --lib dom,es2020 --skipLibCheck
 
 # clean + recreate target dirs
 rm -rf "$APP_TARGET_DIR"

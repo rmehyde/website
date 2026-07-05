@@ -20,27 +20,41 @@ const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
 
 import { DvipdfmxEngine } from "@/app/lib/swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "@/app/lib/swiftlatex/XeTeXEngine";
+import { prewarmEngines } from "@/app/lib/swiftlatexPrewarm";
 import {REVEAL_TEXT} from "@/app/contact/content";
 
 let xetexEngine: XeTeXEngine, dviEngine: DvipdfmxEngine;
 
-export const initializeLatexEngines = async () => {
-    try {
-        if (!xetexEngine) {
-            xetexEngine = new XeTeXEngine();
-            await xetexEngine.loadEngine("/lib/swiftlatex/swiftlatexxetex.js");
-        }
-        if (!dviEngine) {
-            dviEngine = new DvipdfmxEngine();
-            await dviEngine.loadEngine("/lib/swiftlatex/swiftlatexdvipdfm.js");
-        }
-    } catch (e) {
-        console.error("Engine initialization failed:", e);
-        throw e;
+// "Engines ready" = worker init + cache prewarm, as one idempotent promise
+let enginesReadyPromise: Promise<void> | null = null;
+export function warmEngines(): Promise<void> {
+    if (!enginesReadyPromise) {
+        enginesReadyPromise = (async () => {
+            if (!xetexEngine) {
+                xetexEngine = new XeTeXEngine();
+                await xetexEngine.loadEngine("/lib/swiftlatex/swiftlatexxetex.js");
+            }
+            if (!dviEngine) {
+                dviEngine = new DvipdfmxEngine();
+                await dviEngine.loadEngine("/lib/swiftlatex/swiftlatexdvipdfm.js");
+            }
+            const t0 = performance.now();
+            try {
+                await prewarmEngines(xetexEngine, dviEngine);
+                console.log(`Prewarm complete in ${(performance.now() - t0).toFixed(0)}ms`);
+            } catch (e) {
+                console.error('Prewarm failed (falling back to on-demand fetch):', e);
+            }
+        })().catch((e) => {
+            enginesReadyPromise = null; // init failed — let a later attempt retry
+            console.error("Engine initialization failed:", e);
+            throw e;
+        });
     }
+    return enginesReadyPromise;
 }
 
-type RenderState = 'idle' | 'rendering' | 'pending';
+type RenderState = 'idle' | 'rendering';
 
 interface PdfError {
     stage: 'init' | 'latex-gen' | 'xetex' | 'dvipdfmx' | 'unknown';
@@ -66,128 +80,123 @@ export default function PDFComponent({onWeightsComplete}: {
         email: contactOverride.email ?? storeContact.email,
         phone: contactOverride.phone ?? storeContact.phone,
     }), [storeContact, contactOverride]);
-    // Always-current contact for renderPDF to read. Keeping it out of renderPDF's deps means
-    // renderPDF stays stable, so the (single) trigger the parent captured never goes stale after
-    // an unlock — every render path picks up the latest email/phone.
+    // Always-current contact for the compile to read. Keeping it out of the render deps means
+    // the render callbacks stay stable, so the (single) trigger the parent captured never goes
+    // stale after an unlock — every render path picks up the latest email/phone.
     const contactRef = useRef(contact);
     contactRef.current = contact;
+
     const [renderState, setRenderState] = useState<RenderState>('idle');
     const [pdfUrl, setPdfUrl] = useState("");
     const [error, setError] = useState<PdfError | null>(null);
     const [unlockOpen, setUnlockOpen] = useState(false);
+
+    // renderingRef is the synchronous concurrency guard — a render is in flight iff it's true
+    const renderingRef = useRef(false);
+    // The single latest queued request. Rapid changes overwrite it (intermediates are skipped),
+    // the in-flight render picks it up when it finishes
     const pendingWeightsRef = useRef<DimensionScores | null>(null);
-    // Weights of the most recent render, so a contact change (unlock) can re-render with them.
+    // Latest requested weights, so a contact change (unlock) or "Try Again" can re-render them
     const lastWeightsRef = useRef<DimensionScores | null>(null);
+    // Current object URL, tracked so we can revoke the previous one instead of leaking it
+    const pdfUrlRef = useRef<string>("");
 
-    const renderPDF = useCallback(async (weightsToRender: DimensionScores) => {
-        setRenderState('rendering');
-        setError(null);
-        pendingWeightsRef.current = null;
-        lastWeightsRef.current = weightsToRender;
-
-        try {
-            // Engine initialization
-            try {
-                await initializeLatexEngines();
-            } catch (e) {
-                throw { stage: 'init', message: 'Failed to initialize LaTeX engines', details: String(e) };
-            }
-
-            if (!xetexEngine || !dviEngine) {
-                throw { stage: 'init', message: 'Engines not initialized', details: 'xetexEngine or dviEngine is undefined' };
-            }
-
-            // LaTeX generation
-            let latex: string;
-            try {
-                latex = generateResumeLatex(weightsToRender, contactRef.current);
-            } catch (e) {
-                throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) };
-            }
-
-            // XeTeX compilation
-            xetexEngine.writeMemFSFile("main.tex", latex);
-            xetexEngine.setEngineMainFile("main.tex");
-            const result = await xetexEngine.compileLaTeX();
-
-            if (result.status !== 0) {
-                throw { stage: 'xetex', message: 'XeTeX compilation failed', details: result.log };
-            }
-            if (!result.pdf) {
-                throw { stage: 'xetex', message: 'No XDV output from XeTeX', details: result.log };
-            }
-
-            // Dvipdfmx conversion
-            dviEngine.writeMemFSFile("main.xdv", result.pdf);
-            dviEngine.setEngineMainFile("main.xdv");
-
-            const pdfResult = await dviEngine.compilePDF();
-
-            if (pdfResult.status !== 0) {
-                throw { stage: 'dvipdfmx', message: 'Dvipdfmx conversion failed', details: pdfResult.log };
-            }
-            if (!pdfResult.pdf) {
-                throw { stage: 'dvipdfmx', message: 'No PDF output from Dvipdfmx', details: pdfResult.log };
-            }
-
-            // Success
-            const pdfBlob = new Blob([pdfResult.pdf], {type: "application/pdf"});
-            const url = URL.createObjectURL(pdfBlob);
-            setPdfUrl(url);
-
-        } catch (e) {
-            console.error('PDF generation failed:', e);
-            if (e && typeof e === 'object' && 'stage' in e) {
-                setError(e as PdfError);
-            } else {
-                setError({ stage: 'unknown', message: 'An unexpected error occurred', details: String(e) });
-            }
-        } finally {
-            const pendingWeights = pendingWeightsRef.current;
-            if (pendingWeights) {
-                pendingWeightsRef.current = null;
-                setRenderState('pending');
-                setTimeout(() => renderPDF(pendingWeights), 0);
-            } else {
-                setRenderState('idle');
-            }
-        }
+    const publishPdf = useCallback((bytes: Uint8Array<ArrayBuffer>) => {
+        const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+        if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
+        pdfUrlRef.current = url;
+        setPdfUrl(url);
     }, []);
 
-    const triggerRender = useCallback((weightsToRender: DimensionScores) => {
-        if (renderState === 'idle') {
-            renderPDF(weightsToRender);
-        } else {
-            pendingWeightsRef.current = weightsToRender;
-            if (renderState === 'rendering') {
-                setRenderState('pending');
-            }
+    // One compile pass. Assumes the engines are ready; throws a PdfError on failure
+    const compileOnce = useCallback(async (weights: DimensionScores) => {
+        let latex: string;
+        try {
+            latex = generateResumeLatex(weights, contactRef.current);
+        } catch (e) {
+            throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) } as PdfError;
         }
-    }, [renderState, renderPDF]);
 
+        xetexEngine.writeMemFSFile("main.tex", latex);
+        xetexEngine.setEngineMainFile("main.tex");
+        const result = await xetexEngine.compileLaTeX();
+        if (result.status !== 0) throw { stage: 'xetex', message: 'XeTeX compilation failed', details: result.log } as PdfError;
+        if (!result.pdf) throw { stage: 'xetex', message: 'No XDV output from XeTeX', details: result.log } as PdfError;
+
+        dviEngine.writeMemFSFile("main.xdv", result.pdf);
+        dviEngine.setEngineMainFile("main.xdv");
+        const pdfResult = await dviEngine.compilePDF();
+        if (pdfResult.status !== 0) throw { stage: 'dvipdfmx', message: 'Dvipdfmx conversion failed', details: pdfResult.log } as PdfError;
+        if (!pdfResult.pdf) throw { stage: 'dvipdfmx', message: 'No PDF output from Dvipdfmx', details: pdfResult.log } as PdfError;
+
+        publishPdf(pdfResult.pdf);
+    }, [publishPdf]);
+
+    // Serialized render loop. Keeps working on the current request; while it runs, rapid
+    // changes collapse to the single latest (pendingWeightsRef), which it renders next
+    const runRenderLoop = useCallback(async (weights: DimensionScores) => {
+        renderingRef.current = true;
+        setRenderState('rendering');
+        try {
+            try {
+                await warmEngines(); // usually already done by the page's on-load warm
+            } catch (e) {
+                setError({ stage: 'init', message: 'Failed to initialize LaTeX engines', details: String(e) });
+                return;
+            }
+            // A change that arrived during warm-up (before any compile started) replaces the
+            // original — skip straight to the latest. Once compiling, changes queue instead.
+            let current: DimensionScores | null = pendingWeightsRef.current ?? weights;
+            while (current) {
+                pendingWeightsRef.current = null;
+                setError(null);
+                try {
+                    await compileOnce(current);
+                } catch (e) {
+                    console.error('PDF generation failed:', e);
+                    setError(e && typeof e === 'object' && 'stage' in e
+                        ? e as PdfError
+                        : { stage: 'unknown', message: 'An unexpected error occurred', details: String(e) });
+                }
+                current = pendingWeightsRef.current; // latest queued during this pass, if any
+            }
+        } finally {
+            renderingRef.current = false;
+            pendingWeightsRef.current = null;
+            setRenderState('idle');
+        }
+    }, [compileOnce]);
+
+    const triggerRender = useCallback((weights: DimensionScores) => {
+        lastWeightsRef.current = weights; // remember the latest requested, for unlock / retry
+        if (renderingRef.current) {
+            pendingWeightsRef.current = weights; // collapse to latest, the loop will pick it up after current render
+        } else {
+            void runRenderLoop(weights);
+        }
+    }, [runRenderLoop]);
+
+    // Register the trigger with the parent. triggerRender is stable: it reads refs (not state) so it never goes stale
     const hasRegisteredRef = useRef(false);
     useEffect(() => {
         if (!hasRegisteredRef.current && onWeightsComplete) {
             onWeightsComplete(triggerRender);
             hasRegisteredRef.current = true;
         }
-    }, [onWeightsComplete]);
+    }, [onWeightsComplete, triggerRender]);
 
-    // Re-render when the contact info actually changes (passphrase unlock) — the weights are
-    // unchanged, so the weight-driven render path won't fire on its own. We compare against the
-    // PREVIOUS contact value rather than using a one-shot "did mount" flag: React StrictMode
-    // double-invokes mount effects in dev, and a one-shot flag would let the second invoke sneak
-    // past and launch a second concurrent compile ("Engine is still spinning"). A value compare is
-    // idempotent — it fires at most once per genuine change. Keyed on `contact` only; including
-    // triggerRender would re-fire on every renderState change.
+    // Re-render when the contact info actually changes (passphrase unlock)
+    // Value-compare (not a one-shot flag) so StrictMode's double-invoke can't sneak a second fire; and the ref-based
+    // guard means even if it did, it would just queue rather than run concurrently.
     const prevContactRef = useRef(contact);
     useEffect(() => {
         if (prevContactRef.current === contact) return;
         prevContactRef.current = contact;
-        if (lastWeightsRef.current) {
-            triggerRender(lastWeightsRef.current);
-        }
-    }, [contact]);
+        if (lastWeightsRef.current) triggerRender(lastWeightsRef.current);
+    }, [contact, triggerRender]);
+
+    // Revoke the last blob URL on unmount
+    useEffect(() => () => { if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current); }, []);
 
     const stageLabels: Record<PdfError['stage'], string> = {
         'init': 'Engine Initialization',
@@ -233,9 +242,14 @@ export default function PDFComponent({onWeightsComplete}: {
                             Generating PDF...
                         </Button>
                     ) : (
-                        <Button onClick={() => setError(null)} variant="outline">
+                        <Button
+                            onClick={() => {
+                                setError(null);
+                                if (lastWeightsRef.current) triggerRender(lastWeightsRef.current);
+                            }}
+                            variant="outline"
+                        >
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {/* TODO: state issue. Fail -> Try Again. Does nothing, you get "Download Resume" button */}
                             Try Again
                         </Button>
                     )}
