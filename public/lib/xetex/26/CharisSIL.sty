@@ -1,0 +1,67 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{CharisSIL}
+    [2022/09/15 (Bob Tennent)  Style file for CharisSIL fonts.]
+
+\RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
+
+\newif\ifcharssil@otf 
+\ifxetex
+  \charssil@otftrue
+\else\ifluatex
+  \charssil@otftrue
+\else  % [pdf]LaTeX
+  \charssil@otffalse
+\fi\fi
+
+
+\newcommand*{\CharisSIL@scale}{1}
+\DeclareOptionX{scaled}{\renewcommand*{\CharisSIL@scale}{#1}}
+\DeclareOptionX{scale}{\renewcommand*{\CharisSIL@scale}{#1}}
+\DeclareOptionX{type1}{\charssil@otffalse}
+
+\ProcessOptionsX\relax
+
+\ifcharssil@otf
+\else
+  \def\bfseries@rm{b}
+  \def\mdseries@rm{m}
+\fi
+
+\ifcharssil@otf
+  \RequirePackage{fontspec}
+\else
+  \RequirePackage{fontenc,fontaxes,mweights}
+\fi
+
+
+\ifcharssil@otf
+  \defaultfontfeatures{
+        Ligatures = TeX ,
+        Scale     = \CharisSIL@scale ,
+        Extension = .ttf }
+  \setmainfont
+      [ UprightFont    = *-Regular,
+        ItalicFont     = *-Italic,
+        BoldFont    = *-Bold,
+        BoldItalicFont    = *-BoldItalic ,
+      ]
+      {CharisSIL}
+  \newfontfamily\CharisSIL
+      [ UprightFont    = *-Regular,
+        ItalicFont     = *-Italic,
+        BoldFont    = *-Bold,
+        BoldItalicFont    = *-BoldItalic ,
+      ]
+      {CharisSIL}
+\else % type1
+  \def\charssil@family{charssil-TLF}
+  \renewcommand*\rmdefault{\charssil@family}
+  \edef\seriesdefault{\mdseries@rm}
+
+\fi
+
+\ifcharssil@otf
+  \defaultfontfeatures{}
+\fi
+
+\endinput
