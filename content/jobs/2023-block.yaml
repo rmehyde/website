@@ -1,6 +1,3 @@
-# TODO: need a sort of generic "did microservices" like Arthur
-#   also add data viz one (limits + orm + eidv dashboards)
-
 contentType: job
 title: MLE @ Block
 summary: Machine Learning Engineer on Block's ML Platform team
@@ -92,3 +89,25 @@ duties:
       ml: 4
       data-eng: 3
       libs-tooling: 1
+  - title: Maintain Risk Decision Engine
+    contentType: duty
+    summary: Maintain realtime risk decision engine performing two million risk rule evaluations per second
+    detail: Maintain realtime risk decision engine performing two million risk rule evaluations per second to improve performance 
+      and user experience, such as fixing durability of output logging to at-least-once and making evaluation traces more interpretable 
+      to end users
+    scores:
+      backend: 5
+      libs-tooling: 2
+      ml: 2
+      data-eng: 2
+  - title: Built Model Performance Dashboards
+    contentType: duty
+    summary: Built performance dashboards for offline risk decision outcomes, ML-backed identity verification, and transaction limits model
+    detail: Built interactive dashboards to surface performance of various ML- and rules-based decision systems and use cases, including 
+      Cash App's offline risk decision engine, ML-backed identity verification outcomes, and immpact of an ML-based solution to setting 
+      user transaction limits
+    scores:
+        data-analytics: 5
+        leadership: 2
+        ml: 1
+        data-eng: 1

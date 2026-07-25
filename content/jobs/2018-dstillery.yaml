@@ -1,6 +1,3 @@
-# TODO: need a sort of generic "did microservices" like Arthur
-#   also ensure data viz coverage
-
 contentType: job
 title: MLE @ Dstillery
 summary: Machine Learning Engineer at Dstillery
@@ -15,12 +12,12 @@ location: New York, NY
 start: "2018-10-01"
 end: "2020-10-01"
 scores:
-  libs-tooling: 3
+  backend: 5
   ml: 5
+  data-eng: 4
+  libs-tooling: 3
   science: 3
   data-analytics: 2
-  backend: 5
-  data-eng: 4
   frontend: 1
 duties:
   - title: Productionized ML Models
@@ -62,3 +59,17 @@ duties:
       frontend: 4
       backend: 2
       libs-tooling: 2
+  - title: Built & Maintained Microservices
+    contentType: duty
+    summary: Built and maintained microservices for online advertising data ingestion, audience-building, and data export
+    detail: Built and maintained microservices for online advertising data ingestion, audience-building, and data export
+    scores:
+      backend: 5
+      data-eng: 2
+  - title: Modernized Microservice Deployment
+    contentType: duty
+    summary: Migrated Java service deployment from Salt-managed JARs to Docker images on Kubernetes
+    detail: Modernized Java service delivery, migrating from Salt-managed JAR deployments to Docker images orchestrated on Kubernetes
+    scores:
+      devops-infra: 4
+      backend: 3
