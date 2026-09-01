@@ -13,6 +13,7 @@
     - maybe tune number of profile wheel passes
     - lil more spacing between links on homepage
     - animations run as we hit it on profile scroll, needs to be a lil earlier
+    - re-check mobile layout, plot doesn't seem to condense enough horizontally and sometimes there's horizontal scroll
 
 
 - ship :)
