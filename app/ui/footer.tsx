@@ -32,7 +32,7 @@ export function SiteFooter() {
     return (
         <footer
             className="text-xs mt-10 flex items-center justify-between border-t border-border py-6 text-muted-foreground">
-            <span>© {year} Reese Hyde</span>
+            <span>© {year} Reese M.E. Hyde</span>
             <div className="flex items-center gap-4">
                 <a
                     href={GITHUB_URL}
