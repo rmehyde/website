@@ -1,7 +1,7 @@
 
 - finish resume
-	- profile seniority
-	- new bullets (microservices, deploy, etc)
+	[DONE] - profile seniority
+	[DONE] - new bullets (microservices, deploy, etc)
 	- pass of all profiles content + 1page
 
 - icon
