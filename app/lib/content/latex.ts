@@ -1,7 +1,9 @@
 import {BaseContent, ContentByType, ContentTypeEnum, Duty, Job, Link, Project, Education, SoftSkill, TechnicalSkill} from "@/app/lib/content/schema";
+import {estimateLines, linkChars} from "@/app/lib/content/estimate";
 import dedent from "dedent";
 
 const SITE_URL = "https://rmehyde.com";
+export const MAX_RESUME_PROJECTS = 5;
 
 export enum Verbosity {
     Concise = "Concise",
@@ -131,7 +133,7 @@ export function projectsAndOssToLatex(content: ContentByType) {
     const projectsContent = projectsToLatex(
         content[ContentTypeEnum.enum.project],
         Verbosity.Concise,
-        5,
+        MAX_RESUME_PROJECTS,
         false,
     );
     const ossContent = baseContentToLatex(
@@ -151,6 +153,23 @@ export function projectsAndOssToLatex(content: ContentByType) {
     return projectsContent + maybeSeparator + ossContent;
 }
 
+// visible length of one inline item: space + bullet + space, then "title: summary", then any links
+function inlineItemChars(item: BaseContent, includeLinks: boolean): number {
+    return 3 + item.title.length + 2 + item.summary.length + (includeLinks ? linkChars(item.links) : 0);
+}
+
+const MORE_PROJECTS_CHARS = 3 + "(& more at rmehyde.com)".length;
+
+// estimated printed lines of the two paragraphs projectsAndOssToLatex renders
+export function projectsAndOssLines(content: ContentByType): number {
+    const projects = content[ContentTypeEnum.enum.project];
+    const oss = content[ContentTypeEnum.enum.oss];
+    const projectChars = projects.slice(0, MAX_RESUME_PROJECTS).reduce((sum, p) => sum + inlineItemChars(p, false), 0)
+        + (projects.length > MAX_RESUME_PROJECTS ? MORE_PROJECTS_CHARS : 0);
+    const ossChars = oss.reduce((sum, o) => sum + inlineItemChars(o, true), 0);
+    return estimateLines(projectChars) + estimateLines(ossChars);
+}
+
 export function educationToLatex(education: Education[]): string {
     return education.map(edu => {
         const degreeYear = `${escapeLatex(edu.degree)}, ${edu.year}`;
@@ -168,7 +187,7 @@ export function softSkillsToLatex(softSkills: SoftSkill[]): string {
 // approximate printed-width budget for the inline technical-skills line, in characters.
 //   each item costs 3 (leading space + bullet + space) plus its visible text length.
 //   the list arrives relevance-sorted, so the budget trims the least-relevant tail. Tune to fit two lines.
-export const SKILLS_WIDTH_BUDGET = 195
+export const SKILLS_WIDTH_BUDGET = 175
 
 // always present — the wink. its width is reserved up front so it never tips the line over.
 const MORE_SUFFIX = " \\tb~(\\&~more)";

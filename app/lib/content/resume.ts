@@ -1,5 +1,5 @@
 import {DimensionScores} from "@/app/lib/content/scoring";
-import {buildResumeLatex} from "@/app/lib/content/render";
+import {buildResumeLatex, jobLineBudget} from "@/app/lib/content/render";
 import {loadAllContent, getResumeTemplate} from "@/app/lib/content/content-io";
 import {ContactInfo} from "@/app/lib/contact/contact-store";
 
@@ -7,13 +7,15 @@ import {ContactInfo} from "@/app/lib/contact/contact-store";
 export function generateResumeLatex(
     weights: DimensionScores,
     contact: ContactInfo,
-    lineBudget: number = 14
+    // job-bullet lines to give up from the estimated budget, after a compile overflowed the page
+    trimLines: number = 0
 ): string {
+    const allContent = loadAllContent()
     return buildResumeLatex({
-        allContent: loadAllContent(),
+        allContent,
         template: getResumeTemplate(),
         weights,
         contact,
-        lineBudget,
+        lineBudget: jobLineBudget(allContent, weights) - trimLines,
     })
 }

@@ -66,6 +66,17 @@ duties:
       science: 2
       backend: 1
       data-analytics: 1
+  - title: ML Feature Logging
+    contentType: duty
+    summary: Implemented peta-scale logging of all ML feature inputs with efficient storage and fast queries
+    detail: Designed and implemented full-scale logging of all ML input features, optimizing physical layout of Deltalake tables to provide 
+      cost-efficient storage with fast point lookups and aggregations over one quadrillion daily feature values 
+    scores:
+      data-eng: 5
+      ml: 3
+      backend: 3
+      data-analytics: 2
+      libs-tooling: 1
   - title: Offline Risk Management Platform
     contentType: duty
     summary: Re-architected Cash App's batch account-actioning system, from two hardcoded actions to extensible risk-action platform

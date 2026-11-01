@@ -10,13 +10,13 @@ import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 
 import { loadAllContent, loadProfiles, getResumeTemplate } from "./content-fs";
-import { buildResumeLatex } from "@/app/lib/content/render";
+import { buildResumeLatex, jobLineBudget } from "@/app/lib/content/render";
 import { getFilteredAndSortedContent, selectJobDuties, DUTY_FLOOR } from "@/app/lib/content/load";
+import { pageCountFromLog } from "@/app/lib/content/estimate";
 import { Dimension, scoreContentCosine } from "@/app/lib/content/scoring";
 import { ContentTypeEnum, Job } from "@/app/lib/content/schema";
 
 const VALID_DIMS = new Set<string>(Dimension.options);
-const RESUME_LINE_BUDGET = 14;
 const CONTACT = { email: "you@example.com", phone: "+1 (555) 555-5555" };
 
 const CONTENT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "content");
@@ -70,7 +70,7 @@ describe("content invariants (independent of specific scores)", () => {
 
     it("no job ever renders bare — each keeps min(DUTY_FLOOR, its duty count) duties", () => {
         for (const p of profiles) {
-            const selected = getFilteredAndSortedContent(allContent, p.scores, RESUME_LINE_BUDGET) as Job[];
+            const selected = getFilteredAndSortedContent(allContent, p.scores, jobLineBudget(allContent, p.scores)) as Job[];
             for (const job of selected.filter((c) => c.contentType === ContentTypeEnum.enum.job)) {
                 const original = jobs.find((j) => j.company === job.company)!;
                 expect(job.duties.length, `${p.name} / ${job.company}`).toBeGreaterThanOrEqual(
@@ -82,8 +82,9 @@ describe("content invariants (independent of specific scores)", () => {
 
     it("duty line usage stays within budget (floor here is below budget, so it must)", () => {
         for (const p of profiles) {
-            const { trace } = selectJobDuties(jobs, p.scores, RESUME_LINE_BUDGET);
-            expect(trace.linesUsed, p.name).toBeLessThanOrEqual(RESUME_LINE_BUDGET);
+            const budget = jobLineBudget(allContent, p.scores);
+            const { trace } = selectJobDuties(jobs, p.scores, budget);
+            expect(trace.linesUsed, p.name).toBeLessThanOrEqual(budget);
         }
     });
 
@@ -95,5 +96,16 @@ describe("content invariants (independent of specific scores)", () => {
                 expect(s).toBeLessThanOrEqual(1);
             }
         }
+    });
+});
+
+describe("pageCountFromLog", () => {
+    it("reads the page count from TeX's closing log line", () => {
+        expect(pageCountFromLog("(rerunfilecheck) ...\nOutput written on main.xdv (1 page, 35828 bytes).\nTranscript written on main.log.")).toBe(1);
+        expect(pageCountFromLog("Output written on main.xdv (2 pages, 41276 bytes).")).toBe(2);
+    });
+
+    it("returns null when the log has no output line", () => {
+        expect(pageCountFromLog("No pages of output.")).toBeNull();
     });
 });

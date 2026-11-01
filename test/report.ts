@@ -16,12 +16,10 @@ import {
     sortJobsByDate,
     DutyTrace,
 } from "@/app/lib/content/load";
-import { RESUME_THRESHOLD_OVERRIDES } from "@/app/lib/content/render";
+import { RESUME_THRESHOLD_OVERRIDES, jobLineBudget } from "@/app/lib/content/render";
+import { MAX_RESUME_PROJECTS } from "@/app/lib/content/latex";
 import { Content, ContentTypeEnum, Job, BaseContent } from "@/app/lib/content/schema";
 import { Profile } from "@/app/lib/content/profiles";
-
-const RESUME_LINE_BUDGET = 14;
-const MAX_PROJECTS = 5; // mirrors projectsAndOssToLatex's cap
 
 const cos = (n: number) => n.toFixed(3);
 
@@ -128,7 +126,7 @@ export function buildRationaleReport(profile: Profile, allContent: Content[]): s
 
     // --- jobs ---
     const jobs = sortJobsByDate(allContent.filter((c): c is Job => c.contentType === ContentTypeEnum.enum.job));
-    const { trace } = selectJobDuties(jobs, weights, RESUME_LINE_BUDGET);
+    const { trace } = selectJobDuties(jobs, weights, jobLineBudget(allContent, weights));
     lines.push(`## Technical Roles  (job duty lines: ${trace.linesUsed}/${trace.lineBudget})`);
     for (const jt of trace.jobs) {
         lines.push("");
@@ -139,7 +137,7 @@ export function buildRationaleReport(profile: Profile, allContent: Content[]): s
 
     // --- non-jobs ---
     const ofType = (t: Content["contentType"]) => allContent.filter((c) => c.contentType === t) as unknown as BaseContent[];
-    lines.push(...nonJobSection("Projects", ofType(ContentTypeEnum.enum.project), weights, MAX_PROJECTS));
+    lines.push(...nonJobSection("Projects", ofType(ContentTypeEnum.enum.project), weights, MAX_RESUME_PROJECTS));
     lines.push(...nonJobSection("Open Source", ofType(ContentTypeEnum.enum.oss), weights));
     lines.push(...nonJobSection("Education", ofType(ContentTypeEnum.enum.education), weights));
     lines.push(...nonJobSection("Soft Skills", ofType(ContentTypeEnum.enum["soft-skill"]), weights));

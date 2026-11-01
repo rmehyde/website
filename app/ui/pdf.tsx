@@ -4,6 +4,7 @@ import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import {DimensionScores} from "@/app/lib/content/scoring";
 import {useContactStore, contactOverrideFromParams} from "@/app/lib/contact/contact-store";
 import {generateResumeLatex} from "@/app/lib/content/resume";
+import {pageCountFromLog} from "@/app/lib/content/estimate";
 import {Button} from "@/components/ui/button";
 import {Spinner} from "@/components/ui/spinner";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
@@ -17,6 +18,10 @@ import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle} from "@
 import {ContactUnlockForm} from "@/app/ui/contact-unlock-form";
 
 const PDF_FRAGMENTS = "#pagemode=none&navpanes=0&toolbar=0&view=Fit"
+
+// The line budget is an estimate that usually fits one page. When a compile still overflows, recompile
+// with this many fewer lines at most, then show the result regardless.
+const MAX_TRIM_LINES = 2;
 
 import { DvipdfmxEngine } from "@/app/lib/swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "@/app/lib/swiftlatex/XeTeXEngine";
@@ -111,20 +116,30 @@ export default function PDFComponent({onWeightsComplete}: {
 
     // One compile pass. Assumes the engines are ready; throws a PdfError on failure
     const compileOnce = useCallback(async (weights: DimensionScores) => {
-        let latex: string;
-        try {
-            latex = generateResumeLatex(weights, contactRef.current);
-        } catch (e) {
-            throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) } as PdfError;
+        const compileXdv = async (trimLines: number) => {
+            let latex: string;
+            try {
+                latex = generateResumeLatex(weights, contactRef.current, trimLines);
+            } catch (e) {
+                throw { stage: 'latex-gen', message: 'Failed to generate LaTeX source', details: String(e) } as PdfError;
+            }
+
+            xetexEngine.writeMemFSFile("main.tex", latex);
+            xetexEngine.setEngineMainFile("main.tex");
+            const result = await xetexEngine.compileLaTeX();
+            if (result.status !== 0) throw { stage: 'xetex', message: 'XeTeX compilation failed', details: result.log } as PdfError;
+            if (!result.pdf) throw { stage: 'xetex', message: 'No XDV output from XeTeX', details: result.log } as PdfError;
+            return { xdv: result.pdf, pages: pageCountFromLog(result.log) ?? 1 };
+        };
+
+        let trimLines = 0;
+        let { xdv, pages } = await compileXdv(trimLines);
+        while (pages > 1 && trimLines < MAX_TRIM_LINES) {
+            trimLines++;
+            ({ xdv, pages } = await compileXdv(trimLines));
         }
 
-        xetexEngine.writeMemFSFile("main.tex", latex);
-        xetexEngine.setEngineMainFile("main.tex");
-        const result = await xetexEngine.compileLaTeX();
-        if (result.status !== 0) throw { stage: 'xetex', message: 'XeTeX compilation failed', details: result.log } as PdfError;
-        if (!result.pdf) throw { stage: 'xetex', message: 'No XDV output from XeTeX', details: result.log } as PdfError;
-
-        dviEngine.writeMemFSFile("main.xdv", result.pdf);
+        dviEngine.writeMemFSFile("main.xdv", xdv);
         dviEngine.setEngineMainFile("main.xdv");
         const pdfResult = await dviEngine.compilePDF();
         if (pdfResult.status !== 0) throw { stage: 'dvipdfmx', message: 'Dvipdfmx conversion failed', details: pdfResult.log } as PdfError;

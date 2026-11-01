@@ -1,5 +1,6 @@
 import {DimensionScores, scoreContentAbsolute, scoreContentComposite, scoreContentCosine} from "@/app/lib/content/scoring";
 import {ContentSchema, Content, ContentByType, ContentTypeEnum, Job, Duty, Project} from "@/app/lib/content/schema";
+import {estimateLines, linkChars} from "@/app/lib/content/estimate";
 
 // parse one loaded module's contents (single object or array) into validated Content.
 //   shared by every content adapter (webpack require.context, fs-based tests) so the
@@ -125,13 +126,13 @@ export type JobTrace = { company: string; title: string; duties: DutyTrace[] }
 export type SelectionTrace = { jobs: JobTrace[]; linesUsed: number; lineBudget: number }
 
 // choose which duties/subduties to show across all jobs, fitting a rendered-line budget.
-//   units are "leaves": standalone duties, and individual subduties — each renders as one bullet.
+//   units are "leaves": standalone duties, and individual subduties — each renders as one bullet,
+//   which costs its estimated printed lines (a long summary wraps to 2).
 //   phase 1 (floor): every job keeps its top-DUTY_FLOOR top-level duties, so no job is bare.
 //   phase 2 (fill):  the best remaining leaves globally; choosing a subduty grabs its parent
-//                    header (+1 line), and a shown parent always carries >=1 subduty.
+//                    header (+its lines), and a shown parent always carries >=1 subduty.
 //   the floor is a guarantee — honored even if it pushes past the budget.
 //   returns the selected jobs plus a trace of every duty's fate for the rationale report.
-//   TODO: line-awareness — a long summary spills to 2 lines (estimate from char count).
 export function selectJobDuties(
     jobs: Job[],
     weights: DimensionScores,
@@ -145,10 +146,12 @@ export function selectJobDuties(
     const phaseOf = new Map<Duty, 'floor' | 'fill'>()  // which phase chose each leaf
     let used = 0
 
-    const parentCost = (parent: Duty | null) => (parent && !shownParents.has(parent) ? 1 : 0)
+    const dutyLines = (duty: Duty) => estimateLines(duty.summary.length + linkChars(duty.links))
+    const leafCost = (parent: Duty | null, leaf: Duty) =>
+        dutyLines(leaf) + (parent && !shownParents.has(parent) ? dutyLines(parent) : 0)
     const addLeaf = (parent: Duty | null, leaf: Duty, phase: 'floor' | 'fill') => {
         if (chosen.has(leaf)) return
-        used += 1 + parentCost(parent)
+        used += leafCost(parent, leaf)
         chosen.add(leaf)
         phaseOf.set(leaf, phase)
         if (parent) shownParents.add(parent)
@@ -176,7 +179,7 @@ export function selectJobDuties(
         .filter(({ leaf }) => !chosen.has(leaf))
         .sort((a, b) => cos(b.leaf) - cos(a.leaf))
         .forEach(({ parent, leaf }) => {
-            if (used + 1 + parentCost(parent) <= lineBudget) addLeaf(parent, leaf, 'fill')
+            if (used + leafCost(parent, leaf) <= lineBudget) addLeaf(parent, leaf, 'fill')
         })
 
     // rebuild: all jobs kept; standalone duties chosen, parents with >=1 chosen subduty; relevance order
