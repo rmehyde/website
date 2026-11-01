@@ -15,14 +15,21 @@ const maxedScores: DimensionScores = dimensionScoresSchema.parse(
     Object.fromEntries(Dimension.options.map((d) => [d, maxScore]))
 );
 
+// 1 = dabbled, 2 = solid, 3 = expert
+const senioritySchema = z.literal([1, 2, 3]);
+export type Seniority = z.infer<typeof senioritySchema>;
+
 // yaml entries can omit `scores` for now
 const profileSchema = z.object({
     name: z.string().min(1),
+    seniority: senioritySchema,
     scores: dimensionScoresSchema.optional().transform((s) => s ?? maxedScores),
 });
 
 export const profilesSchema = z.array(profileSchema);
 export type Profile = z.infer<typeof profileSchema>;
+// Selector entry: the custom profile isn't in the yaml and has no seniority.
+export type ProfileOption = Omit<Profile, "seniority"> & { seniority?: Seniority };
 
 export function parseProfiles(raw: unknown): Profile[] {
     return profilesSchema.parse(raw);

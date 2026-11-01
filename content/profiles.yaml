@@ -1,4 +1,5 @@
 - name: ML Platform Engineer
+  seniority: 3
   scores:
     libs-tooling: 4
     science: 2
@@ -11,6 +12,7 @@
     frontend: 1
     data-eng: 3
 - name: Applied ML Engineer
+  seniority: 3
   scores:
     libs-tooling: 2
     science: 3
@@ -23,6 +25,7 @@
     frontend: 1
     data-eng: 3
 - name: Tech Lead
+  seniority: 3
   scores:
     libs-tooling: 3
     science: 2
@@ -35,6 +38,7 @@
     frontend: 1
     data-eng: 2
 - name: Backend Engineer
+  seniority: 3
   scores:
     libs-tooling: 2
     science: 1
@@ -47,6 +51,7 @@
     frontend: 1
     data-eng: 4
 - name: Machine Learning Scientist
+  seniority: 2
   scores:
     libs-tooling: 2
     science: 5
@@ -59,6 +64,7 @@
     frontend: 1
     data-eng: 3
 - name: Sales Engineer
+  seniority: 2
   scores:
     libs-tooling: 2
     science: 1
@@ -71,6 +77,7 @@
     frontend: 2
     data-eng: 3
 - name: Devops Engineer
+  seniority: 1
   scores:
     libs-tooling: 3
     science: 1
@@ -83,6 +90,7 @@
     frontend: 1
     data-eng: 2
 - name: Data Engineer
+  seniority: 2
   scores:
     libs-tooling: 2
     science: 1
@@ -95,6 +103,7 @@
     frontend: 1
     data-eng: 5
 - name: Frontend Engineer
+  seniority: 1
   scores:
     libs-tooling: 1
     science: 1
@@ -107,6 +116,7 @@
     frontend: 5
     data-eng: 1
 - name: Data Analyst
+  seniority: 2
   scores:
     libs-tooling: 2
     science: 2
@@ -119,6 +129,7 @@
     frontend: 3
     data-eng: 2
 - name: Full-Stack Engineer
+  seniority: 2
   scores:
     libs-tooling: 3
     science: 1

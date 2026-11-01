@@ -1,7 +1,8 @@
 'use client'
 
 import {profiles as defaultProfiles} from "../lib/content/content-io";
-import {Profile, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
+import {ProfileOption, Seniority, CUSTOM_PROFILE_NAME} from "../lib/content/profiles";
+import SeniorityInsignia from "./seniority-insignia";
 import {
     Select,
     SelectContent, SelectGroup,
@@ -24,11 +25,22 @@ function articleFor(name: string | undefined): string {
     return /^[aeiou]/i.test(name) ? 'an' : 'a';
 }
 
+// Shared by the spin rows and the dropdown (whose selected item Radix mirrors into the trigger),
+// so the name lands at the same x when the intro hands off to the select.
+function ProfileLabel({ name, seniority }: { name: string; seniority?: Seniority }) {
+    return (
+        <span className="inline-flex items-center gap-[0.4em] whitespace-nowrap">
+            <SeniorityInsignia seniority={seniority}/>
+            {name}
+        </span>
+    );
+}
+
 interface ProfileSelectorProps {
     mode: Mode;
     selectedProfile: string;
     previewProfile?: string;  // Current displayed value during the intro spin
-    profiles?: Profile[];  // Optional, falls back to default profiles
+    profiles?: ProfileOption[];  // Optional, falls back to default profiles
     prefersReducedMotion?: boolean; // Skip animations if user prefers reduced motion
     onProfileChange: (profileName: string) => void;
     onPreviewChange: (profileName: string) => void;
@@ -239,14 +251,15 @@ export default function ProfileSelector({
     const displayProfile = (mode === 'intro' ? previewProfile : selectedProfile) ?? selectedProfile;
     const article = articleFor(displayProfile);
 
+    // Stays stacked until 25rem: lead text + w-64 trigger + page gutters overflow at the xs breakpoint
     return (
-        <div className={cn("flex flex-col items-start w-fit gap-x-3 gap-y-1 xs:flex-row xs:items-center", className)}>
+        <div className={cn("flex flex-col items-start w-fit gap-x-3 gap-y-1 [@media(min-width:25rem)]:flex-row [@media(min-width:25rem)]:items-center", className)}>
             {/* "Reese is a" is fixed; the "n" always reserves its width (visibility, not display) and only
                 shows when needed — so the wheel never shifts and just the "n" fades in/out. */}
             <div className={cn(scale.lead, "whitespace-nowrap")} aria-label={`Reese is ${article}`}>
                 Reese is a<span aria-hidden="true" className={article === 'an' ? '' : 'invisible'}>n</span>
             </div>
-            <div className="relative w-60 md:w-72">
+            <div className="relative w-64 md:w-72 lg:w-80">
                 <Select value={selectedProfile} onValueChange={handleSelectChange}>
                     <SelectTrigger 
                         className={cn(scale.feature, `w-full gap-1 py-0 overflow-hidden ${
@@ -275,7 +288,10 @@ export default function ProfileSelector({
                                     >
                                         {profileSequence.map((profileName, index) => (
                                             <div key={index} className="h-full leading-6 flex items-center flex-shrink-0 whitespace-nowrap">
-                                                {profileName}
+                                                <ProfileLabel
+                                                    name={profileName}
+                                                    seniority={profiles.find(p => p.name === profileName)?.seniority}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -289,7 +305,7 @@ export default function ProfileSelector({
                     <SelectContent>
                         {profiles.filter(p => p.name !== CUSTOM_PROFILE_NAME).map((p) => (
                             <SelectItem key={p.name} value={p.name} className={scale.feature}>
-                                {p.name}
+                                <ProfileLabel name={p.name} seniority={p.seniority}/>
                             </SelectItem>
                         ))}
                         <SelectSeparator />
@@ -301,7 +317,7 @@ export default function ProfileSelector({
                                 className={scale.feature}
                                 disabled
                             >
-                                {CUSTOM_PROFILE_NAME}
+                                <ProfileLabel name={CUSTOM_PROFILE_NAME}/>
                             </SelectItem>
                             <SelectLabel className="text-xs text-muted-foreground font-normal -mt-2 flex items-center gap-1">
                                 Customize graph

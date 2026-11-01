@@ -6,7 +6,7 @@ import React, {useState, useRef, useEffect} from "react";
 import PDFComponent, { warmEngines } from "@/app/ui/pdf";
 import ProfileSelector from "@/app/ui/profiles-wheel";
 import {profiles} from '@/app/lib/content/content-io';
-import {Profile, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
+import {ProfileOption, CUSTOM_PROFILE_NAME} from '@/app/lib/content/profiles';
 import {preserveContactParams} from '@/app/lib/contact/contact-store';
 
 type Mode = 'intro' | 'interactive';
@@ -166,7 +166,7 @@ export default function DynamicResume() {
     };
     
     // Create extended profiles list including custom option
-    const extendedProfiles: Profile[] = [
+    const extendedProfiles: ProfileOption[] = [
         ...profiles,
         { 
             name: CUSTOM_PROFILE_NAME, 

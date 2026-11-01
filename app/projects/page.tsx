@@ -2,7 +2,7 @@
 
 import ContentCards from "@/app/ui/cards/content-cards";
 import {Dimension, dimensionLabels, dimensionScoresSchema, maxScore} from '@/app/lib/content/scoring';
-import {RadialSelector} from "@/components/ui/radial";
+import {RadialSelector} from "@/app/ui/radial";
 import React, {useState} from "react";
 import {scale} from "@/app/lib/typography";
 
