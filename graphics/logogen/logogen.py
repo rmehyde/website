@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
 # Base stroke colour: black in light mode, white in dark mode (via a CSS media
-# query baked into the SVG). The cap keeps its own colour and is unaffected.
+# query baked into the SVG). The cap flips the same way, between the colours in
+# LogoParams.
 LIGHT_BASE = "#000000"
 DARK_BASE = "#ffffff"
 
@@ -17,6 +18,7 @@ class LogoParams(BaseModel):
     line_thickness: float = 20
     crossbar_pos: float = 0.5   # 0 = top, 1 = bottom (relative)
     cap_color: str = "#000000"
+    cap_color_dark: str = "#6c9cef"   # cap colour under prefers-color-scheme: dark
     roundedness: Roundedness | float = 20.
     cap_overlap: float | None = None   # cap extends this far down the verticals to
                                         # hide the colour-boundary seam; None -> t/4
@@ -45,7 +47,8 @@ def generate_logo_svg(
     padding: margin per side as a fraction of the larger dimension, when squaring
 
     The base strokes are emitted black with a `prefers-color-scheme: dark` media
-    query that flips them to white; the cap keeps its own colour.
+    query that flips them to white; the same query flips the cap from cap_color
+    to cap_color_dark.
     """
     # pull out params
     width = params.width
@@ -53,6 +56,7 @@ def generate_logo_svg(
     line_thickness = params.line_thickness
     crossbar_pos = params.crossbar_pos
     cap_color = params.cap_color
+    cap_color_dark = params.cap_color_dark
     roundedness = params.roundedness
     cap_overlap = params.cap_overlap
     square = params.square
@@ -223,7 +227,7 @@ def generate_logo_svg(
             f'L {TR_arc_start[0]} {TR_arc_start[1]} '
             f'A {r_tr} {r_tr} 0 0 1 {TR_arc_end[0]} {TR_arc_end[1]} '
             f'L {x_right} {right_nub_y}" '
-            f'stroke="{cap_color}" />'
+            f'class="cap" stroke="{cap_color}" />'
         )
     else:
         # sharp top-left corner: no arc and no left nub — that corner already
@@ -235,7 +239,7 @@ def generate_logo_svg(
             f'L {TR_arc_start[0]} {TR_arc_start[1]} '
             f'A {r_tr} {r_tr} 0 0 1 {TR_arc_end[0]} {TR_arc_end[1]} '
             f'L {x_right} {right_nub_y}" '
-            f'stroke="{cap_color}" />'
+            f'class="cap" stroke="{cap_color}" />'
         )
 
     # === assemble SVG (base first, cap drawn on top) ===
@@ -261,14 +265,13 @@ def generate_logo_svg(
     view_w = canvas if square else w
     view_h = canvas if square else h
 
-    # Base strokes: black in light mode (presentation attribute, so the logo
-    # still renders if a rasteriser ignores CSS) and white in dark mode (the
-    # media query overrides the attribute). The cap sets its own stroke and so
-    # is unaffected in both modes.
+    # Strokes carry their light-mode colours as presentation attributes, so the
+    # logo still renders if a rasteriser ignores CSS. In dark mode the media query
+    # overrides those attributes: white for the base, cap_color_dark for the cap.
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg"
      width="{view_w}" height="{view_h}" viewBox="0 0 {view_w} {view_h}">
   <style>
-    @media (prefers-color-scheme: dark) {{ .base {{ stroke: {DARK_BASE}; }} }}
+    @media (prefers-color-scheme: dark) {{ .base {{ stroke: {DARK_BASE}; }} .cap {{ stroke: {cap_color_dark}; }} }}
   </style>
   <g class="base" fill="none"
      stroke="{LIGHT_BASE}"

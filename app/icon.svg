@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      width="232.0" height="232.0" viewBox="0 0 232.0 232.0">
   <style>
-    @media (prefers-color-scheme: dark) { .base { stroke: #ffffff; } }
+    @media (prefers-color-scheme: dark) { .base { stroke: #ffffff; } .cap { stroke: #6c9cef; } }
   </style>
   <g class="base" fill="none"
      stroke="#000000"
@@ -11,6 +11,6 @@
     <path d="M 10.0 190.0 L 10.0 25.0" />
     <path d="M 115.0 190.0 L 115.0 126.0 A 20.0 20.0 0 0 0 95.0 106.0 L 10.0 106.0" />
     <path d="M 115.0 30.0 L 115.0 76.0 A 30.0 30.0 0 0 1 85.0 106.0 L 75.0 106.0" />
-    <path d="M 10.0 30.0 L 10.0 25.0 A 15.0 15.0 0 0 1 25.0 10.0 L 95.0 10.0 A 20.0 20.0 0 0 1 115.0 30.0 L 115.0 35.0" stroke="#245dc1" />
+    <path d="M 10.0 30.0 L 10.0 25.0 A 15.0 15.0 0 0 1 25.0 10.0 L 95.0 10.0 A 20.0 20.0 0 0 1 115.0 30.0 L 115.0 35.0" class="cap" stroke="#245dc1" />
   </g>
 </svg>
